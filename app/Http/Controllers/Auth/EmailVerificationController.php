@@ -26,6 +26,10 @@ class EmailVerificationController extends Controller
             return redirect()->route('home');
         }
 
+        if (! $user->requiresEmailVerificationCode()) {
+            return redirect()->route('home');
+        }
+
         return Inertia::render('VerifyEmail', [
             'email' => $user->email,
         ]);
@@ -36,7 +40,12 @@ class EmailVerificationController extends Controller
      */
     public function store(VerifyEmailCodeRequest $request, EmailVerificationCodeService $service): RedirectResponse
     {
-        $service->verify($request->user(), $request->validated('code'));
+        $user = $request->user();
+        if ($user === null || ! $user->requiresEmailVerificationCode()) {
+            return redirect()->route('home');
+        }
+
+        $service->verify($user, $request->validated('code'));
 
         return redirect()->route('home')->with('success', 'Correo verificado correctamente.');
     }
@@ -48,6 +57,10 @@ class EmailVerificationController extends Controller
     {
         $user = $request->user();
         if ($user === null || $user->hasVerifiedEmail()) {
+            return redirect()->route('home');
+        }
+
+        if (! $user->requiresEmailVerificationCode()) {
             return redirect()->route('home');
         }
 

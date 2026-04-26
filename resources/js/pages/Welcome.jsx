@@ -35,12 +35,20 @@ export default function Welcome() {
                             Cerrar sesión
                         </Link>
                     ) : (
-                        <Link
-                            href="/register"
-                            className="inline-flex items-center rounded-lg bg-[#1b1b18] dark:bg-[#EDEDEC] text-[#EDEDEC] dark:text-[#1b1b18] px-4 py-2 text-sm font-medium hover:opacity-90"
-                        >
-                            Registrarse
-                        </Link>
+                        <>
+                            <Link
+                                href="/login"
+                                className="inline-flex items-center rounded-lg border border-black/20 dark:border-white/20 bg-transparent px-4 py-2 text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC] hover:bg-black/[0.04] dark:hover:bg-white/10"
+                            >
+                                Iniciar sesión
+                            </Link>
+                            <Link
+                                href="/register"
+                                className="inline-flex items-center rounded-lg bg-[#1b1b18] dark:bg-[#EDEDEC] text-[#EDEDEC] dark:text-[#1b1b18] px-4 py-2 text-sm font-medium hover:opacity-90"
+                            >
+                                Registrarse
+                            </Link>
+                        </>
                     )}
                 </div>
             </div>

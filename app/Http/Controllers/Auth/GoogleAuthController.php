@@ -22,6 +22,8 @@ class GoogleAuthController extends Controller
 
     /**
      * Recibe el callback de Google y autentica o crea el usuario.
+     * Alta o acceso con Google marca el correo como verificado ({@see User::$email_verified_at});
+     * la verificación por código solo aplica al registro manual.
      */
     public function callback(): RedirectResponse
     {
@@ -58,10 +60,9 @@ class GoogleAuthController extends Controller
             $user->first_name = $firstName;
             $user->last_name = $lastName;
             $user->password = null;
-            $user->email_verified_at = now();
-        } else {
-            $user->email_verified_at = $user->email_verified_at ?? now();
         }
+
+        $user->email_verified_at ??= now();
 
         if ($user->email_verified_at !== null) {
             $user->email_verification_code_hash = null;

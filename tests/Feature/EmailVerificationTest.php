@@ -112,6 +112,30 @@ class EmailVerificationTest extends TestCase
         Mail::assertSent(VerificationCodeMail::class, 2);
     }
 
+    public function test_unverified_manual_user_visiting_home_is_redirected_to_verification(): void
+    {
+        $user = User::factory()->unverified()->create([
+            'password' => 'Password123!',
+            'google_id' => null,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('home'))
+            ->assertRedirect(route('verification.code.show'));
+    }
+
+    public function test_unverified_user_with_google_id_is_not_forced_to_code_verification(): void
+    {
+        $user = User::factory()->unverified()->create([
+            'password' => 'Password123!',
+            'google_id' => 'google-xyz',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('home'))
+            ->assertOk();
+    }
+
     public function test_guest_cannot_access_verify_routes(): void
     {
         $this->get(route('verification.code.show'))->assertRedirect(route('home'));

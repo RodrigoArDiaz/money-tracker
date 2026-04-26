@@ -51,6 +51,14 @@ class User extends Authenticatable implements OAuthenticatable
     }
 
     /**
+     * Solo el registro manual (sin Google) usa el flujo de verificación por código.
+     */
+    public function requiresEmailVerificationCode(): bool
+    {
+        return ! $this->hasVerifiedEmail() && $this->google_id === null;
+    }
+
+    /**
      * Nombre completo para vistas y APIs que esperan `name`.
      */
     protected function name(): Attribute

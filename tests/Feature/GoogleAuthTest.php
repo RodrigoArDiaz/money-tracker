@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
 use Tests\TestCase;
@@ -21,8 +22,10 @@ class GoogleAuthTest extends TestCase
         $response->assertRedirect();
     }
 
-    public function test_google_callback_creates_and_logs_in_user(): void
+    public function test_google_callback_creates_verified_user_and_redirects_home(): void
     {
+        Mail::fake();
+
         $socialUser = (new SocialiteUser)->map([
             'id' => 'google-test-id',
             'nickname' => null,
@@ -48,6 +51,74 @@ class GoogleAuthTest extends TestCase
         ]);
 
         $this->assertNotNull(User::where('email', 'luis@example.com')->first()->email_verified_at);
+        Mail::assertNothingSent();
+    }
+
+    public function test_google_callback_existing_verified_user_goes_home(): void
+    {
+        Mail::fake();
+
+        User::factory()->create([
+            'email' => 'verified-google@example.com',
+            'google_id' => null,
+        ]);
+
+        $socialUser = (new SocialiteUser)->map([
+            'id' => 'google-verified-id',
+            'nickname' => null,
+            'name' => 'Verificado',
+            'email' => 'verified-google@example.com',
+            'avatar' => null,
+        ])->setRaw([
+            'given_name' => 'Verificado',
+            'family_name' => 'User',
+        ]);
+
+        Socialite::fake('google', $socialUser);
+
+        $this->get(route('auth.google.callback'))
+            ->assertRedirect(route('home'));
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'verified-google@example.com',
+            'google_id' => 'google-verified-id',
+        ]);
+
+        $this->assertNotNull(User::where('email', 'verified-google@example.com')->first()->email_verified_at);
+        Mail::assertNothingSent();
+    }
+
+    public function test_google_callback_verifies_previously_manual_unverified_user(): void
+    {
+        Mail::fake();
+
+        User::factory()->unverified()->create([
+            'email' => 'pending@example.com',
+            'password' => 'Password123!',
+            'google_id' => null,
+        ]);
+
+        $socialUser = (new SocialiteUser)->map([
+            'id' => 'google-pending-id',
+            'nickname' => null,
+            'name' => 'Pending User',
+            'email' => 'pending@example.com',
+            'avatar' => null,
+        ])->setRaw([
+            'given_name' => 'Pending',
+            'family_name' => 'User',
+        ]);
+
+        Socialite::fake('google', $socialUser);
+
+        $this->get(route('auth.google.callback'))
+            ->assertRedirect(route('home'));
+
+        $user = User::where('email', 'pending@example.com')->first();
+        $this->assertNotNull($user);
+        $this->assertNotNull($user->email_verified_at);
+        $this->assertSame('google-pending-id', $user->google_id);
+        Mail::assertNothingSent();
     }
 
     public function test_google_callback_without_email_redirects_to_register(): void
