@@ -1,7 +1,6 @@
-import { Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 
 import { useTranslate } from '@/hooks/use-translate';
-import Alert from '../atoms/Alert';
 import AuthPanelDivider from '../atoms/AuthPanelDivider';
 import PasswordInput from '../atoms/PasswordInput';
 import PrimaryButton from '../atoms/PrimaryButton';
@@ -11,7 +10,6 @@ import GoogleOAuthLink from '../molecules/GoogleOAuthLink';
 
 export default function AuthLoginPanel({ canLoginWithGoogle }) {
     const { t } = useTranslate();
-    const { flash } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         email: '',
         password: '',
@@ -28,18 +26,6 @@ export default function AuthLoginPanel({ canLoginWithGoogle }) {
             <div className="rounded-2xl border border-border bg-card/90 p-8 text-card-foreground shadow-sm backdrop-blur-sm">
                 <h2 className="mb-1 text-center text-xl font-semibold">{t('auth.login_title')}</h2>
                 <p className="mb-6 text-center text-sm text-muted-foreground">{t('auth.login_subtitle')}</p>
-
-                {flash?.error && (
-                    <Alert variant="danger" className="mb-4">
-                        {flash.error}
-                    </Alert>
-                )}
-
-                {flash?.success && (
-                    <Alert variant="success" role="status" className="mb-4">
-                        {flash.success}
-                    </Alert>
-                )}
 
                 {canLoginWithGoogle && (
                     <GoogleOAuthLink href="/auth/google">{t('auth.continue_google')}</GoogleOAuthLink>

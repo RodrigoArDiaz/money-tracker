@@ -15,6 +15,7 @@ This project’s **declared** dependency ranges define the stack below. Prefer p
 | Backend framework | `laravel/framework` `^13.0` | HTTP, queues, ORM, config |
 | Full-stack bridge | `inertiajs/inertia-laravel` `^3.0` + `@inertiajs/react` `^3.x` | SPA without a separate API for page navigations |
 | Frontend | `react` / `react-dom` `^19.x` | UI components (JSX) |
+| Toasts / feedback | `sonner` | Mensajes transitorios al usuario (ver [user-feedback-sonner.mdc](mdc:.cursor/rules/user-feedback-sonner.mdc)) |
 | Build | `vite` `^8.x`, `laravel-vite-plugin` `^3.x`, `@vitejs/plugin-react` `^6.x` | Bundling and HMR |
 | CSS | `tailwindcss` `^4.x`, `@tailwindcss/vite` `^4.x` | Utility-first styles via Vite |
 | OAuth2 API | `laravel/passport` `^13.x` | OAuth2 server (clients, tokens) |

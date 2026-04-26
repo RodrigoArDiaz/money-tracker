@@ -1,5 +1,7 @@
 import '../css/app.css';
 
+import { AppToaster } from '@/components/AppToaster';
+import { FlashToasts } from '@/components/FlashToasts';
 import LocaleSync from '@/components/LocaleSync';
 import { ThemeProvider } from '@/components/theme-provider';
 import { createInertiaApp } from '@inertiajs/react';
@@ -18,21 +20,23 @@ createInertiaApp({
         const Page = pageModule.default;
 
         // No reasignar `pageModule.default`: en ESM es de solo lectura.
-        return {
-            ...pageModule,
-            default: function InertiaPageShell(props) {
-                return (
-                    <>
-                        <LocaleSync />
-                        <Page {...props} />
-                    </>
-                );
-            },
-        };
+                return {
+                    ...pageModule,
+                    default: function InertiaPageShell(props) {
+                        return (
+                            <>
+                                <LocaleSync />
+                                <Page {...props} />
+                            </>
+                        );
+                    },
+                };
     },
     setup({ el, App, props }) {
         createRoot(el).render(
             <ThemeProvider>
+                <AppToaster />
+                <FlashToasts />
                 <App {...props} />
             </ThemeProvider>,
         );

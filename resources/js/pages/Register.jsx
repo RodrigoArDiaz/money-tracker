@@ -1,9 +1,8 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 import LocaleSwitcher from '@/components/molecules/LocaleSwitcher';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
 import { useTranslate } from '@/hooks/use-translate';
-import Alert from '../components/atoms/Alert';
 import AuthPanelDivider from '../components/atoms/AuthPanelDivider';
 import PasswordInput from '../components/atoms/PasswordInput';
 import PrimaryButton from '../components/atoms/PrimaryButton';
@@ -13,7 +12,6 @@ import GoogleOAuthLink from '../components/molecules/GoogleOAuthLink';
 
 export default function Register({ canRegisterWithGoogle }) {
     const { t } = useTranslate();
-    const { flash } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         first_name: '',
         last_name: '',
@@ -38,12 +36,6 @@ export default function Register({ canRegisterWithGoogle }) {
                 <div className="rounded-2xl border border-border bg-card/90 p-8 text-card-foreground shadow-sm backdrop-blur-sm">
                     <h1 className="text-xl font-semibold mb-1 text-center">{t('register.title')}</h1>
                     <p className="text-sm text-muted-foreground text-center mb-6">{t('register.subtitle')}</p>
-
-                    {flash?.error && (
-                        <Alert variant="danger" className="mb-4">
-                            {flash.error}
-                        </Alert>
-                    )}
 
                     {canRegisterWithGoogle && (
                         <GoogleOAuthLink href="/auth/google">{t('auth.continue_google')}</GoogleOAuthLink>

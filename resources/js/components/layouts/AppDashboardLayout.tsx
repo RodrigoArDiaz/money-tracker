@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { LayoutDashboard, LogOut, Wallet } from 'lucide-react';
+import { LayoutDashboard, LogOut, Tags, Wallet } from 'lucide-react';
 import * as React from 'react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -75,11 +75,11 @@ function AppSidebar() {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
-            <SidebarContent>
+            <SidebarContent className="group-data-[collapsible=icon]:overflow-y-auto">
                 <SidebarGroup>
                     <SidebarGroupLabel>{t('layout.nav_section')}</SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <SidebarMenu>
+                        <SidebarMenu className="gap-1">
                             <SidebarMenuItem>
                                 <SidebarMenuButton
                                     asChild
@@ -89,6 +89,18 @@ function AppSidebar() {
                                     <Link href="/dashboard">
                                         <LayoutDashboard />
                                         <span>{t('dashboard.nav_home')}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={url.startsWith('/expense-categories')}
+                                    tooltip={t('expense_categories.nav_label')}
+                                >
+                                    <Link href="/expense-categories">
+                                        <Tags />
+                                        <span>{t('expense_categories.nav_label')}</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

@@ -1,9 +1,8 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 import LocaleSwitcher from '@/components/molecules/LocaleSwitcher';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
 import { useTranslate } from '@/hooks/use-translate';
-import Alert from '../components/atoms/Alert';
 import FieldError from '../components/atoms/FieldError';
 import Label from '../components/atoms/Label';
 import PrimaryButton from '../components/atoms/PrimaryButton';
@@ -11,7 +10,6 @@ import TextInput from '../components/atoms/TextInput';
 
 export default function VerifyEmail({ email }) {
     const { t } = useTranslate();
-    const { flash } = usePage().props;
     const verifyForm = useForm({ code: '' });
     const resendForm = useForm({});
 
@@ -39,12 +37,6 @@ export default function VerifyEmail({ email }) {
                         {t('verify_email.intro')}{' '}
                         <span className="font-medium text-foreground">{email}</span>.
                     </p>
-
-                    {flash?.success && (
-                        <Alert variant="success" role="status" className="mb-4">
-                            {flash.success}
-                        </Alert>
-                    )}
 
                     <form onSubmit={submitVerify} className="space-y-4">
                         <div>
