@@ -63,6 +63,14 @@ class GoogleAuthController extends Controller
             $user->email_verified_at = $user->email_verified_at ?? now();
         }
 
+        if ($user->email_verified_at !== null) {
+            $user->email_verification_code_hash = null;
+            $user->email_verification_code_expires_at = null;
+            $user->email_verification_sent_at = null;
+            $user->email_verification_failed_attempts = 0;
+            $user->email_verification_locked_until = null;
+        }
+
         $user->save();
 
         Auth::login($user, remember: true);

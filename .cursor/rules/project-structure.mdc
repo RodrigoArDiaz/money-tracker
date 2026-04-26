@@ -18,8 +18,10 @@ money-tracker/
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   └── Middleware/HandleInertiaRequests.php
+│   ├── Mail/             # Mailables (p. ej. verificación por correo)
 │   ├── Models/
-│   └── Providers/          # AppServiceProvider, TelescopeServiceProvider
+│   ├── Services/         # Casos de uso (p. ej. Auth/EmailVerificationCodeService)
+│   └── Providers/        # AppServiceProvider, TelescopeServiceProvider
 ├── bootstrap/              # app.php, providers.php, cache/
 ├── config/                 # app, auth, database, passport, permission, sanctum, telescope, …
 ├── database/

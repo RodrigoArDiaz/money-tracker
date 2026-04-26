@@ -1,9 +1,20 @@
 services:
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      # Puertos por defecto 1026/8026 para no chocar con otro Mailpit en 1025/8025 del host
+      - "${MAILPIT_SMTP_PORT:-1026}:1025"
+      - "${MAILPIT_UI_PORT:-8026}:8025"
+
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: money-tracker-app
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    depends_on:
+      - mailpit
     ports:
       - "${APP_PORT:-8000}:8000"
       - "${VITE_PORT:-5173}:5173"
@@ -13,3 +24,8 @@ services:
     environment:
       APP_URL: "${APP_URL:-http://localhost:8000}"
       INERTIA_SSR_ENABLED: "false"
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+      MAIL_USERNAME: "${MAIL_USERNAME:-}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD:-}"

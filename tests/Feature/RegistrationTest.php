@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Mail\VerificationCodeMail;
+use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -19,6 +22,8 @@ class RegistrationTest extends TestCase
 
     public function test_user_can_register_with_password(): void
     {
+        Mail::fake();
+
         $response = $this->post(route('register'), [
             'first_name' => 'Ana',
             'last_name' => 'García',
@@ -27,13 +32,18 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'Password123!',
         ]);
 
-        $response->assertRedirect(route('home'));
+        $response->assertRedirect(route('verification.code.show'));
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', [
             'email' => 'ana@example.com',
             'first_name' => 'Ana',
             'last_name' => 'García',
         ]);
+
+        $user = User::where('email', 'ana@example.com')->first();
+        $this->assertNotNull($user);
+        $this->assertNull($user->email_verified_at);
+        Mail::assertSent(VerificationCodeMail::class);
     }
 
     public function test_registration_requires_valid_email(): void

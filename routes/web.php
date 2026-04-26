@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -11,6 +12,16 @@ Route::get('/', function () {
 })->name('home');
 
 Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify', [EmailVerificationController::class, 'show'])->name('verification.code.show');
+    Route::post('/email/verify', [EmailVerificationController::class, 'store'])
+        ->middleware('throttle:12,1')
+        ->name('verification.code.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
+        ->middleware('throttle:6,1')
+        ->name('verification.code.resend');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
