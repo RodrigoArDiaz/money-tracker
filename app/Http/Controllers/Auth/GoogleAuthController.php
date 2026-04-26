@@ -77,7 +77,7 @@ class GoogleAuthController extends Controller
         Auth::login($user, remember: true);
 
         return redirect()
-            ->route('home')
+            ->route('dashboard')
             ->with('success', 'Sesión iniciada con Google.');
     }
 }

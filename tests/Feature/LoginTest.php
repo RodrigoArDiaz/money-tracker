@@ -35,7 +35,7 @@ class LoginTest extends TestCase
             'password' => 'Password123!',
         ]);
 
-        $response->assertRedirect(route('home'));
+        $response->assertRedirect(route('dashboard'));
         $this->assertAuthenticated();
     }
 
@@ -67,7 +67,7 @@ class LoginTest extends TestCase
         $this->post(route('login'), [
             'email' => 'hybrid@example.com',
             'password' => 'Password123!',
-        ])->assertRedirect(route('home'));
+        ])->assertRedirect(route('dashboard'));
 
         $this->assertAuthenticated();
     }
@@ -110,7 +110,7 @@ class LoginTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('login'))
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('dashboard'));
     }
 
     public function test_authenticated_unverified_manual_user_visiting_login_is_redirected_to_verification(): void
@@ -134,6 +134,6 @@ class LoginTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('login'))
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('dashboard'));
     }
 }

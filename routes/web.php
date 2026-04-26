@@ -9,11 +9,19 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
     return Inertia::render('Welcome', [
         'canLoginWithGoogle' => filled(config('services.google.client_id'))
             && filled(config('services.google.client_secret')),
     ]);
 })->name('home');
+
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware('auth')->name('dashboard');
 
 Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
 

@@ -41,7 +41,7 @@ class GoogleAuthTest extends TestCase
 
         $response = $this->get(route('auth.google.callback'));
 
-        $response->assertRedirect(route('home'));
+        $response->assertRedirect(route('dashboard'));
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', [
             'email' => 'luis@example.com',
@@ -77,7 +77,7 @@ class GoogleAuthTest extends TestCase
         Socialite::fake('google', $socialUser);
 
         $this->get(route('auth.google.callback'))
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('dashboard'));
 
         $this->assertDatabaseHas('users', [
             'email' => 'verified-google@example.com',
@@ -112,7 +112,7 @@ class GoogleAuthTest extends TestCase
         Socialite::fake('google', $socialUser);
 
         $this->get(route('auth.google.callback'))
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('dashboard'));
 
         $user = User::where('email', 'pending@example.com')->first();
         $this->assertNotNull($user);

@@ -5,9 +5,14 @@ import { createRoot } from 'react-dom/client';
 
 createInertiaApp({
     resolve: (name) => {
-        const pages = import.meta.glob('./pages/**/*.jsx');
+        const jsxPages = import.meta.glob('./pages/**/*.jsx');
+        const tsxPages = import.meta.glob('./pages/**/*.tsx');
+        const load = jsxPages[`./pages/${name}.jsx`] ?? tsxPages[`./pages/${name}.tsx`];
+        if (!load) {
+            throw new Error(`Página no encontrada: ${name}`);
+        }
 
-        return pages[`./pages/${name}.jsx`]();
+        return load();
     },
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />);

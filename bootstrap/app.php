@@ -22,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return route('verification.code.show');
             }
 
-            return route('home');
+            return route('dashboard');
         });
 
         $middleware->web(append: [

@@ -44,6 +44,6 @@ class LoginController extends Controller
                 ->with('success', 'Verificá tu correo con el código que te enviamos para continuar.');
         }
 
-        return redirect()->intended(route('home'));
+        return redirect()->intended(route('dashboard'));
     }
 }
