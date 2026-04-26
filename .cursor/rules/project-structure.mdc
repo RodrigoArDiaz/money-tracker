@@ -1,0 +1,70 @@
+---
+description: Money-tracker repo layout (Laravel + Inertia) and key files
+alwaysApply: true
+---
+
+# Project structure (Money Tracker)
+
+**Laravel** app with **Inertia + React (JSX)** and **Vite**. OAuth API via **Laravel Passport**; permissions **Spatie**; debugging **Telescope** (and **Debugbar** in development).
+
+## Directory tree (summary)
+
+Excludes `vendor/`, `node_modules/`, `.git/` (dependencies and version control).
+
+```
+money-tracker/
+├── .cursor/rules/          # Project Cursor rules (*.mdc)
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   └── Middleware/HandleInertiaRequests.php
+│   ├── Models/
+│   └── Providers/          # AppServiceProvider, TelescopeServiceProvider
+├── bootstrap/              # app.php, providers.php, cache/
+├── config/                 # app, auth, database, passport, permission, sanctum, telescope, …
+├── database/
+│   ├── factories/
+│   ├── migrations/         # users, cache, jobs; oauth (Passport); permission (Spatie); telescope
+│   ├── seeders/
+│   └── database.sqlite     # Local SQLite (environment-dependent)
+├── docker/                 # entrypoint.sh
+├── public/                 # index.php, build/ (compiled Vite assets)
+├── resources/
+│   ├── css/app.css
+│   ├── js/
+│   │   ├── app.jsx         # Inertia / Vite bootstrap
+│   │   └── pages/          # React pages (e.g. Welcome.jsx)
+│   └── views/              # app.blade.php (Inertia shell), welcome.blade.php
+├── routes/
+│   ├── web.php
+│   └── console.php
+├── storage/                # logs, framework, oauth-*.key (do not commit secrets)
+├── tests/                  # Feature/, Unit/, TestCase.php
+├── artisan
+├── composer.json / composer.lock
+├── package.json / package-lock.json / vite.config.js
+├── phpunit.xml
+├── docker-compose.yml
+├── Dockerfile
+├── .env / .env.example
+└── README.md
+```
+
+## Important files and folders
+
+| Area | Where to look first |
+|------|---------------------|
+| HTTP entry | [routes/web.php](mdc:routes/web.php) |
+| Inertia SPA | [resources/js/app.jsx](mdc:resources/js/app.jsx), [resources/views/app.blade.php](mdc:resources/views/app.blade.php), [app/Http/Middleware/HandleInertiaRequests.php](mdc:app/Http/Middleware/HandleInertiaRequests.php) |
+| Front build | [vite.config.js](mdc:vite.config.js), output in `public/build/` |
+| Models | [app/Models/](mdc:app/Models/) |
+| API auth | [config/passport.php](mdc:config/passport.php), [config/auth.php](mdc:config/auth.php) |
+| Roles/permissions | [config/permission.php](mdc:config/permission.php) |
+| Observability | [config/telescope.php](mdc:config/telescope.php), [app/Providers/TelescopeServiceProvider.php](mdc:app/Providers/TelescopeServiceProvider.php) |
+| Container | [docker-compose.yml](mdc:docker-compose.yml), [Dockerfile](mdc:Dockerfile), [docker/entrypoint.sh](mdc:docker/entrypoint.sh) |
+| Agent rules | [.cursor/rules/](mdc:.cursor/rules/) |
+
+## Notes
+
+- Do not document or commit secrets; use only [`.env.example`](mdc:.env.example) as the variable reference.
+- `storage/oauth-*.key` and `.env` are sensitive to the local environment.

@@ -1,0 +1,149 @@
+---
+description: Application stack (Laravel 13, React 19, Vite 8, Tailwind 4) and version-specific practices
+alwaysApply: true
+---
+
+# Application stack and practices
+
+This project’s **declared** dependency ranges define the stack below. Prefer patterns documented for these major versions; when in doubt, check the official upgrade guides before adopting APIs from older tutorials.
+
+## Stack overview
+
+| Layer | Packages / runtime | Role |
+|-------|---------------------|------|
+| Runtime | PHP `^8.4` | Server language |
+| Backend framework | `laravel/framework` `^13.0` | HTTP, queues, ORM, config |
+| Full-stack bridge | `inertiajs/inertia-laravel` `^3.0` + `@inertiajs/react` `^3.x` | SPA without a separate API for page navigations |
+| Frontend | `react` / `react-dom` `^19.x` | UI components (JSX) |
+| Build | `vite` `^8.x`, `laravel-vite-plugin` `^3.x`, `@vitejs/plugin-react` `^6.x` | Bundling and HMR |
+| CSS | `tailwindcss` `^4.x`, `@tailwindcss/vite` `^4.x` | Utility-first styles via Vite |
+| OAuth2 API | `laravel/passport` `^13.x` | OAuth2 server (clients, tokens) |
+| First-party API / SPA auth | `laravel/sanctum` `^4.x` | SPA session auth, simple API tokens |
+| Social login | `laravel/socialite` `^5.x` | OAuth with external providers |
+| Authorization (roles/permissions) | `spatie/laravel-permission` `^7.x` | RBAC in PHP |
+| Dev / quality | `laravel/telescope` `^5.x`, `barryvdh/laravel-debugbar` `^4.x`, `laravel/pint` `^1.x`, `phpunit/phpunit` `^12.x`, `laravel/pail` `^1.x` | Debugging, style, tests, log tailing |
+
+Related layout: [project-structure.mdc](mdc:.cursor/rules/project-structure.mdc).
+
+---
+
+## PHP 8.4 and Laravel 13
+
+**Do**
+
+- Use **typed properties**, **return types**, and **`readonly`** where values should not change after construction.
+- Validate HTTP input with **Form Requests**; keep controllers thin.
+- Prefer **Eloquent** and **query builder** over raw SQL unless there is a measured need.
+- Use **`php artisan test`** (PHPUnit 12) and **attributes** (`#[Test]`, etc.) for new tests.
+- Run **`./vendor/bin/pint`** (or `composer` script if added) before pushing PHP style changes.
+- Offload slow work to **queues**; configure workers in production.
+
+**Avoid**
+
+- Untyped public APIs on new code, `mixed` without reason, or business logic duplicated across controllers and jobs without a clear boundary.
+
+---
+
+## Passport (`^13`) vs Sanctum (`^4`)
+
+**Do**
+
+- Use **Sanctum** for the **first-party** Inertia/React SPA (cookie/session or token patterns Sanctum supports for your setup).
+- Use **Passport** for **OAuth2** clients (mobile apps, third-party integrations, machine-to-machine) that need the full OAuth2 flows Passport provides.
+- Keep **encryption keys** for Passport out of version control; rotate using Laravel/Passport documented commands.
+
+**Avoid**
+
+- Using Passport and Sanctum interchangeably without a clear split; document which routes use which guard/driver.
+
+---
+
+## Spatie Laravel Permission (`^7`)
+
+**Do**
+
+- Assign **roles/permissions** in seeders or admin flows; cache config in production (`permission.php`).
+- Check abilities with gates/policies or package helpers **on the server**; never rely on hiding UI alone for security.
+
+**Avoid**
+
+- Duplicating permission strings across the codebase without a single source of truth (constants or enums if helpful).
+
+---
+
+## Inertia (Laravel 3 + React 3)
+
+**Do**
+
+- Share global props (user, flash, locale) in [app/Http/Middleware/HandleInertiaRequests.php](mdc:app/Http/Middleware/HandleInertiaRequests.php).
+- Use **`router`**, **`Link`**, **`useForm`**, **`usePage`** from `@inertiajs/react` for navigation and forms.
+- Return **`Inertia::render()`** from controllers for page responses; reserve JSON APIs for non-Inertia consumers.
+
+**Avoid**
+
+- Mixing full client-side routing for “pages” that should be Inertia visits (breaks back button and shared props unless intentional).
+
+---
+
+## React 19
+
+**Do**
+
+- **Functional components** and hooks only for new UI.
+- Treat **`ref`** as a normal prop where the API allows (React 19); prefer patterns from current React docs.
+- Keep components **pure** where possible; lift state deliberately.
+
+**Avoid**
+
+- Legacy class components or deprecated lifecycle patterns on new code.
+
+---
+
+## Vite 8 and Laravel Vite plugin
+
+**Do**
+
+- Use **`@vite(['resources/css/app.css', 'resources/js/app.jsx'])`** (with `@viteReactRefresh` where needed) in the Blade root used by Inertia ([resources/views/app.blade.php](mdc:resources/views/app.blade.php)).
+- Run **`npm run dev`** during development for HMR; **`npm run build`** for production assets in `public/build/`.
+- Align **`laravel-vite-plugin`** and **`vite`** major versions with the versions in [package.json](mdc:package.json).
+
+**Avoid**
+
+- Hard-coding hashed asset filenames; always go through Vite’s manifest.
+
+---
+
+## Tailwind CSS 4
+
+**Do**
+
+- Use the **Vite plugin** (`@tailwindcss/vite`) and a CSS entry that imports Tailwind per v4 docs (e.g. `@import "tailwindcss";` in [resources/css/app.css](mdc:resources/css/app.css)).
+- Prefer **utility classes** and small component extractions consistent with the rest of the repo.
+
+**Avoid**
+
+- Tailwind v3-only config patterns that conflict with v4’s CSS-first setup unless you have verified they still apply.
+
+---
+
+## Development tooling
+
+| Tool | Practice |
+|------|----------|
+| Telescope | Enable in **non-production** or restricted environments; avoid leaking sensitive data. |
+| Debugbar | Dev-only; do not depend on it in application logic. |
+| Pail | Use for **`composer dev`** log streaming; not a substitute for proper logging in production. |
+| PHPUnit 12 | Prefer **fast unit tests** for pure PHP; **Feature tests** for HTTP and database. |
+
+---
+
+## Dependency hygiene
+
+**Do**
+
+- Change versions via **`composer.json`** / **[package.json](mdc:package.json)** and lockfiles; run **`composer update`** / **`npm update`** deliberately, not ad hoc edits to lockfiles.
+- After PHP or Laravel upgrades, re-read **official upgrade notes** and run the full test suite.
+
+**Avoid**
+
+- Adding overlapping packages for the same concern (e.g. multiple competing HTTP clients) without justification.
