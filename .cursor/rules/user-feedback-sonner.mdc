@@ -1,0 +1,30 @@
+---
+description: Retroalimentación al usuario con toasts Sonner (no Alert por flash)
+globs:
+  - resources/js/**/*
+  - app/Http/**/*
+alwaysApply: false
+---
+
+# Feedback al usuario: Sonner
+
+## Obligatorio
+
+- Para mensajes **transitorios** de éxito, error o aviso (incluidos los que vienen de **sesión flash** `success` / `error` en Inertia), usar **Sonner** (`toast` desde `sonner`), no bloques `Alert` embebidos en la página por ese motivo.
+- El **`Toaster`** global y el listener de flash están en la raíz de la SPA: [resources/js/components/AppToaster.tsx](mdc:resources/js/components/AppToaster.tsx) y [resources/js/components/FlashToasts.tsx](mdc:resources/js/components/FlashToasts.tsx), montados en [resources/js/app.jsx](mdc:resources/js/app.jsx) dentro de `ThemeProvider`.
+
+## Backend (Laravel)
+
+- Seguir usando `redirect()->with('success', …)` o `->with('error', …)` (o `session()->flash` equivalente). Eso se expone al cliente en **`props.flash`** vía [HandleInertiaRequests.php](mdc:app/Http/Middleware/HandleInertiaRequests.php). **FlashToasts** escucha los eventos `navigate` y `success` de Inertia y lee `props.flash` (y opcionalmente `page.flash` si en el futuro se usa `Inertia::flash()`). El evento global `flash` de Inertia por sí solo **no** incluye ese `with()` de Laravel.
+
+## Frontend adicional (sin recarga o copy solo cliente)
+
+- Usar `toast.success()`, `toast.error()` o `toast.message()` importando desde `sonner`. Mantener textos traducidos cuando sea copy de producto (p. ej. `t('...')`).
+
+## Excepciones
+
+- **Alert** u otros componentes persistentes en el flujo siguen siendo válidos cuando el mensaje es **parte del diseño de la pantalla** (p. ej. aviso legal fijo, estado vacío explicativo), no un feedback puntual de una acción recién realizada.
+
+## Dependencia
+
+- `sonner` está declarado en [package.json](mdc:package.json); el tema del toast sigue el **tema resuelto** (`light` / `dark`) vía [theme-provider](mdc:resources/js/components/theme-provider.tsx).

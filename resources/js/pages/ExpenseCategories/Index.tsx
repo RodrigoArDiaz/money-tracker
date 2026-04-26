@@ -1,7 +1,6 @@
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import * as React from 'react';
 
-import Alert from '@/components/atoms/Alert';
 import FieldError from '@/components/atoms/FieldError';
 import Label from '@/components/atoms/Label';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
@@ -40,7 +39,6 @@ export default function Index({
     expenseCategoryIconNames: string[];
 }) {
     const { t } = useTranslate();
-    const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [editingCategory, setEditingCategory] = React.useState<CategoryRow | null>(null);
     const [deletingCategory, setDeletingCategory] = React.useState<CategoryRow | null>(null);
     const [deleteSubmitting, setDeleteSubmitting] = React.useState(false);
@@ -125,16 +123,6 @@ export default function Index({
     return (
         <AppDashboardLayout title={t('expense_categories.title')}>
             <Head title={t('expense_categories.head_title_index')} />
-            {flash?.success ? (
-                <Alert variant="success" role="status">
-                    {flash.success}
-                </Alert>
-            ) : null}
-            {flash?.error ? (
-                <Alert variant="danger" role="alert">
-                    {flash.error}
-                </Alert>
-            ) : null}
             <p className="max-w-2xl text-sm text-muted-foreground leading-relaxed">
                 {t('expense_categories.index_description')}
             </p>
