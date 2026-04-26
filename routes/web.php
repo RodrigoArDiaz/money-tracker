@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,6 +25,8 @@ Route::get('/dashboard', function () {
 })->middleware('auth')->name('dashboard');
 
 Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
+
+Route::post('/locale', LocaleController::class)->middleware('throttle:30,1')->name('locale.update');
 
 Route::middleware('auth')->group(function () {
     Route::get('/email/verify', [EmailVerificationController::class, 'show'])->name('verification.code.show');

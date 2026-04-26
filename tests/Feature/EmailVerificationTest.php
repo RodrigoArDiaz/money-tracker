@@ -219,7 +219,7 @@ class EmailVerificationTest extends TestCase
         $response->assertSessionHasErrors('code');
         $messages = session('errors')->get('code');
         $this->assertIsArray($messages);
-        $this->assertStringContainsString('Demasiados intentos', $messages[0]);
+        $this->assertStringContainsString(__('frontend.verification_service.code_locked'), $messages[0]);
     }
 
     public function test_verify_redirects_home_when_already_verified(): void

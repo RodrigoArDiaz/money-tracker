@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Models\User;
 use App\Services\Auth\EmailVerificationCodeService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -29,7 +30,9 @@ class RegisteredUserController extends Controller
      */
     public function store(RegisterUserRequest $request, EmailVerificationCodeService $verification): RedirectResponse
     {
-        $user = User::create($request->validated());
+        $user = User::create(array_merge($request->validated(), [
+            'preferred_locale' => $this->resolveInitialLocale($request),
+        ]));
 
         Auth::login($user);
 
@@ -37,6 +40,20 @@ class RegisteredUserController extends Controller
 
         return redirect()
             ->route('verification.code.show')
-            ->with('success', 'Te enviamos un código de 6 dígitos a tu correo. Ingresalo para verificar tu cuenta.');
+            ->with('success', __('frontend.flash.register_success'));
+    }
+
+    /**
+     * @return non-falsy-string
+     */
+    private function resolveInitialLocale(Request $request): string
+    {
+        $supported = config('locales.supported', ['es', 'en']);
+        $sessionLocale = $request->session()->get('locale');
+        if (is_string($sessionLocale) && in_array($sessionLocale, $supported, true)) {
+            return $sessionLocale;
+        }
+
+        return config('locales.default', config('app.locale'));
     }
 }

@@ -1,0 +1,112 @@
+<?php
+
+return [
+    'locale' => [
+        'switch_aria' => 'Cambiar idioma',
+        'menu_label' => 'Idioma',
+        'es' => 'Español',
+        'en' => 'Inglés',
+    ],
+
+    'theme' => [
+        'switch_aria' => 'Elegir tema claro u oscuro',
+        'appearance' => 'Apariencia',
+        'light' => 'Claro',
+        'dark' => 'Oscuro',
+        'system' => 'Sistema',
+    ],
+
+    'welcome' => [
+        'head_title' => 'Money Tracker — Iniciar sesión',
+        'hero_text' => 'Gestioná tus gastos diarios con claridad: registrá cada movimiento, revisá el resumen y mantené el rumbo de tus finanzas.',
+    ],
+
+    'auth' => [
+        'login_title' => 'Iniciar sesión',
+        'login_subtitle' => 'Entrá con Google o con tu correo y contraseña.',
+        'email' => 'Correo electrónico',
+        'password' => 'Contraseña',
+        'remember' => 'Recordarme en este dispositivo',
+        'signing_in' => 'Entrando…',
+        'sign_in' => 'Entrar',
+        'no_account' => '¿No tenés cuenta?',
+        'register_link' => 'Registrarse',
+        'divider_email' => 'o con email',
+        'continue_google' => 'Continuar con Google',
+        'invalid_credentials' => 'Credenciales incorrectas.',
+    ],
+
+    'register' => [
+        'head_title' => 'Registro',
+        'title' => 'Crear cuenta',
+        'subtitle' => 'Regístrate con Google o con tu correo.',
+        'first_name' => 'Nombre',
+        'last_name' => 'Apellido',
+        'password_confirm' => 'Confirmar contraseña',
+        'password_hint' => 'Mínimo 12 caracteres, con mayúsculas y minúsculas, al menos un número y un símbolo.',
+        'show_password' => 'Mostrar contraseña',
+        'hide_password' => 'Ocultar contraseña',
+        'show_password_confirm' => 'Mostrar confirmación de contraseña',
+        'hide_password_confirm' => 'Ocultar confirmación de contraseña',
+        'submitting' => 'Creando cuenta…',
+        'submit' => 'Registrarse',
+        'has_account' => '¿Ya tenés cuenta?',
+        'sign_in_link' => 'Iniciar sesión',
+        'home_link' => 'Inicio',
+    ],
+
+    'verify_email' => [
+        'head_title' => 'Verificar correo',
+        'title' => 'Verificá tu correo',
+        'intro' => 'Enviamos un código de 6 dígitos a',
+        'code_label' => 'Código',
+        'verifying' => 'Verificando…',
+        'verify' => 'Verificar',
+        'sending' => 'Enviando…',
+        'resend' => 'Reenviar código',
+        'back_home' => 'Volver al inicio',
+    ],
+
+    'dashboard' => [
+        'head_title' => 'Panel — Money Tracker',
+        'nav_home' => 'Inicio',
+        'header_default' => 'Panel',
+        'title' => 'Inicio',
+        'welcome_heading' => 'Bienvenido',
+        'welcome_text' => 'Este es tu panel principal. Desde aquí podrás ver el resumen de tus finanzas cuando añadamos las siguientes funciones.',
+    ],
+
+    'layout' => [
+        'panel' => 'Panel',
+        'nav_section' => 'Navegación',
+        'home_tooltip' => 'Inicio',
+        'footer_hint' => 'Más secciones próximamente.',
+        'sign_out' => 'Cerrar sesión',
+    ],
+
+    'flash' => [
+        'email_verified' => 'Correo verificado correctamente.',
+        'verification_code_resent' => 'Te enviamos un código nuevo.',
+        'google_session_expired' => 'La sesión de Google expiró o fue rechazada. Intentá de nuevo.',
+        'google_no_email' => 'Google no devolvió un correo. No se puede crear la cuenta.',
+        'google_login_success' => 'Sesión iniciada con Google.',
+        'verify_email_prompt' => 'Verificá tu correo con el código que te enviamos para continuar.',
+        'register_success' => 'Te enviamos un código de 6 dígitos a tu correo. Ingresalo para verificar tu cuenta.',
+    ],
+
+    'verification_service' => [
+        'resend_wait' => 'Debés esperar un minuto antes de solicitar otro código.',
+        'code_locked' => 'Demasiados intentos fallidos. Volvé a intentar más tarde o solicitá un código nuevo.',
+        'code_invalid' => 'Código inválido o expirado. Solicitá uno nuevo.',
+    ],
+
+    'validation' => [
+        'attributes' => [
+            'first_name' => 'nombre',
+            'last_name' => 'apellido',
+            'email' => 'correo electrónico',
+            'password' => 'contraseña',
+            'code' => 'código',
+        ],
+    ],
+];

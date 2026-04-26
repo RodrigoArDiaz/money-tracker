@@ -32,14 +32,14 @@ class GoogleAuthController extends Controller
         } catch (InvalidStateException|Throwable) {
             return redirect()
                 ->route('register')
-                ->with('error', 'La sesión de Google expiró o fue rechazada. Intenta de nuevo.');
+                ->with('error', __('frontend.flash.google_session_expired'));
         }
 
         $email = $socialUser->getEmail();
         if (! $email) {
             return redirect()
                 ->route('register')
-                ->with('error', 'Google no devolvió un correo. No se puede crear la cuenta.');
+                ->with('error', __('frontend.flash.google_no_email'));
         }
 
         $raw = $socialUser->user ?? [];
@@ -78,6 +78,6 @@ class GoogleAuthController extends Controller
 
         return redirect()
             ->route('dashboard')
-            ->with('success', 'Sesión iniciada con Google.');
+            ->with('success', __('frontend.flash.google_login_success'));
     }
 }

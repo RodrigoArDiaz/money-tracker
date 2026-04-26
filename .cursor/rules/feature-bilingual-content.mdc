@@ -1,0 +1,41 @@
+---
+description: Cada feature debe exponer al usuario textos en todos los idiomas soportados (es/en)
+globs:
+alwaysApply: true
+---
+
+# Contenido visible bilingüe en cada feature
+
+Los idiomas soportados están en [config/locales.php](mdc:config/locales.php) (hoy **es** y **en**). Al implementar o ampliar una **feature**, todo lo que el usuario **pueda leer** en la interfaz o en mensajes de la aplicación debe existir **en cada idioma**, salvo las excepciones indicadas abajo.
+
+## Definición de “información que puede ver el usuario”
+
+Incluye, entre otros:
+
+- Textos en **React** (páginas, layouts, componentes, `aria-label`, placeholders si son copy de producto).
+- **Mensajes flash**, errores de validación y strings devueltos desde **PHP** que se muestran en Inertia o en sesión.
+- **Asuntos o cuerpos de correo** orientados al usuario (si la feature envía mail).
+- **Títulos** de página (`Head title`) y mensajes de confirmación o vacío.
+
+## Obligación de paridad de idiomas
+
+1. **Misma estructura de claves** en [lang/en/frontend.php](mdc:lang/en/frontend.php) y [lang/es/frontend.php](mdc:lang/es/frontend.php). Toda clave nueva en uno debe existir en el otro con la traducción adecuada.
+2. En el **frontend**, usar **`t('grupo.clave')`** vía [use-translate.ts](mdc:resources/js/hooks/use-translate.ts); no dejar cadenas de producto hardcodeadas en un solo idioma.
+3. En el **backend**, usar **`__('frontend....')`** (o el grupo acordado bajo `lang/*/`) para flashes, mensajes de negocio y textos de error mostrados al usuario.
+4. Si se añaden mensajes de **validación** personalizados o atributos, deben respetar el locale activo (p. ej. entradas en ambos archivos de idioma o claves `frontend` compartidas).
+
+## Excepciones (no exigen traducción entre idiomas)
+
+- **Nombre de marca** acordado como literal (p. ej. “Money Tracker”) cuando el producto defina que no cambia entre locales.
+- **Datos procedentes de base de datos** o de terceros (nombres de comercio, notas del usuario, importes ya formateados según reglas de negocio).
+- Identificadores técnicos, logs solo para desarrolladores, y claves internas no mostradas al usuario.
+
+## Criterio de cierre de una feature
+
+Antes de dar por terminada la feature, revisar:
+
+- [ ] No hay strings nuevos de UI en un solo idioma sin entrada equivalente en **en** y **es**.
+- [ ] Los archivos `lang/en/frontend.php` y `lang/es/frontend.php` están alineados en claves.
+- [ ] Cambio de idioma (**LocaleSwitcher**) muestra la feature correctamente en ambos locales.
+
+Detalle de implementación (Inertia, `POST /locale`, `LocaleSync`): [frontend-i18n.mdc](mdc:.cursor/rules/frontend-i18n.mdc).

@@ -31,7 +31,7 @@ class VerifyEmailCodeRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'code' => 'código',
+            'code' => __('frontend.validation.attributes.code'),
         ];
     }
 }

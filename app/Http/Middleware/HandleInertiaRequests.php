@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Lang;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -37,6 +38,13 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+            'locale' => fn () => app()->getLocale(),
+            'available_locales' => fn () => config('locales.supported', ['es', 'en']),
+            'translations' => function () {
+                $lines = Lang::get('frontend', [], app()->getLocale());
+
+                return is_array($lines) ? $lines : [];
+            },
             'auth' => [
                 'user' => $request->user(),
             ],

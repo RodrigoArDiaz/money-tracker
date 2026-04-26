@@ -2,6 +2,7 @@ import { Monitor, Moon, Sun } from 'lucide-react';
 import * as React from 'react';
 
 import { type Theme, useTheme } from '@/components/theme-provider';
+import { useTranslate } from '@/hooks/use-translate';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -19,6 +20,7 @@ type ThemeMenuProps = {
 
 export default function ThemeMenu({ align = 'end' }: ThemeMenuProps): React.ReactElement {
     const { theme, setTheme, resolvedTheme } = useTheme();
+    const { t } = useTranslate();
 
     return (
         <DropdownMenu>
@@ -28,13 +30,13 @@ export default function ThemeMenu({ align = 'end' }: ThemeMenuProps): React.Reac
                     variant="ghost"
                     size="icon-sm"
                     className="shrink-0"
-                    aria-label="Elegir tema claro u oscuro"
+                    aria-label={t('theme.switch_aria')}
                 >
                     {resolvedTheme === 'dark' ? <Moon /> : <Sun />}
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align={align} className="w-48">
-                <DropdownMenuLabel>Apariencia</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('theme.appearance')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup
                     value={theme}
@@ -42,15 +44,15 @@ export default function ThemeMenu({ align = 'end' }: ThemeMenuProps): React.Reac
                 >
                     <DropdownMenuRadioItem value="light" className="gap-2">
                         <Sun className="size-4" />
-                        Claro
+                        {t('theme.light')}
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="dark" className="gap-2">
                         <Moon className="size-4" />
-                        Oscuro
+                        {t('theme.dark')}
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="system" className="gap-2">
                         <Monitor className="size-4" />
-                        Sistema
+                        {t('theme.system')}
                     </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
             </DropdownMenuContent>

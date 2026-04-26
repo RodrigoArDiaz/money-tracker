@@ -49,7 +49,7 @@ class EmailVerificationController extends Controller
 
         $service->verify($user, $request->validated('code'));
 
-        return redirect()->route('dashboard')->with('success', 'Correo verificado correctamente.');
+        return redirect()->route('dashboard')->with('success', __('frontend.flash.email_verified'));
     }
 
     /**
@@ -72,6 +72,6 @@ class EmailVerificationController extends Controller
             return back()->withErrors($e->errors());
         }
 
-        return back()->with('success', 'Te enviamos un código nuevo.');
+        return back()->with('success', __('frontend.flash.verification_code_resent'));
     }
 }

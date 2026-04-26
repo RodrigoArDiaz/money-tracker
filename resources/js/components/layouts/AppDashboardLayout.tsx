@@ -29,8 +29,10 @@ import {
     SidebarSeparator,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
+import LocaleSwitcher from '@/components/molecules/LocaleSwitcher';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { useTranslate } from '@/hooks/use-translate';
 import { cn } from '@/lib/utils';
 
 type AuthUser = {
@@ -52,6 +54,7 @@ function initialsFromName(name: string): string {
 
 function AppSidebar() {
     const { url } = usePage();
+    const { t } = useTranslate();
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -65,7 +68,7 @@ function AppSidebar() {
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">Money Tracker</span>
-                                    <span className="truncate text-xs text-sidebar-foreground/70">Panel</span>
+                                    <span className="truncate text-xs text-sidebar-foreground/70">{t('layout.panel')}</span>
                                 </div>
                             </Link>
                         </SidebarMenuButton>
@@ -74,18 +77,18 @@ function AppSidebar() {
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Navegación</SidebarGroupLabel>
+                    <SidebarGroupLabel>{t('layout.nav_section')}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton
                                     asChild
                                     isActive={url.startsWith('/dashboard')}
-                                    tooltip="Inicio"
+                                    tooltip={t('layout.home_tooltip')}
                                 >
                                     <Link href="/dashboard">
                                         <LayoutDashboard />
-                                        <span>Inicio</span>
+                                        <span>{t('dashboard.nav_home')}</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -96,7 +99,7 @@ function AppSidebar() {
             <SidebarSeparator />
             <SidebarFooter className="p-2">
                 <p className="px-2 text-xs text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
-                    Más secciones próximamente.
+                    {t('layout.footer_hint')}
                 </p>
             </SidebarFooter>
             <SidebarRail />
@@ -105,6 +108,8 @@ function AppSidebar() {
 }
 
 function UserMenu({ user }: { user: AuthUser }) {
+    const { t } = useTranslate();
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -131,7 +136,7 @@ function UserMenu({ user }: { user: AuthUser }) {
                     }}
                 >
                     <LogOut className="size-4" />
-                    Cerrar sesión
+                    {t('layout.sign_out')}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
@@ -146,6 +151,7 @@ export default function AppDashboardLayout({
     title?: string;
 }) {
     const { auth } = usePage<{ auth: { user: AuthUser | null } }>().props;
+    const { t } = useTranslate();
     const user = auth.user;
 
     return (
@@ -160,9 +166,12 @@ export default function AppDashboardLayout({
                     >
                         <SidebarTrigger className="-ml-1" />
                         <div className="flex flex-1 flex-col gap-0.5">
-                            <h1 className="text-sm font-semibold tracking-tight md:text-base">{title ?? 'Panel'}</h1>
+                            <h1 className="text-sm font-semibold tracking-tight md:text-base">
+                                {title ?? t('dashboard.header_default')}
+                            </h1>
                         </div>
                         <div className="flex items-center gap-1">
+                            <LocaleSwitcher align="end" />
                             <ThemeMenu align="end" />
                             {user ? <UserMenu user={user} /> : null}
                         </div>

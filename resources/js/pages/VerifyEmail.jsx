@@ -1,6 +1,8 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
+import LocaleSwitcher from '@/components/molecules/LocaleSwitcher';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
+import { useTranslate } from '@/hooks/use-translate';
 import Alert from '../components/atoms/Alert';
 import FieldError from '../components/atoms/FieldError';
 import Label from '../components/atoms/Label';
@@ -8,6 +10,7 @@ import PrimaryButton from '../components/atoms/PrimaryButton';
 import TextInput from '../components/atoms/TextInput';
 
 export default function VerifyEmail({ email }) {
+    const { t } = useTranslate();
     const { flash } = usePage().props;
     const verifyForm = useForm({ code: '' });
     const resendForm = useForm({});
@@ -24,15 +27,17 @@ export default function VerifyEmail({ email }) {
 
     return (
         <div className="relative flex min-h-screen items-center justify-center bg-background px-4 py-10 text-foreground">
-            <div className="fixed right-4 top-4 z-50">
+            <div className="fixed right-4 top-4 z-50 flex items-center gap-1">
+                <LocaleSwitcher align="end" />
                 <ThemeMenu align="end" />
             </div>
-            <Head title="Verificar correo" />
+            <Head title={t('verify_email.head_title')} />
             <div className="w-full max-w-md">
                 <div className="rounded-2xl border border-border bg-card/90 p-8 text-card-foreground shadow-sm backdrop-blur-sm">
-                    <h1 className="text-xl font-semibold mb-1 text-center">Verificá tu correo</h1>
+                    <h1 className="text-xl font-semibold mb-1 text-center">{t('verify_email.title')}</h1>
                     <p className="text-sm text-muted-foreground text-center mb-6">
-                        Enviamos un código de 6 dígitos a <span className="font-medium text-foreground">{email}</span>.
+                        {t('verify_email.intro')}{' '}
+                        <span className="font-medium text-foreground">{email}</span>.
                     </p>
 
                     {flash?.success && (
@@ -43,7 +48,7 @@ export default function VerifyEmail({ email }) {
 
                     <form onSubmit={submitVerify} className="space-y-4">
                         <div>
-                            <Label htmlFor="code">Código</Label>
+                            <Label htmlFor="code">{t('verify_email.code_label')}</Label>
                             <TextInput
                                 id="code"
                                 type="text"
@@ -59,7 +64,7 @@ export default function VerifyEmail({ email }) {
                         </div>
 
                         <PrimaryButton type="submit" disabled={verifyForm.processing}>
-                            {verifyForm.processing ? 'Verificando…' : 'Verificar'}
+                            {verifyForm.processing ? t('verify_email.verifying') : t('verify_email.verify')}
                         </PrimaryButton>
                     </form>
 
@@ -69,14 +74,14 @@ export default function VerifyEmail({ email }) {
                             disabled={resendForm.processing}
                             className="w-full text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
                         >
-                            {resendForm.processing ? 'Enviando…' : 'Reenviar código'}
+                            {resendForm.processing ? t('verify_email.sending') : t('verify_email.resend')}
                         </button>
                         <FieldError message={resendForm.errors.resend} />
                     </form>
 
                     <p className="mt-6 text-center text-sm text-muted-foreground">
                         <Link href="/" className="font-medium text-foreground hover:underline">
-                            Volver al inicio
+                            {t('verify_email.back_home')}
                         </Link>
                     </p>
                 </div>
