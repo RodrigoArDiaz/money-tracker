@@ -7,20 +7,15 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class LoginController extends Controller
 {
     /**
-     * Muestra el formulario de inicio de sesión.
+     * La pantalla de acceso vive en la ruta home (/); mantenemos /login como redirección por compatibilidad.
      */
-    public function create(): Response
+    public function create(): RedirectResponse
     {
-        return Inertia::render('Login', [
-            'canLoginWithGoogle' => filled(config('services.google.client_id'))
-                && filled(config('services.google.client_secret')),
-        ]);
+        return redirect()->route('home');
     }
 
     /**

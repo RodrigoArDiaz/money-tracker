@@ -118,7 +118,7 @@ export default function Register({ canRegisterWithGoogle }) {
 
                     <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
                         ¿Ya tenés cuenta?{' '}
-                        <Link href="/login" className="font-medium text-[#1b1b18] dark:text-[#EDEDEC] hover:underline">
+                        <Link href="/" className="font-medium text-[#1b1b18] dark:text-[#EDEDEC] hover:underline">
                             Iniciar sesión
                         </Link>
                         {' · '}

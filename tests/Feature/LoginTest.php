@@ -10,11 +10,16 @@ class LoginTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
-    public function test_login_page_displays(): void
+    public function test_home_shows_welcome_with_login_for_guests(): void
     {
-        $this->get(route('login'))
-            ->assertStatus(200)
-            ->assertInertia(fn ($page) => $page->component('Login'));
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Welcome'));
+    }
+
+    public function test_login_get_redirects_to_home(): void
+    {
+        $this->get(route('login'))->assertRedirect(route('home'));
     }
 
     public function test_user_can_login_with_verified_email_and_password(): void

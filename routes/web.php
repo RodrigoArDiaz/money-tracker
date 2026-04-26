@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    return Inertia::render('Welcome', [
+        'canLoginWithGoogle' => filled(config('services.google.client_id'))
+            && filled(config('services.google.client_secret')),
+    ]);
 })->name('home');
 
 Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
