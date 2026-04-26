@@ -114,9 +114,6 @@ import {
     CircleHelp,
 } from 'lucide-react';
 
-
-export const EXPENSE_CATEGORY_ICON_CHUNK_SIZE = 36;
-
 const iconEntries = [
     ['Wallet', Wallet],
     ['ShoppingCart', ShoppingCart],

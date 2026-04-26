@@ -90,7 +90,6 @@ return [
         'icon_picker_title' => 'Choose an icon',
         'icon_picker_description' => 'Tap an icon to use for this category. Scroll the list if it does not fit on screen.',
         'pick_icon_aria' => 'Open icon picker',
-        'icons_load_more' => 'Load more icons',
         'edit_icon_hint' => 'Choose an icon (scroll to see all).',
         'edit' => 'Edit',
         'delete' => 'Delete',

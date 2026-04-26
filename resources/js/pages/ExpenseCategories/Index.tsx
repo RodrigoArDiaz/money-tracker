@@ -18,7 +18,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { useExpenseCategoryIconProgressiveList } from '@/hooks/use-expense-category-icon-progressive-list';
 import { useTranslate } from '@/hooks/use-translate';
 import { ExpenseCategoryIcon, EXPENSE_CATEGORY_ICON_MAP } from '@/lib/expense-category-icons';
 
@@ -48,12 +47,6 @@ export default function Index({
         () => expenseCategoryIconNames.filter((n) => EXPENSE_CATEGORY_ICON_MAP[n] !== undefined),
         [expenseCategoryIconNames],
     );
-
-    const editIconProgress = useExpenseCategoryIconProgressiveList(
-        safeIconNames.length,
-        editingCategory?.id ?? null,
-    );
-    const editIconNamesSlice = safeIconNames.slice(0, editIconProgress.visibleCount);
 
     const createForm = useForm({
         name: '',
@@ -279,21 +272,13 @@ export default function Index({
                         <div className="grid gap-2">
                             <Label>{t('expense_categories.icon_label')}</Label>
                             <p className="text-xs text-muted-foreground">{t('expense_categories.edit_icon_hint')}</p>
-                            <div
-                                className="max-h-48 overflow-y-auto overscroll-contain rounded-lg border border-border bg-background p-3"
-                                onScroll={editIconProgress.onScroll}
-                            >
+                            <div className="max-h-48 overflow-y-auto overscroll-contain rounded-lg border border-border bg-background p-3">
                                 <ExpenseCategoryIconGrid
-                                    names={editIconNamesSlice}
+                                    names={safeIconNames}
                                     selected={editForm.data.icon}
                                     onSelect={(name) => editForm.setData('icon', name)}
                                 />
                             </div>
-                            {editIconProgress.hasMore ? (
-                                <Button type="button" variant="outline" size="sm" onClick={editIconProgress.loadMore}>
-                                    {t('expense_categories.icons_load_more')}
-                                </Button>
-                            ) : null}
                             <FieldError message={editForm.errors.icon} />
                         </div>
                     </form>

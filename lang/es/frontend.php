@@ -90,7 +90,6 @@ return [
         'icon_picker_title' => 'Elegir icono',
         'icon_picker_description' => 'Tocá un icono para usarlo en esta categoría. Podés desplazarte en la lista si no entra en pantalla.',
         'pick_icon_aria' => 'Abrir selector de icono',
-        'icons_load_more' => 'Cargar más iconos',
         'edit_icon_hint' => 'Elegí un icono (desplazá para ver todos).',
         'edit' => 'Editar',
         'delete' => 'Eliminar',
