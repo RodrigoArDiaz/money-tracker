@@ -18,8 +18,10 @@ money-tracker/
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   └── Middleware/HandleInertiaRequests.php
+│   ├── Mail/             # Mailables (p. ej. verificación por correo)
 │   ├── Models/
-│   └── Providers/          # AppServiceProvider, TelescopeServiceProvider
+│   ├── Services/         # Casos de uso (p. ej. Auth/EmailVerificationCodeService)
+│   └── Providers/        # AppServiceProvider, TelescopeServiceProvider
 ├── bootstrap/              # app.php, providers.php, cache/
 ├── config/                 # app, auth, database, passport, permission, sanctum, telescope, …
 ├── database/
@@ -33,6 +35,7 @@ money-tracker/
 │   ├── css/app.css
 │   ├── js/
 │   │   ├── app.jsx         # Inertia / Vite bootstrap
+│   │   ├── components/     # atoms/, molecules/ (UI reutilizable)
 │   │   └── pages/          # React pages (e.g. Welcome.jsx)
 │   └── views/              # app.blade.php (Inertia shell), welcome.blade.php
 ├── routes/
