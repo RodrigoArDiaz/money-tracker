@@ -111,4 +111,110 @@ class EmailVerificationTest extends TestCase
 
         Mail::assertSent(VerificationCodeMail::class, 2);
     }
+
+    public function test_guest_cannot_access_verify_routes(): void
+    {
+        $this->get(route('verification.code.show'))->assertRedirect(route('home'));
+
+        $this->post(route('verification.code.verify'), ['code' => '123456'])->assertRedirect(route('home'));
+
+        $this->post(route('verification.code.resend'))->assertRedirect(route('home'));
+    }
+
+    public function test_verify_rejects_invalid_code_format(): void
+    {
+        Mail::fake();
+
+        $this->post(route('register'), [
+            'first_name' => 'E1',
+            'last_name' => 'Test',
+            'email' => 'e1@example.com',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+        ]);
+
+        $this->post(route('verification.code.verify'), [
+            'code' => '12345',
+        ])->assertSessionHasErrors('code');
+
+        $this->post(route('verification.code.verify'), [
+            'code' => 'abcdef',
+        ])->assertSessionHasErrors('code');
+    }
+
+    public function test_verify_rejects_expired_code(): void
+    {
+        Mail::fake();
+
+        $this->post(route('register'), [
+            'first_name' => 'E2',
+            'last_name' => 'Test',
+            'email' => 'e2@example.com',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+        ]);
+
+        /** @var VerificationCodeMail $mailable */
+        $mailable = Mail::sent(VerificationCodeMail::class)->first();
+        $code = $mailable->plainCode;
+
+        $this->travel(16)->minutes();
+
+        $this->post(route('verification.code.verify'), [
+            'code' => $code,
+        ])->assertSessionHasErrors('code');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'e2@example.com',
+            'email_verified_at' => null,
+        ]);
+    }
+
+    public function test_verify_locks_after_max_failed_attempts(): void
+    {
+        Mail::fake();
+
+        $this->post(route('register'), [
+            'first_name' => 'E3',
+            'last_name' => 'Test',
+            'email' => 'e3@example.com',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+        ]);
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->post(route('verification.code.verify'), [
+                'code' => '000000',
+            ])->assertSessionHasErrors('code');
+        }
+
+        $response = $this->post(route('verification.code.verify'), [
+            'code' => '000000',
+        ]);
+
+        $response->assertSessionHasErrors('code');
+        $messages = session('errors')->get('code');
+        $this->assertIsArray($messages);
+        $this->assertStringContainsString('Demasiados intentos', $messages[0]);
+    }
+
+    public function test_verify_redirects_home_when_already_verified(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('verification.code.verify'), [
+            'code' => '123456',
+        ])->assertRedirect(route('home'));
+    }
+
+    public function test_resend_redirects_home_when_already_verified(): void
+    {
+        Mail::fake();
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('verification.code.resend'))->assertRedirect(route('home'));
+
+        Mail::assertNothingSent();
+    }
 }

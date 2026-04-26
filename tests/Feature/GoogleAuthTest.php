@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
@@ -45,5 +46,26 @@ class GoogleAuthTest extends TestCase
             'first_name' => 'Luis',
             'last_name' => 'Pérez',
         ]);
+
+        $this->assertNotNull(User::where('email', 'luis@example.com')->first()->email_verified_at);
+    }
+
+    public function test_google_callback_without_email_redirects_to_register(): void
+    {
+        $socialUser = (new SocialiteUser)->map([
+            'id' => 'google-no-mail',
+            'nickname' => null,
+            'name' => 'Sin Mail',
+            'email' => null,
+            'avatar' => null,
+        ])->setRaw([]);
+
+        Socialite::fake('google', $socialUser);
+
+        $this->get(route('auth.google.callback'))
+            ->assertRedirect(route('register'));
+
+        $this->assertGuest();
+        $this->assertDatabaseMissing('users', ['google_id' => 'google-no-mail']);
     }
 }

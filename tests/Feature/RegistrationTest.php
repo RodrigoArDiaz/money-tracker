@@ -67,4 +67,28 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'solo-minusculas',
         ])->assertSessionHasErrors('password');
     }
+
+    public function test_registration_rejects_duplicate_email(): void
+    {
+        User::factory()->create(['email' => 'taken@example.com']);
+
+        $this->post(route('register'), [
+            'first_name' => 'Ana',
+            'last_name' => 'García',
+            'email' => 'taken@example.com',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+        ])->assertSessionHasErrors('email');
+    }
+
+    public function test_registration_rejects_password_confirmation_mismatch(): void
+    {
+        $this->post(route('register'), [
+            'first_name' => 'Ana',
+            'last_name' => 'García',
+            'email' => 'mismatch@example.com',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password124!',
+        ])->assertSessionHasErrors('password');
+    }
 }
