@@ -1,5 +1,7 @@
 # Architecture Best Practices
 
+For **Controller–Service–Repository** layering (optional Repository in Laravel), see [controller-service-repository.md](controller-service-repository.md).
+
 ## Single-Purpose Action Classes
 
 Extract discrete business operations into invokable Action classes.

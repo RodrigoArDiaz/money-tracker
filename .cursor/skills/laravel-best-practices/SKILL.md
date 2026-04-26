@@ -150,7 +150,14 @@ Check sibling files, related controllers, models, or tests for established patte
 - Default to `ORDER BY id DESC` or `created_at DESC`; `mb_*` for UTF-8 safety
 - `defer()` for post-response work; `Context` for request-scoped data; `Concurrency::run()` for parallel execution
 
-### 16. Migrations → `rules/migrations.md`
+### 16. Controller–Service–Repository → `rules/controller-service-repository.md`
+
+- Thin controllers (HTTP, auth, response); use cases in **Services**; **Repository** only when it reduces duplication or improves test seams (Eloquent alone is often enough)
+- `FormRequest` + `$request->validated()` into the service; no business logic or heavy queries in controllers
+- `DB::transaction` and orchestration in the service; inject dependencies, never `app()` for layers
+- Repositories do not know HTTP; feature tests for full flow, unit tests at service/repository boundaries when useful
+
+### 17. Migrations → `rules/migrations.md`
 
 - Generate migrations with `php artisan make:migration`
 - `constrained()` for foreign keys
@@ -160,21 +167,21 @@ Check sibling files, related controllers, models, or tests for established patte
 - Reversible `down()` by default; forward-fix migrations for intentionally irreversible changes
 - One concern per migration — never mix DDL and DML
 
-### 17. Collections → `rules/collections.md`
+### 18. Collections → `rules/collections.md`
 
 - Higher-order messages for simple collection operations
 - `cursor()` vs. `lazy()` — choose based on relationship needs
 - `lazyById()` when updating records while iterating
 - `toQuery()` for bulk operations on collections
 
-### 18. Blade & Views → `rules/blade-views.md`
+### 19. Blade & Views → `rules/blade-views.md`
 
 - `$attributes->merge()` in component templates
 - Blade components over `@include`; `@pushOnce` for per-component scripts
 - View Composers for shared view data
 - `@aware` for deeply nested component props
 
-### 19. Conventions & Style → `rules/style.md`
+### 20. Conventions & Style → `rules/style.md`
 
 - Follow Laravel naming conventions for all entities
 - Prefer Laravel helpers (`Str`, `Arr`, `Number`, `Uri`, `Str::of()`, `$request->string()`) over raw PHP functions
@@ -185,6 +192,6 @@ Check sibling files, related controllers, models, or tests for established patte
 
 Always use a sub-agent to read rule files and explore this skill's content.
 
-1. Identify the file type and select relevant sections (e.g., migration → §16, controller → §1, §3, §5, §6, §10)
+1. Identify the file type and select relevant sections (e.g., migration → §17, controller → §1, §3, §5, §6, §10, §16, architecture → §15)
 2. Check sibling files for existing patterns — follow those first per Consistency First
 3. Verify API syntax with `search-docs` for the installed Laravel version
