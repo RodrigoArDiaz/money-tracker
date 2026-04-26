@@ -107,4 +107,20 @@ class ExpenseCategoryAbmTest extends TestCase
             ->post('/expense-categories', ['name' => 'Test', 'icon' => 'NotLucideIcon'])
             ->assertSessionHasErrors('icon');
     }
+
+    #[Test]
+    public function index_lists_categories_in_alphabetical_order_by_name(): void
+    {
+        $user = User::factory()->create();
+        ExpenseCategory::factory()->for($user, 'user')->create(['name' => 'zebra']);
+        ExpenseCategory::factory()->for($user, 'user')->create(['name' => 'Alpha']);
+        ExpenseCategory::factory()->for($user, 'user')->create(['name' => 'beta']);
+
+        $this->actingAs($user)
+            ->get('/expense-categories')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('ExpenseCategories/Index')
+                ->where('categories', fn ($categories) => collect($categories)->pluck('name')->all() === ['Alpha', 'beta', 'zebra']));
+    }
 }

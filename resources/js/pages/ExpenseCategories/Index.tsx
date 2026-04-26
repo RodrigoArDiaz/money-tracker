@@ -10,6 +10,7 @@ import FormField from '@/components/molecules/FormField';
 import { ExpenseCategoryIconGrid } from '@/components/molecules/ExpenseCategoryIconGrid';
 import { ExpenseCategoryIconPickerDialog } from '@/components/molecules/ExpenseCategoryIconPickerDialog';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
     Dialog,
     DialogContent,
@@ -20,6 +21,7 @@ import {
 } from '@/components/ui/dialog';
 import { useTranslate } from '@/hooks/use-translate';
 import { ExpenseCategoryIcon, EXPENSE_CATEGORY_ICON_MAP } from '@/lib/expense-category-icons';
+import { Pencil, Trash2 } from 'lucide-react';
 
 type CategoryRow = {
     id: number;
@@ -130,7 +132,7 @@ export default function Index({
                     onSubmit={submitCreate}
                     className="mt-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end md:gap-x-3 md:gap-y-2"
                 >
-                    <div className="min-w-0 w-full md:w-150 md:shrink-0">
+                    <div className="min-w-0 w-full md:w-64 md:shrink-0">
                         <FormField
                             label={t('expense_categories.name_label')}
                             htmlFor="new-category-name"
@@ -178,55 +180,59 @@ export default function Index({
                     {t('expense_categories.empty')}
                 </section>
             ) : (
-                <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
-                    <table className="w-full min-w-[28rem] text-left text-sm text-card-foreground">
-                        <thead className="border-b border-border bg-muted/40 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                            <tr>
-                                <th className="px-4 py-3">{t('expense_categories.name_label')}</th>
-                                <th className="px-4 py-3 text-right">{t('expense_categories.expenses_count_label')}</th>
-                                <th className="px-4 py-3 text-right">{t('expense_categories.edit')}</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                            {categories.map((row) => (
-                                <tr key={row.id} className="bg-card hover:bg-muted/20">
-                                    <td className="px-4 py-3">
-                                        <span className="flex items-center gap-2 font-medium">
-                                            <ExpenseCategoryIcon
-                                                name={row.icon}
-                                                className="size-4 shrink-0 text-muted-foreground"
-                                            />
-                                            {row.name}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-right tabular-nums text-muted-foreground">
-                                        {row.expenses_count}
-                                    </td>
-                                    <td className="px-4 py-3 text-right">
-                                        <div className="flex flex-wrap justify-end gap-2">
+                <ul className="m-0 grid list-none justify-start gap-2.5 p-0 [grid-template-columns:repeat(auto-fill,minmax(6.25rem,7rem))]">
+                    {categories.map((row) => (
+                        <li key={row.id} className="min-w-0">
+                            <article className="group flex h-full w-full flex-col rounded-lg border border-border bg-card px-2 pb-1.5 pt-2 text-card-foreground shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out will-change-transform hover:border-primary/25 hover:bg-muted/15 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-md motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-sm">
+                                <div
+                                    className="mx-auto mb-2 flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/30 text-primary transition-transform duration-200 ease-out motion-safe:group-hover:scale-110 motion-reduce:group-hover:scale-100"
+                                    aria-hidden
+                                >
+                                    <ExpenseCategoryIcon name={row.icon} className="size-[1.35rem]" />
+                                </div>
+                                <h3 className="line-clamp-2 min-h-8 text-center text-xs font-semibold leading-tight tracking-tight">
+                                    {row.name}
+                                </h3>
+                                <div className="mt-auto flex items-center justify-around border-t border-border/50 px-0.5 pt-1.5">
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
                                             <Button
+                                                type="button"
                                                 variant="outline"
-                                                size="sm"
-                                                type="button"
+                                                size="icon-sm"
+                                                className="shrink-0 border-emerald-600/35 text-emerald-600 hover:border-emerald-600/55 hover:bg-emerald-500/10 hover:text-emerald-700 dark:border-emerald-500/40 dark:text-emerald-400 dark:hover:border-emerald-400/60 dark:hover:bg-emerald-500/15 dark:hover:text-emerald-300"
                                                 onClick={() => openEdit(row)}
+                                                aria-label={t('expense_categories.card_edit_aria')}
                                             >
-                                                {t('expense_categories.edit')}
+                                                <Pencil className="size-3.5" aria-hidden />
                                             </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" sideOffset={4}>
+                                            {t('expense_categories.edit')}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
                                             <Button
-                                                variant="destructive"
-                                                size="sm"
                                                 type="button"
+                                                variant="outline"
+                                                size="icon-sm"
+                                                className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                 onClick={() => openDeleteModal(row)}
+                                                aria-label={t('expense_categories.card_delete_aria')}
                                             >
-                                                {t('expense_categories.delete')}
+                                                <Trash2 className="size-3.5" aria-hidden />
                                             </Button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" sideOffset={4}>
+                                            {t('expense_categories.delete')}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+                            </article>
+                        </li>
+                    ))}
+                </ul>
             )}
 
             <ExpenseCategoryIconPickerDialog

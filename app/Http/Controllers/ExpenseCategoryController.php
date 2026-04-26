@@ -23,7 +23,8 @@ class ExpenseCategoryController extends Controller
         $categories = $request->user()
             ->expenseCategories()
             ->withCount('expenses')
-            ->orderBy('name')
+            ->orderByRaw('LOWER(name)')
+            ->orderBy('id')
             ->get()
             ->map(fn (ExpenseCategory $category): array => [
                 'id' => $category->id,

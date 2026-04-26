@@ -93,6 +93,8 @@ return [
         'edit_icon_hint' => 'Choose an icon (scroll to see all).',
         'edit' => 'Edit',
         'delete' => 'Delete',
+        'card_edit_aria' => 'Edit category',
+        'card_delete_aria' => 'Delete category',
         'back_to_list' => 'Back to list',
         'create_heading' => 'New category',
         'edit_heading' => 'Edit category',

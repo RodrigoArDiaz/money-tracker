@@ -93,6 +93,8 @@ return [
         'edit_icon_hint' => 'Elegí un icono (desplazá para ver todos).',
         'edit' => 'Editar',
         'delete' => 'Eliminar',
+        'card_edit_aria' => 'Editar categoría',
+        'card_delete_aria' => 'Eliminar categoría',
         'back_to_list' => 'Volver al listado',
         'create_heading' => 'Nueva categoría',
         'edit_heading' => 'Editar categoría',
