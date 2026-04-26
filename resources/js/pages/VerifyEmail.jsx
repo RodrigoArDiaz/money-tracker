@@ -1,5 +1,6 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
+import ThemeMenu from '@/components/molecules/ThemeMenu';
 import Alert from '../components/atoms/Alert';
 import FieldError from '../components/atoms/FieldError';
 import Label from '../components/atoms/Label';
@@ -22,13 +23,16 @@ export default function VerifyEmail({ email }) {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] dark:text-[#EDEDEC] px-4 py-10">
+        <div className="relative flex min-h-screen items-center justify-center bg-background px-4 py-10 text-foreground">
+            <div className="fixed right-4 top-4 z-50">
+                <ThemeMenu align="end" />
+            </div>
             <Head title="Verificar correo" />
             <div className="w-full max-w-md">
-                <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-[#161615] shadow-sm p-8">
+                <div className="rounded-2xl border border-border bg-card/90 p-8 text-card-foreground shadow-sm backdrop-blur-sm">
                     <h1 className="text-xl font-semibold mb-1 text-center">Verificá tu correo</h1>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6">
-                        Enviamos un código de 6 dígitos a <span className="font-medium text-[#1b1b18] dark:text-[#EDEDEC]">{email}</span>.
+                    <p className="text-sm text-muted-foreground text-center mb-6">
+                        Enviamos un código de 6 dígitos a <span className="font-medium text-foreground">{email}</span>.
                     </p>
 
                     {flash?.success && (
@@ -63,15 +67,15 @@ export default function VerifyEmail({ email }) {
                         <button
                             type="submit"
                             disabled={resendForm.processing}
-                            className="w-full text-sm text-gray-600 dark:text-gray-400 hover:text-[#1b1b18] dark:hover:text-[#EDEDEC] disabled:opacity-50"
+                            className="w-full text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
                         >
                             {resendForm.processing ? 'Enviando…' : 'Reenviar código'}
                         </button>
                         <FieldError message={resendForm.errors.resend} />
                     </form>
 
-                    <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-                        <Link href="/" className="font-medium text-[#1b1b18] dark:text-[#EDEDEC] hover:underline">
+                    <p className="mt-6 text-center text-sm text-muted-foreground">
+                        <Link href="/" className="font-medium text-foreground hover:underline">
                             Volver al inicio
                         </Link>
                     </p>

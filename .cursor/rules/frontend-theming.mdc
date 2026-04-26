@@ -1,0 +1,39 @@
+---
+description: Tema claro/oscuro (clase .dark) y tokens de color en React/Tailwind
+globs:
+  - resources/js/**/*.jsx
+  - resources/js/**/*.tsx
+alwaysApply: false
+---
+
+# Frontend: tema claro / oscuro
+
+El proyecto usa **Tailwind v4** con la variante personalizada `@custom-variant dark (&:is(.dark *));` en [resources/css/app.css](mdc:resources/css/app.css). La clase `dark` se aplica en **`<html>`** (no en `body`).
+
+## Comportamiento global
+
+- **Persistencia:** `localStorage` con clave **`money-tracker-theme`** (`light` | `dark` | `system`). Debe coincidir con `THEME_STORAGE_KEY` en [resources/js/components/theme-provider.tsx](mdc:resources/js/components/theme-provider.tsx) y con el script inline en [resources/views/app.blade.php](mdc:resources/views/app.blade.php) (evitar FOUC).
+- **React:** Toda la app Inertia va envuelta en **`ThemeProvider`** en [resources/js/app.jsx](mdc:resources/js/app.jsx). Usá **`useTheme()`** solo bajo ese árbol.
+- **UI reutilizable:** Preferí el menú **[ThemeMenu](mdc:resources/js/components/molecules/ThemeMenu.tsx)** para el conmutador (Claro / Oscuro / Sistema).
+
+## Al crear o editar componentes (JSX/TSX)
+
+1. **Priorizar tokens semánticos** que ya responden al tema en `app.css` / shadcn: `bg-background`, `text-foreground`, `text-muted-foreground`, `border-border`, `bg-card`, `text-card-foreground`, `bg-muted`, `text-primary`, `ring-ring`, etc.
+2. **Evitar** colores fijos sin contraparte oscura (`bg-[#FDFDFC]`, `text-[#1b1b18]`, `gray-600` suelto) salvo casos muy puntuales; si los usás, añadí **`dark:`** explícito o migrá a tokens.
+3. **Variante `dark:`** de Tailwind sigue siendo válida para detalles puntuales; recordá que el proyecto también resuelve oscuro vía **ancestro** `.dark`, coherente con `@custom-variant dark (&:is(.dark *))`.
+4. **No** dependas de `prefers-color-scheme` solo en CSS para el estado guardado del usuario: el modo **Sistema** lo sincroniza `ThemeProvider` y el script inicial.
+5. **Formularios y focus:** usá `border-input`, `ring-ring`, estilos de shadcn o clases que ya definan bien foco en ambos temas.
+
+## Referencia rápida
+
+```jsx
+// Preferible
+<div className="border-border bg-card text-card-foreground">
+
+// Evitar como estilo base de layout
+<div className="bg-white text-gray-900">
+```
+
+## Tests manuales
+
+Al terminar un componente visible, comprobar **Claro**, **Oscuro** y **Sistema** (con el SO en claro y en oscuro) usando `ThemeMenu`.

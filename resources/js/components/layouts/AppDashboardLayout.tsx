@@ -29,6 +29,7 @@ import {
     SidebarSeparator,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
+import ThemeMenu from '@/components/molecules/ThemeMenu';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
@@ -161,7 +162,10 @@ export default function AppDashboardLayout({
                         <div className="flex flex-1 flex-col gap-0.5">
                             <h1 className="text-sm font-semibold tracking-tight md:text-base">{title ?? 'Panel'}</h1>
                         </div>
-                        {user ? <UserMenu user={user} /> : null}
+                        <div className="flex items-center gap-1">
+                            <ThemeMenu align="end" />
+                            {user ? <UserMenu user={user} /> : null}
+                        </div>
                     </header>
                     <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">{children}</div>
                 </SidebarInset>

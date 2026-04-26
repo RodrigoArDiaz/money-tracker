@@ -1,5 +1,6 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
+import ThemeMenu from '@/components/molecules/ThemeMenu';
 import Alert from '../components/atoms/Alert';
 import AuthPanelDivider from '../components/atoms/AuthPanelDivider';
 import PasswordInput from '../components/atoms/PasswordInput';
@@ -24,12 +25,15 @@ export default function Register({ canRegisterWithGoogle }) {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] dark:text-[#EDEDEC] px-4 py-10">
+        <div className="relative flex min-h-screen items-center justify-center bg-background px-4 py-10 text-foreground">
+            <div className="fixed right-4 top-4 z-50">
+                <ThemeMenu align="end" />
+            </div>
             <Head title="Registro" />
             <div className="w-full max-w-md">
-                <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-[#161615] shadow-sm p-8">
+                <div className="rounded-2xl border border-border bg-card/90 p-8 text-card-foreground shadow-sm backdrop-blur-sm">
                     <h1 className="text-xl font-semibold mb-1 text-center">Crear cuenta</h1>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6">
+                    <p className="text-sm text-muted-foreground text-center mb-6">
                         Regístrate con Google o con tu correo.
                     </p>
 
@@ -116,13 +120,13 @@ export default function Register({ canRegisterWithGoogle }) {
                         </PrimaryButton>
                     </form>
 
-                    <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+                    <p className="mt-6 text-center text-sm text-muted-foreground">
                         ¿Ya tenés cuenta?{' '}
-                        <Link href="/" className="font-medium text-[#1b1b18] dark:text-[#EDEDEC] hover:underline">
+                        <Link href="/" className="font-medium text-foreground hover:underline">
                             Iniciar sesión
                         </Link>
                         {' · '}
-                        <Link href="/" className="font-medium text-[#1b1b18] dark:text-[#EDEDEC] hover:underline">
+                        <Link href="/" className="font-medium text-foreground hover:underline">
                             Inicio
                         </Link>
                     </p>
