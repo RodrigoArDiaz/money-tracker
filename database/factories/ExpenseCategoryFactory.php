@@ -19,9 +19,12 @@ class ExpenseCategoryFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->words(2, true);
+
         return [
             'user_id' => User::factory(),
-            'name' => fake()->words(2, true),
+            'name' => $name,
+            'names' => ['es' => $name, 'en' => $name],
             'icon' => fake()->randomElement(ExpenseCategoryIcons::names()),
         ];
     }

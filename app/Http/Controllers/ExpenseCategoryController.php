@@ -20,6 +20,8 @@ class ExpenseCategoryController extends Controller
     {
         $this->authorize('viewAny', ExpenseCategory::class);
 
+        $locale = app()->getLocale();
+
         $categories = $request->user()
             ->expenseCategories()
             ->withCount('expenses')
@@ -28,13 +30,25 @@ class ExpenseCategoryController extends Controller
             ->get()
             ->map(fn (ExpenseCategory $category): array => [
                 'id' => $category->id,
-                'name' => $category->name,
+                'name' => $category->localizedName($locale),
                 'icon' => $category->icon,
                 'expenses_count' => $category->expenses_count,
             ]);
 
+        $defaultExpenseCategories = ExpenseCategory::query()
+            ->system()
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->map(fn (ExpenseCategory $row): array => [
+                'id' => $row->id,
+                'name' => $row->localizedName($locale),
+                'icon' => $row->icon,
+            ]);
+
         return Inertia::render('ExpenseCategories/Index', [
             'categories' => $categories,
+            'defaultExpenseCategories' => $defaultExpenseCategories,
             'expenseCategoryIconNames' => ExpenseCategoryIcons::names(),
         ]);
     }

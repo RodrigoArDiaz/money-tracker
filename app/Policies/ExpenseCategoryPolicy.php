@@ -14,7 +14,8 @@ class ExpenseCategoryPolicy
 
     public function view(User $user, ExpenseCategory $expenseCategory): bool
     {
-        return $this->userOwnsCategory($user, $expenseCategory);
+        return $expenseCategory->user_id === null
+            || $this->userOwnsCategory($user, $expenseCategory);
     }
 
     public function create(User $user): bool

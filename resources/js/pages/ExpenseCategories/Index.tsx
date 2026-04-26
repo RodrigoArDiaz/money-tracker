@@ -30,13 +30,24 @@ type CategoryRow = {
     expenses_count: number;
 };
 
+type DefaultCategoryRow = {
+    id: number;
+    name: string;
+    icon: string;
+};
+
 const DEFAULT_CATEGORY_ICON = 'Tag';
+
+const categoryGridClassName =
+    'm-0 grid list-none justify-start gap-2.5 p-0 [grid-template-columns:repeat(auto-fill,minmax(6.25rem,7rem))]';
 
 export default function Index({
     categories,
+    defaultExpenseCategories,
     expenseCategoryIconNames,
 }: {
     categories: CategoryRow[];
+    defaultExpenseCategories: DefaultCategoryRow[];
     expenseCategoryIconNames: string[];
 }) {
     const { t } = useTranslate();
@@ -175,12 +186,20 @@ export default function Index({
                     </PrimaryButton>
                 </form>
             </section>
-            {categories.length === 0 ? (
-                <section className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-                    {t('expense_categories.empty')}
-                </section>
-            ) : (
-                <ul className="m-0 grid list-none justify-start gap-2.5 p-0 [grid-template-columns:repeat(auto-fill,minmax(6.25rem,7rem))]">
+            <section className="flex flex-col gap-3" aria-labelledby="expense-categories-mine-heading">
+                <h2 id="expense-categories-mine-heading" className="text-sm font-semibold tracking-tight">
+                    {t('expense_categories.my_categories_heading')}
+                </h2>
+                {categories.length === 0 ? (
+                    <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+                        {t(
+                            defaultExpenseCategories.length > 0
+                                ? 'expense_categories.empty_my_categories'
+                                : 'expense_categories.empty',
+                        )}
+                    </div>
+                ) : (
+                    <ul className={categoryGridClassName}>
                     {categories.map((row) => (
                         <li key={row.id} className="min-w-0">
                             <article className="group flex h-full w-full flex-col rounded-lg border border-border bg-card px-2 pb-1.5 pt-2 text-card-foreground shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out will-change-transform hover:border-primary/25 hover:bg-muted/15 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-md motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-sm">
@@ -232,8 +251,43 @@ export default function Index({
                             </article>
                         </li>
                     ))}
-                </ul>
-            )}
+                    </ul>
+                )}
+            </section>
+
+            {defaultExpenseCategories.length > 0 ? (
+                <>
+                    <hr className="my-8 border-0 border-t border-border" />
+                    <section
+                        className="flex flex-col gap-3"
+                        aria-labelledby="expense-categories-default-heading"
+                    >
+                        <h2
+                            id="expense-categories-default-heading"
+                            className="text-sm font-semibold tracking-tight"
+                        >
+                            {t('expense_categories.default_categories_heading')}
+                        </h2>
+                        <ul className={categoryGridClassName}>
+                            {defaultExpenseCategories.map((row) => (
+                                <li key={row.id} className="min-w-0">
+                                    <article className="group flex h-full w-full flex-col rounded-lg border border-dashed border-muted-foreground/25 bg-muted/10 px-2 pb-2 pt-2 text-card-foreground shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-muted-foreground/40 motion-safe:hover:shadow-sm motion-reduce:hover:translate-y-0">
+                                        <div
+                                            className="mx-auto mb-2 flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background/80 text-primary transition-transform duration-200 ease-out motion-safe:group-hover:scale-105 motion-reduce:group-hover:scale-100"
+                                            aria-hidden
+                                        >
+                                            <ExpenseCategoryIcon name={row.icon} className="size-[1.35rem]" />
+                                        </div>
+                                        <h3 className="line-clamp-2 min-h-8 text-center text-xs font-semibold leading-tight tracking-tight">
+                                            {row.name}
+                                        </h3>
+                                    </article>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                </>
+            ) : null}
 
             <ExpenseCategoryIconPickerDialog
                 open={iconPickerOpen}

@@ -31,6 +31,7 @@ class ExpenseCategoryAbmTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->component('ExpenseCategories/Index')
                 ->has('categories', fn ($c) => $c->toArray() === [])
+                ->has('defaultExpenseCategories', fn ($c) => $c->toArray() === [])
                 ->has('expenseCategoryIconNames', count(ExpenseCategoryIcons::names())));
 
         $this->actingAs($user)
