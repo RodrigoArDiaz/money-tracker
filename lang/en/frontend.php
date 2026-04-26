@@ -1,0 +1,112 @@
+<?php
+
+return [
+    'locale' => [
+        'switch_aria' => 'Change language',
+        'menu_label' => 'Language',
+        'es' => 'Spanish',
+        'en' => 'English',
+    ],
+
+    'theme' => [
+        'switch_aria' => 'Choose light or dark theme',
+        'appearance' => 'Appearance',
+        'light' => 'Light',
+        'dark' => 'Dark',
+        'system' => 'System',
+    ],
+
+    'welcome' => [
+        'head_title' => 'Money Tracker — Sign in',
+        'hero_text' => 'Manage your daily spending with clarity: log every movement, review summaries, and stay on top of your finances.',
+    ],
+
+    'auth' => [
+        'login_title' => 'Sign in',
+        'login_subtitle' => 'Continue with Google or with your email and password.',
+        'email' => 'Email',
+        'password' => 'Password',
+        'remember' => 'Remember me on this device',
+        'signing_in' => 'Signing in…',
+        'sign_in' => 'Sign in',
+        'no_account' => "Don't have an account?",
+        'register_link' => 'Register',
+        'divider_email' => 'or with email',
+        'continue_google' => 'Continue with Google',
+        'invalid_credentials' => 'Invalid credentials.',
+    ],
+
+    'register' => [
+        'head_title' => 'Register',
+        'title' => 'Create account',
+        'subtitle' => 'Sign up with Google or with your email.',
+        'first_name' => 'First name',
+        'last_name' => 'Last name',
+        'password_confirm' => 'Confirm password',
+        'password_hint' => 'At least 12 characters, upper and lower case, at least one number and one symbol.',
+        'show_password' => 'Show password',
+        'hide_password' => 'Hide password',
+        'show_password_confirm' => 'Show password confirmation',
+        'hide_password_confirm' => 'Hide password confirmation',
+        'submitting' => 'Creating account…',
+        'submit' => 'Register',
+        'has_account' => 'Already have an account?',
+        'sign_in_link' => 'Sign in',
+        'home_link' => 'Home',
+    ],
+
+    'verify_email' => [
+        'head_title' => 'Verify email',
+        'title' => 'Verify your email',
+        'intro' => 'We sent a 6-digit code to',
+        'code_label' => 'Code',
+        'verifying' => 'Verifying…',
+        'verify' => 'Verify',
+        'sending' => 'Sending…',
+        'resend' => 'Resend code',
+        'back_home' => 'Back to home',
+    ],
+
+    'dashboard' => [
+        'head_title' => 'Dashboard — Money Tracker',
+        'nav_home' => 'Home',
+        'header_default' => 'Dashboard',
+        'title' => 'Home',
+        'welcome_heading' => 'Welcome',
+        'welcome_text' => 'This is your main dashboard. From here you will see your finance summary as we add more features.',
+    ],
+
+    'layout' => [
+        'panel' => 'Panel',
+        'nav_section' => 'Navigation',
+        'home_tooltip' => 'Home',
+        'footer_hint' => 'More sections coming soon.',
+        'sign_out' => 'Sign out',
+    ],
+
+    'flash' => [
+        'email_verified' => 'Email verified successfully.',
+        'verification_code_resent' => 'We sent you a new code.',
+        'google_session_expired' => 'The Google session expired or was rejected. Try again.',
+        'google_no_email' => 'Google did not return an email. The account cannot be created.',
+        'google_login_success' => 'Signed in with Google.',
+        'verify_email_prompt' => 'Verify your email with the code we sent you to continue.',
+        'register_success' => 'We sent a 6-digit code to your email. Enter it to verify your account.',
+    ],
+
+    'verification_service' => [
+        'resend_wait' => 'You must wait one minute before requesting another code.',
+        'code_locked' => 'Too many failed attempts. Try again later or request a new code.',
+        'code_invalid' => 'Invalid or expired code. Request a new one.',
+    ],
+
+    'validation' => [
+        'attributes' => [
+            'first_name' => 'first name',
+            'last_name' => 'last name',
+            'email' => 'email',
+            'password' => 'password',
+            'code' => 'code',
+        ],
+    ],
+];

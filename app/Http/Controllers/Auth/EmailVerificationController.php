@@ -23,11 +23,11 @@ class EmailVerificationController extends Controller
             return redirect()->route('home');
         }
         if ($user->hasVerifiedEmail()) {
-            return redirect()->route('home');
+            return redirect()->route('dashboard');
         }
 
         if (! $user->requiresEmailVerificationCode()) {
-            return redirect()->route('home');
+            return redirect()->route('dashboard');
         }
 
         return Inertia::render('VerifyEmail', [
@@ -42,12 +42,14 @@ class EmailVerificationController extends Controller
     {
         $user = $request->user();
         if ($user === null || ! $user->requiresEmailVerificationCode()) {
-            return redirect()->route('home');
+            return $user === null
+                ? redirect()->route('home')
+                : redirect()->route('dashboard');
         }
 
         $service->verify($user, $request->validated('code'));
 
-        return redirect()->route('home')->with('success', 'Correo verificado correctamente.');
+        return redirect()->route('dashboard')->with('success', __('frontend.flash.email_verified'));
     }
 
     /**
@@ -56,12 +58,12 @@ class EmailVerificationController extends Controller
     public function resend(Request $request, EmailVerificationCodeService $service): RedirectResponse
     {
         $user = $request->user();
-        if ($user === null || $user->hasVerifiedEmail()) {
+        if ($user === null) {
             return redirect()->route('home');
         }
 
-        if (! $user->requiresEmailVerificationCode()) {
-            return redirect()->route('home');
+        if ($user->hasVerifiedEmail() || ! $user->requiresEmailVerificationCode()) {
+            return redirect()->route('dashboard');
         }
 
         try {
@@ -70,6 +72,6 @@ class EmailVerificationController extends Controller
             return back()->withErrors($e->errors());
         }
 
-        return back()->with('success', 'Te enviamos un código nuevo.');
+        return back()->with('success', __('frontend.flash.verification_code_resent'));
     }
 }

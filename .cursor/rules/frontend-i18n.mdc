@@ -1,0 +1,26 @@
+---
+description: Internacionalización (es/en) con Laravel lang + Inertia + useTranslate
+globs:
+  - resources/js/**/*.jsx
+  - resources/js/**/*.tsx
+  - lang/**/*.php
+alwaysApply: false
+---
+
+# Frontend: i18n (es / en)
+
+- **Fuente de verdad:** cadenas de UI en [lang/en/frontend.php](mdc:lang/en/frontend.php) y [lang/es/frontend.php](mdc:lang/es/frontend.php) (misma estructura de claves anidadas).
+- **Locale activo:** middleware [SetLocale](mdc:app/Http/Middleware/SetLocale.php) según `users.preferred_locale` (autenticado) o `session('locale')` (invitado). Config: [config/locales.php](mdc:config/locales.php).
+- **Inertia:** [HandleInertiaRequests](mdc:app/Http/Middleware/HandleInertiaRequests.php) comparte `locale`, `translations` (árbol `frontend` del locale actual) y `available_locales`.
+- **React:** hook [use-translate.ts](mdc:resources/js/hooks/use-translate.ts) — `const { t, locale } = useTranslate();` y claves con puntos, p. ej. `t('auth.sign_in')`. Interpolación: `t('clave', { name: 'x' })` con `:name` en la cadena PHP.
+- **Cambio de idioma:** [LocaleSwitcher](mdc:resources/js/components/molecules/LocaleSwitcher.tsx) hace `POST /locale` ([LocaleController](mdc:app/Http/Controllers/LocaleController.php)). No añadir paquetes npm para textos si basta con `t()` y Laravel.
+- **Nombre de la app:** mantener **Money Tracker** como literal de marca cuando corresponda; no traducir el nombre del producto entre idiomas salvo decisión explícita.
+- **Datos de usuario / BD:** no pasar por `t()`; mostrar tal cual vienen del servidor.
+- **Mensajes flash y validación en PHP:** usar `__('frontend....')` para que respeten el locale (p. ej. controladores de auth y [EmailVerificationCodeService](mdc:app/Services/Auth/EmailVerificationCodeService.php)).
+- **HTML / navegador:** [app.blade.php](mdc:resources/views/app.blade.php) usa `lang` según `app()->getLocale()` y `translate="no"`. [LocaleSync](mdc:resources/js/components/LocaleSync.tsx) actualiza `document.documentElement.lang` en navegaciones Inertia para alinear con el idioma real y desalentar traducción automática del navegador.
+
+## Al añadir texto nuevo
+
+1. Añadir la clave en **ambos** `lang/en/frontend.php` y `lang/es/frontend.php`.
+2. Usar `t('...')` en JSX/TSX o `__('frontend...')` en PHP.
+3. Evitar cadenas visibles hardcodeadas en un solo idioma.

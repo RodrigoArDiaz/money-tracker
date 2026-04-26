@@ -1,5 +1,6 @@
 import { Link, useForm, usePage } from '@inertiajs/react';
 
+import { useTranslate } from '@/hooks/use-translate';
 import Alert from '../atoms/Alert';
 import AuthPanelDivider from '../atoms/AuthPanelDivider';
 import PasswordInput from '../atoms/PasswordInput';
@@ -9,6 +10,7 @@ import FormField from '../molecules/FormField';
 import GoogleOAuthLink from '../molecules/GoogleOAuthLink';
 
 export default function AuthLoginPanel({ canLoginWithGoogle }) {
+    const { t } = useTranslate();
     const { flash } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         email: '',
@@ -22,12 +24,10 @@ export default function AuthLoginPanel({ canLoginWithGoogle }) {
     }
 
     return (
-        <div className="w-full max-w-md mx-auto">
-            <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-[#161615] shadow-sm p-8">
-                <h2 className="text-xl font-semibold mb-1 text-center">Iniciar sesión</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6">
-                    Entrá con Google o con tu correo y contraseña.
-                </p>
+        <div className="mx-auto w-full max-w-md">
+            <div className="rounded-2xl border border-border bg-card/90 p-8 text-card-foreground shadow-sm backdrop-blur-sm">
+                <h2 className="mb-1 text-center text-xl font-semibold">{t('auth.login_title')}</h2>
+                <p className="mb-6 text-center text-sm text-muted-foreground">{t('auth.login_subtitle')}</p>
 
                 {flash?.error && (
                     <Alert variant="danger" className="mb-4">
@@ -41,12 +41,14 @@ export default function AuthLoginPanel({ canLoginWithGoogle }) {
                     </Alert>
                 )}
 
-                {canLoginWithGoogle && <GoogleOAuthLink href="/auth/google">Continuar con Google</GoogleOAuthLink>}
+                {canLoginWithGoogle && (
+                    <GoogleOAuthLink href="/auth/google">{t('auth.continue_google')}</GoogleOAuthLink>
+                )}
 
-                <AuthPanelDivider>o con email</AuthPanelDivider>
+                <AuthPanelDivider>{t('auth.divider_email')}</AuthPanelDivider>
 
                 <form onSubmit={submit} className="space-y-4">
-                    <FormField label="Correo electrónico" htmlFor="email" error={errors.email}>
+                    <FormField label={t('auth.email')} htmlFor="email" error={errors.email}>
                         <TextInput
                             id="email"
                             type="email"
@@ -57,37 +59,37 @@ export default function AuthLoginPanel({ canLoginWithGoogle }) {
                         />
                     </FormField>
 
-                    <FormField label="Contraseña" htmlFor="password" error={errors.password}>
+                    <FormField label={t('auth.password')} htmlFor="password" error={errors.password}>
                         <PasswordInput
                             id="password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
                             autoComplete="current-password"
                             required
-                            toggleShowAriaLabel="Mostrar contraseña"
-                            toggleHideAriaLabel="Ocultar contraseña"
+                            toggleShowAriaLabel={t('register.show_password')}
+                            toggleHideAriaLabel={t('register.hide_password')}
                         />
                     </FormField>
 
-                    <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
                         <input
                             type="checkbox"
                             checked={data.remember}
                             onChange={(e) => setData('remember', e.target.checked)}
-                            className="rounded border-black/20 dark:border-white/20"
+                            className="rounded border-input"
                         />
-                        Recordarme en este dispositivo
+                        {t('auth.remember')}
                     </label>
 
                     <PrimaryButton type="submit" disabled={processing}>
-                        {processing ? 'Entrando…' : 'Entrar'}
+                        {processing ? t('auth.signing_in') : t('auth.sign_in')}
                     </PrimaryButton>
                 </form>
 
-                <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-                    ¿No tenés cuenta?{' '}
-                    <Link href="/register" className="font-medium text-[#1b1b18] dark:text-[#EDEDEC] hover:underline">
-                        Registrarse
+                <p className="mt-6 text-center text-sm text-muted-foreground">
+                    {t('auth.no_account')}{' '}
+                    <Link href="/register" className="font-medium text-foreground hover:underline">
+                        {t('auth.register_link')}
                     </Link>
                 </p>
             </div>

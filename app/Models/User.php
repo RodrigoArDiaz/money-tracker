@@ -14,7 +14,7 @@ use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['first_name', 'last_name', 'email', 'password', 'google_id'])]
+#[Fillable(['first_name', 'last_name', 'email', 'password', 'google_id', 'preferred_locale'])]
 #[Hidden(['password', 'remember_token', 'email_verification_code_hash'])]
 class User extends Authenticatable implements OAuthenticatable
 {

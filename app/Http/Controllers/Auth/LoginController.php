@@ -25,7 +25,7 @@ class LoginController extends Controller
     {
         if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             throw ValidationException::withMessages([
-                'email' => 'Credenciales incorrectas.',
+                'email' => __('frontend.auth.invalid_credentials'),
             ]);
         }
 
@@ -34,16 +34,16 @@ class LoginController extends Controller
         $user = Auth::user();
         if ($user === null) {
             throw ValidationException::withMessages([
-                'email' => 'Credenciales incorrectas.',
+                'email' => __('frontend.auth.invalid_credentials'),
             ]);
         }
 
         if ($user->requiresEmailVerificationCode()) {
             return redirect()
                 ->route('verification.code.show')
-                ->with('success', 'Verificá tu correo con el código que te enviamos para continuar.');
+                ->with('success', __('frontend.flash.verify_email_prompt'));
         }
 
-        return redirect()->intended(route('home'));
+        return redirect()->intended(route('dashboard'));
     }
 }

@@ -33,8 +33,8 @@ class LoginRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'email' => 'correo electrónico',
-            'password' => 'contraseña',
+            'email' => __('frontend.validation.attributes.email'),
+            'password' => __('frontend.validation.attributes.password'),
         ];
     }
 }

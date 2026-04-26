@@ -48,7 +48,7 @@ class EmailVerificationCodeService
         if ($user->email_verification_sent_at !== null
             && $user->email_verification_sent_at->gt(now()->subSeconds(self::RESEND_COOLDOWN_SECONDS))) {
             throw ValidationException::withMessages([
-                'resend' => 'Debes esperar un minuto antes de solicitar otro código.',
+                'resend' => __('frontend.verification_service.resend_wait'),
             ]);
         }
 
@@ -66,28 +66,28 @@ class EmailVerificationCodeService
 
         if ($user->email_verification_locked_until !== null && $user->email_verification_locked_until->isFuture()) {
             throw ValidationException::withMessages([
-                'code' => 'Demasiados intentos fallidos. Vuelve a intentar más tarde o solicita un código nuevo.',
+                'code' => __('frontend.verification_service.code_locked'),
             ]);
         }
 
         if ($user->email_verification_code_hash === null || $user->email_verification_code_expires_at === null) {
             $this->registerFailedAttempt($user);
             throw ValidationException::withMessages([
-                'code' => 'Código inválido o expirado. Solicita uno nuevo.',
+                'code' => __('frontend.verification_service.code_invalid'),
             ]);
         }
 
         if ($user->email_verification_code_expires_at->isPast()) {
             $this->registerFailedAttempt($user);
             throw ValidationException::withMessages([
-                'code' => 'Código inválido o expirado. Solicita uno nuevo.',
+                'code' => __('frontend.verification_service.code_invalid'),
             ]);
         }
 
         if (! Hash::check($code, $user->email_verification_code_hash)) {
             $this->registerFailedAttempt($user);
             throw ValidationException::withMessages([
-                'code' => 'Código inválido o expirado. Solicita uno nuevo.',
+                'code' => __('frontend.verification_service.code_invalid'),
             ]);
         }
 

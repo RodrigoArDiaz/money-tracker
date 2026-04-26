@@ -18,7 +18,7 @@ class EmailVerificationTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('verification.code.show'))
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('dashboard'));
     }
 
     public function test_user_can_verify_email_with_code_from_mail(): void
@@ -47,7 +47,7 @@ class EmailVerificationTest extends TestCase
 
         $this->post(route('verification.code.verify'), [
             'code' => $mailable->plainCode,
-        ])->assertRedirect(route('home'));
+        ])->assertRedirect(route('dashboard'));
 
         $user->refresh();
         $this->assertNotNull($user->email_verified_at);
@@ -133,7 +133,7 @@ class EmailVerificationTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('home'))
-            ->assertOk();
+            ->assertRedirect(route('dashboard'));
     }
 
     public function test_guest_cannot_access_verify_routes(): void
@@ -219,7 +219,7 @@ class EmailVerificationTest extends TestCase
         $response->assertSessionHasErrors('code');
         $messages = session('errors')->get('code');
         $this->assertIsArray($messages);
-        $this->assertStringContainsString('Demasiados intentos', $messages[0]);
+        $this->assertStringContainsString(__('frontend.verification_service.code_locked'), $messages[0]);
     }
 
     public function test_verify_redirects_home_when_already_verified(): void
@@ -228,7 +228,7 @@ class EmailVerificationTest extends TestCase
 
         $this->actingAs($user)->post(route('verification.code.verify'), [
             'code' => '123456',
-        ])->assertRedirect(route('home'));
+        ])->assertRedirect(route('dashboard'));
     }
 
     public function test_resend_redirects_home_when_already_verified(): void
@@ -237,7 +237,7 @@ class EmailVerificationTest extends TestCase
 
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route('verification.code.resend'))->assertRedirect(route('home'));
+        $this->actingAs($user)->post(route('verification.code.resend'))->assertRedirect(route('dashboard'));
 
         Mail::assertNothingSent();
     }
