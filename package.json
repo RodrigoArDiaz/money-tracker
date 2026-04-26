@@ -16,5 +16,8 @@
         "react-dom": "^19.2.5",
         "tailwindcss": "^4.0.0",
         "vite": "^8.0.0"
+    },
+    "dependencies": {
+        "lucide-react": "^1.11.0"
     }
 }

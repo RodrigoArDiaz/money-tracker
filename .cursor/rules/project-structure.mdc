@@ -33,6 +33,7 @@ money-tracker/
 │   ├── css/app.css
 │   ├── js/
 │   │   ├── app.jsx         # Inertia / Vite bootstrap
+│   │   ├── components/     # atoms/, molecules/ (UI reutilizable)
 │   │   └── pages/          # React pages (e.g. Welcome.jsx)
 │   └── views/              # app.blade.php (Inertia shell), welcome.blade.php
 ├── routes/

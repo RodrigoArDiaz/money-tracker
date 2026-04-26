@@ -1,0 +1,36 @@
+---
+description: UI React (Inertia) con componentes atómicos y moleculares reutilizables
+globs: resources/js/**/*.jsx
+alwaysApply: false
+---
+
+# Componentes atómicos (React + Inertia)
+
+## Objetivo
+
+Prefiere **piezas pequeñas y reutilizables** antes que páginas monolíticas con mucho JSX repetido. Así se unifican estilos, accesibilidad y mantenimiento.
+
+## Estructura sugerida
+
+| Capa | Rol | Ubicación |
+|------|-----|-----------|
+| **Átomos** | Un solo elemento o bloque mínimo sin lógica de negocio: input estilizado, label, mensaje de error, botón, alerta, divisor | `resources/js/components/atoms/` |
+| **Moléculas** | Composición de 2+ átomos con un propósito claro: campo con label + error + control, enlace OAuth | `resources/js/components/molecules/` |
+| **Páginas** | Orquestan datos (Inertia `useForm`, `usePage`), layout de pantalla y ensamblan moléculas/átomos | `resources/js/pages/` |
+
+Las **páginas** no deben duplicar clases largas de inputs/botones si ya existe un átomo; extrae a `atoms/` o comparte constantes (p. ej. `inputStyles.js`).
+
+## Cuándo extraer
+
+- El mismo patrón visual o de marcado se repite **2+ veces** → átomo o molécula.
+- Inputs, alertas, botones primarios o divisores de auth → **siempre** vía componentes compartidos si ya existen en `components/`.
+- Iconos: preferir **`lucide-react`** en átomos/moléculas en lugar de SVG inline repetido.
+
+## Qué evitar
+
+- Páginas de cientos de líneas con bloques copy-paste de `<label>` + `<input>` + error.
+- Lógica de negocio dentro de átomos (validación Laravel, llamadas API); los átomos reciben props y callbacks.
+
+## Referencia en el proyecto
+
+Ejemplo actual: registro en `resources/js/pages/Register.jsx` usando `components/atoms/*` y `components/molecules/FormField.jsx`, `GoogleOAuthLink.jsx`.
