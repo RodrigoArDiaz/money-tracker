@@ -8,10 +8,7 @@ import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
 import { HomeExpenseListItem, type HomeExpenseListRow } from '@/components/molecules/HomeExpenseListItem';
-import {
-    HomeTodayTotalSummaryCard,
-    HOME_TODAY_EXPENSES_SECTION_HEADING_ID,
-} from '@/components/molecules/HomeTodayTotalSummaryCard';
+import { HomeTodayTotalSummaryCard } from '@/components/molecules/HomeTodayTotalSummaryCard';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -39,49 +36,41 @@ function compactLabelClass(): string {
     return 'mb-0.5 block text-xs font-medium text-muted-foreground';
 }
 
+function formatDayHeading(dateStr: string, locale: string): string {
+    const d = new Date(`${dateStr}T12:00:00`);
+    const label = new Intl.DateTimeFormat(locale === 'es' ? 'es' : 'en', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    }).format(d);
+
+    return capitalizeFirstLetter(label);
+}
+
+function sumExpenseRowsAmount(rows: HomeExpenseListRow[]): number {
+    return rows.reduce((sum, row) => {
+        const n = Number.parseFloat(row.amount);
+
+        return sum + (Number.isNaN(n) ? 0 : n);
+    }, 0);
+}
+
 export default function Home({
     today,
     myCategories,
     defaultCategories,
-    expenses,
+    expensesByDay,
 }: {
     today: string;
     myCategories: CategoryOption[];
     defaultCategories: CategoryOption[];
-    expenses: HomeExpenseListRow[];
+    expensesByDay: { date: string; expenses: HomeExpenseListRow[] }[];
 }) {
     const { t, locale } = useTranslate();
 
-    const formattedDateLabel = React.useMemo(() => {
-        const d = new Date(`${today}T12:00:00`);
-        return new Intl.DateTimeFormat(locale === 'es' ? 'es' : 'en', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        }).format(d);
-    }, [today, locale]);
-
-    const formattedDateHeading = React.useMemo(
-        () => capitalizeFirstLetter(formattedDateLabel),
-        [formattedDateLabel],
-    );
-
     const amountThousandSeparator = locale === 'es' ? '.' : ',';
     const amountDecimalSeparator = locale === 'es' ? ',' : '.';
-
-    const todayTotalNumeric = React.useMemo(() => {
-        return expenses.reduce((sum, row) => {
-            const n = Number.parseFloat(row.amount);
-
-            return sum + (Number.isNaN(n) ? 0 : n);
-        }, 0);
-    }, [expenses]);
-
-    const todayTotalDisplay = React.useMemo(
-        () => formatAmountDisplay(todayTotalNumeric.toFixed(2), locale),
-        [todayTotalNumeric, locale],
-    );
 
     const form = useForm({
         expense_category_id: '',
@@ -338,31 +327,60 @@ export default function Home({
                     </form>
                 </section>
 
-                <section
-                    className="flex flex-col gap-2"
-                    aria-labelledby={HOME_TODAY_EXPENSES_SECTION_HEADING_ID}
-                >
-                    <HomeTodayTotalSummaryCard
-                        formattedDateHeading={formattedDateHeading}
-                        todayTotalDisplay={todayTotalDisplay}
-                    />
-                    {expenses.length === 0 ? (
-                        <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
-                            {t('expenses.empty_today')}
-                        </p>
-                    ) : (
-                        <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-                            {expenses.map((row) => (
-                                <li key={row.id}>
-                                    <HomeExpenseListItem
-                                        row={row}
-                                        onEdit={openEdit}
-                                        onDelete={setDeletingExpense}
+                <section className="flex flex-col gap-6" aria-label={t('expenses.month_expenses_section_aria')}>
+                    {expensesByDay.map((day, index) => {
+                        const isToday = day.date === today;
+                        const formattedDayHeading = formatDayHeading(day.date, locale);
+                        const dayTotalNumeric = sumExpenseRowsAmount(day.expenses);
+                        const dayTotalDisplay = formatAmountDisplay(dayTotalNumeric.toFixed(2), locale);
+                        const headingId = `home-expenses-day-${day.date}`;
+
+                        return (
+                            <React.Fragment key={day.date}>
+                                {index > 0 ? (
+                                    <div
+                                        className="h-px w-full shrink-0 bg-muted"
+                                        aria-hidden
                                     />
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                                ) : null}
+                                <section
+                                    className="flex flex-col gap-2"
+                                    aria-labelledby={headingId}
+                                >
+                                    <HomeTodayTotalSummaryCard
+                                        headingId={headingId}
+                                        formattedDateHeading={formattedDayHeading}
+                                        todayTotalDisplay={dayTotalDisplay}
+                                        totalCaption={isToday ? undefined : t('expenses.day_total_caption')}
+                                        totalAriaLabel={
+                                            isToday
+                                                ? undefined
+                                                : t('expenses.day_total_aria', { amount: dayTotalDisplay })
+                                        }
+                                    />
+                                    {day.expenses.length === 0 ? (
+                                        isToday ? (
+                                            <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
+                                                {t('expenses.empty_today')}
+                                            </p>
+                                        ) : null
+                                    ) : (
+                                        <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
+                                            {day.expenses.map((row) => (
+                                                <li key={row.id}>
+                                                    <HomeExpenseListItem
+                                                        row={row}
+                                                        onEdit={openEdit}
+                                                        onDelete={setDeletingExpense}
+                                                    />
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </section>
+                            </React.Fragment>
+                        );
+                    })}
                 </section>
             </div>
 

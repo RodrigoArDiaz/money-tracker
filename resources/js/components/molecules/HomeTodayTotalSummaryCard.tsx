@@ -4,20 +4,27 @@ import { Sigma } from 'lucide-react';
 import { useTranslate } from '@/hooks/use-translate';
 import { EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME } from '@/lib/expense-card-surface';
 
-export const HOME_TODAY_EXPENSES_SECTION_HEADING_ID = 'today-expenses-date-heading';
-
 export function HomeTodayTotalSummaryCard({
     formattedDateHeading,
     todayTotalDisplay,
+    headingId,
+    totalCaption,
+    totalAriaLabel,
 }: {
     formattedDateHeading: string;
     todayTotalDisplay: string;
+    headingId: string;
+    totalCaption?: string;
+    totalAriaLabel?: string;
 }): React.ReactElement {
     const { t } = useTranslate();
 
+    const caption = totalCaption ?? t('expenses.today_total_caption');
+    const totalAria = totalAriaLabel ?? t('expenses.today_total_aria', { amount: todayTotalDisplay });
+
     return (
         <article className={EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME}>
-            <h2 id={HOME_TODAY_EXPENSES_SECTION_HEADING_ID} className="sr-only">
+            <h2 id={headingId} className="sr-only">
                 {t('expenses.date_heading', { date: formattedDateHeading })}
             </h2>
             <div className="flex flex-col gap-2 sm:hidden">
@@ -25,13 +32,12 @@ export function HomeTodayTotalSummaryCard({
                     <div className="flex min-w-0 flex-1 items-center gap-2">
                         <Sigma className="size-5 shrink-0 text-primary/90" aria-hidden />
                         <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
-                            {t('expenses.today_total_caption')}
+                            {caption}
                         </p>
                     </div>
                     <p
-                        id="today-expenses-total"
                         className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground"
-                        aria-label={t('expenses.today_total_aria', { amount: todayTotalDisplay })}
+                        aria-label={totalAria}
                     >
                         {todayTotalDisplay}
                     </p>
@@ -52,13 +58,13 @@ export function HomeTodayTotalSummaryCard({
                         <Sigma className="size-5 shrink-0 text-primary/90" aria-hidden />
                         <p
                             className="min-w-0 text-left text-lg font-semibold tabular-nums tracking-tight text-foreground"
-                            aria-label={t('expenses.today_total_aria', { amount: todayTotalDisplay })}
+                            aria-label={totalAria}
                         >
                             {todayTotalDisplay}
                         </p>
                     </div>
                     <p className="max-w-[min(100%,16rem)] text-sm font-medium leading-snug text-muted-foreground sm:max-w-[20rem]">
-                        {t('expenses.today_total_caption')}
+                        {caption}
                     </p>
                 </div>
                 <p
