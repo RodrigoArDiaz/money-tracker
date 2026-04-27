@@ -101,9 +101,11 @@ export function HomeMonthPicker({
                         <select
                             id="home-month-picker-year"
                             className={cn(
-                                'h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none',
+                                'home-month-picker-year',
+                                'h-9 w-full min-w-0 cursor-pointer rounded-lg border border-input bg-background px-2.5 py-1',
+                                'text-sm text-foreground outline-none transition-colors',
                                 'focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50',
-                                'dark:bg-input/30',
+                                'dark:border-input dark:bg-input/30 dark:text-foreground dark:[color-scheme:dark]',
                             )}
                             value={draftYear}
                             onChange={(e) => {

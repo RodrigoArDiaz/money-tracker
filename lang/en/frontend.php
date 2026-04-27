@@ -68,20 +68,22 @@ return [
     ],
 
     'dashboard' => [
-        'head_title' => 'Home — Money Tracker',
-        'nav_home' => 'Home',
-        'header_default' => 'Home',
-        'title' => 'Home',
+        'head_title' => 'Your expenses — Money Tracker',
+        'nav_home' => 'Your expenses',
+        'header_default' => 'Your expenses',
+        'title' => 'Your expenses',
         'welcome_heading' => 'Welcome',
         'welcome_text' => 'This is your main dashboard. From here you will see your finance summary as we add more features.',
     ],
 
     'expenses' => [
-        'head_title' => 'Home — Money Tracker',
+        'head_title' => 'Your expenses — Money Tracker',
         'title' => 'This month',
         'month_picker_aria' => 'Choose month to view expenses',
         'month_picker_year_label' => 'Year',
         'month_picker_months_region' => 'Months',
+        'month_total_nav_aria' => 'Total spent in this month: :amount',
+        'month_total_nav_tooltip' => 'Total expenses for the month',
         'month_expenses_section_aria' => 'Expenses this month, by day',
         'date_heading' => ':date',
         'today_total_aria' => 'Today\'s total: :amount',
@@ -172,7 +174,7 @@ return [
     'layout' => [
         'panel' => 'Panel',
         'nav_section' => 'Navigation',
-        'home_tooltip' => 'Home',
+        'home_tooltip' => 'Your expenses',
         'footer_hint' => 'More sections coming soon.',
         'sign_out' => 'Sign out',
     ],

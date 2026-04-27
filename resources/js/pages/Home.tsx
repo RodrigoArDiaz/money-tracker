@@ -19,11 +19,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslate } from '@/hooks/use-translate';
 import { DEFAULT_EXPENSE_CATEGORY_ICON } from '@/lib/expense-card-surface';
 import { capitalizeFirstLetter, formatAmountDisplay } from '@/lib/expense-format';
 import { ExpenseCategoryIcon } from '@/lib/expense-category-icons';
-import { ChevronDown, Tags } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ChevronDown, Sigma, Tags } from 'lucide-react';
 
 type CategoryOption = {
     id: number;
@@ -73,6 +75,16 @@ export default function Home({
     expensesByDay: { date: string; expenses: HomeExpenseListRow[] }[];
 }) {
     const { t, locale } = useTranslate();
+
+    const monthTotalNumeric = React.useMemo(
+        () => expensesByDay.reduce((acc, day) => acc + sumExpenseRowsAmount(day.expenses), 0),
+        [expensesByDay],
+    );
+
+    const monthTotalDisplay = React.useMemo(
+        () => formatAmountDisplay(monthTotalNumeric.toFixed(2), locale),
+        [monthTotalNumeric, locale],
+    );
 
     const amountThousandSeparator = locale === 'es' ? '.' : ',';
     const amountDecimalSeparator = locale === 'es' ? ',' : '.';
@@ -233,7 +245,31 @@ export default function Home({
     }
 
     return (
-        <AppDashboardLayout title={<HomeMonthPicker viewYear={viewYear} viewMonth={viewMonth} />}>
+        <AppDashboardLayout
+            title={
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <HomeMonthPicker viewYear={viewYear} viewMonth={viewMonth} />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div
+                                className={cn(
+                                    'flex h-9 shrink-0 cursor-default items-center justify-center gap-2 rounded-lg border border-border bg-background px-2.5',
+                                    'text-sm font-semibold tabular-nums tracking-tight text-foreground',
+                                    'shadow-none md:h-10 dark:border-input dark:bg-input/30',
+                                )}
+                                aria-label={t('expenses.month_total_nav_aria', { amount: monthTotalDisplay })}
+                            >
+                                <Sigma className="size-4 shrink-0 text-primary/90 md:size-[1.125rem]" aria-hidden />
+                                {monthTotalDisplay}
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" sideOffset={6}>
+                            {t('expenses.month_total_nav_tooltip')}
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+            }
+        >
             <Head title={t('expenses.head_title')} />
             <div className="space-y-6">
                 <section className="rounded-xl border bg-card p-3 text-card-foreground shadow-sm sm:p-4">

@@ -68,20 +68,22 @@ return [
     ],
 
     'dashboard' => [
-        'head_title' => 'Inicio — Money Tracker',
-        'nav_home' => 'Inicio',
-        'header_default' => 'Inicio',
-        'title' => 'Inicio',
+        'head_title' => 'Tus gastos — Money Tracker',
+        'nav_home' => 'Tus gastos',
+        'header_default' => 'Tus gastos',
+        'title' => 'Tus gastos',
         'welcome_heading' => 'Bienvenido',
         'welcome_text' => 'Este es tu panel principal. Desde aquí podrás ver el resumen de tus finanzas cuando añadamos las siguientes funciones.',
     ],
 
     'expenses' => [
-        'head_title' => 'Inicio — Money Tracker',
+        'head_title' => 'Tus gastos — Money Tracker',
         'title' => 'Este mes',
         'month_picker_aria' => 'Elegir mes para ver gastos',
         'month_picker_year_label' => 'Año',
         'month_picker_months_region' => 'Meses',
+        'month_total_nav_aria' => 'Total gastado en este mes: :amount',
+        'month_total_nav_tooltip' => 'Total de gasto del mes',
         'month_expenses_section_aria' => 'Gastos del mes, por día',
         'date_heading' => ':date',
         'today_total_aria' => 'Total de hoy: :amount',
@@ -172,7 +174,7 @@ return [
     'layout' => [
         'panel' => 'Panel',
         'nav_section' => 'Navegación',
-        'home_tooltip' => 'Inicio',
+        'home_tooltip' => 'Tus gastos',
         'footer_hint' => 'Más secciones próximamente.',
         'sign_out' => 'Cerrar sesión',
     ],
