@@ -21,6 +21,8 @@ class HomePageService
      *
      * @return array{
      *     today: string,
+     *     viewYear: int,
+     *     viewMonth: int,
      *     myCategories: list<array{id: int, name: string, icon: string|null}>,
      *     defaultCategories: list<array{id: int, name: string, icon: string|null}>,
      *     expensesByDay: list<array{
@@ -36,13 +38,12 @@ class HomePageService
      *     }>
      * }
      */
-    public function inertiaPropsForAuthenticatedUser(User $user): array
+    public function inertiaPropsForAuthenticatedUser(User $user, int $viewYear, int $viewMonth): array
     {
         $locale = app()->getLocale();
         $now = now();
         $today = $now->toDateString();
-        $year = (int) $now->year;
-        $month = (int) $now->month;
+        $isViewingCurrentMonth = $viewYear === (int) $now->year && $viewMonth === (int) $now->month;
 
         $myCategories = $this->expenseCategoryRepository
             ->ownedByUserOrdered($user)
@@ -62,19 +63,25 @@ class HomePageService
             ])
             ->all();
 
-        $monthExpenses = $this->expenseRepository->forUserInMonthWithCategory($user, $year, $month);
+        $monthExpenses = $this->expenseRepository->forUserInMonthWithCategory($user, $viewYear, $viewMonth);
 
         /** @var Collection<string, Collection<int, Expense>> $byDate */
         $byDate = $monthExpenses->groupBy(fn (Expense $expense): string => $expense->spent_on->toDateString());
 
-        $datesToShow = $byDate->keys()
-            ->merge([$today])
-            ->unique()
-            ->filter(fn (string $date): bool => $date === $today || $byDate->has($date))
-            ->sort()
-            ->values()
-            ->reverse()
-            ->values();
+        $datesToShow = $isViewingCurrentMonth
+            ? $byDate->keys()
+                ->merge([$today])
+                ->unique()
+                ->filter(fn (string $date): bool => $date === $today || $byDate->has($date))
+                ->sort()
+                ->values()
+                ->reverse()
+                ->values()
+            : $byDate->keys()
+                ->sort()
+                ->values()
+                ->reverse()
+                ->values();
 
         $expensesByDay = $datesToShow
             ->map(function (string $date) use ($byDate, $locale): array {
@@ -99,6 +106,8 @@ class HomePageService
 
         return [
             'today' => $today,
+            'viewYear' => $viewYear,
+            'viewMonth' => $viewMonth,
             'myCategories' => $myCategories,
             'defaultCategories' => $defaultCategories,
             'expensesByDay' => $expensesByDay,

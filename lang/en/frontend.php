@@ -79,6 +79,9 @@ return [
     'expenses' => [
         'head_title' => 'Home — Money Tracker',
         'title' => 'This month',
+        'month_picker_aria' => 'Choose month to view expenses',
+        'month_picker_year_label' => 'Year',
+        'month_picker_months_region' => 'Months',
         'month_expenses_section_aria' => 'Expenses this month, by day',
         'date_heading' => ':date',
         'today_total_aria' => 'Today\'s total: :amount',

@@ -79,6 +79,9 @@ return [
     'expenses' => [
         'head_title' => 'Inicio — Money Tracker',
         'title' => 'Este mes',
+        'month_picker_aria' => 'Elegir mes para ver gastos',
+        'month_picker_year_label' => 'Año',
+        'month_picker_months_region' => 'Meses',
         'month_expenses_section_aria' => 'Gastos del mes, por día',
         'date_heading' => ':date',
         'today_total_aria' => 'Total de hoy: :amount',

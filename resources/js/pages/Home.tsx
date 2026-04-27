@@ -8,6 +8,7 @@ import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
 import { HomeExpenseListItem, type HomeExpenseListRow } from '@/components/molecules/HomeExpenseListItem';
+import { HomeMonthPicker } from '@/components/molecules/HomeMonthPicker';
 import { HomeTodayTotalSummaryCard } from '@/components/molecules/HomeTodayTotalSummaryCard';
 import { Button } from '@/components/ui/button';
 import {
@@ -58,11 +59,15 @@ function sumExpenseRowsAmount(rows: HomeExpenseListRow[]): number {
 
 export default function Home({
     today,
+    viewYear,
+    viewMonth,
     myCategories,
     defaultCategories,
     expensesByDay,
 }: {
     today: string;
+    viewYear: number;
+    viewMonth: number;
     myCategories: CategoryOption[];
     defaultCategories: CategoryOption[];
     expensesByDay: { date: string; expenses: HomeExpenseListRow[] }[];
@@ -76,13 +81,27 @@ export default function Home({
         expense_category_id: '',
         description: '',
         amount: '',
+        redirect_year: String(viewYear),
+        redirect_month: String(viewMonth),
     });
 
     const editForm = useForm({
         expense_category_id: '',
         description: '',
         amount: '',
+        redirect_year: String(viewYear),
+        redirect_month: String(viewMonth),
     });
+
+    React.useEffect(() => {
+        form.setData('redirect_year', String(viewYear));
+        form.setData('redirect_month', String(viewMonth));
+    }, [viewYear, viewMonth]);
+
+    React.useEffect(() => {
+        editForm.setData('redirect_year', String(viewYear));
+        editForm.setData('redirect_month', String(viewMonth));
+    }, [viewYear, viewMonth]);
 
     const [categoryPickerOpen, setCategoryPickerOpen] = React.useState(false);
     const [editCategoryPickerOpen, setEditCategoryPickerOpen] = React.useState(false);
@@ -168,6 +187,8 @@ export default function Home({
             expense_category_id: String(row.expense_category_id),
             description: row.description,
             amount: row.amount,
+            redirect_year: String(viewYear),
+            redirect_month: String(viewMonth),
         });
         editForm.clearErrors();
         setEditDialogOpen(true);
@@ -200,6 +221,10 @@ export default function Home({
         setDeleteSubmitting(true);
         router.delete(`/expenses/${deletingExpense.id}`, {
             preserveScroll: true,
+            data: {
+                redirect_year: viewYear,
+                redirect_month: viewMonth,
+            },
             onFinish: () => {
                 setDeleteSubmitting(false);
                 setDeletingExpense(null);
@@ -208,7 +233,7 @@ export default function Home({
     }
 
     return (
-        <AppDashboardLayout title={t('expenses.title')}>
+        <AppDashboardLayout title={<HomeMonthPicker viewYear={viewYear} viewMonth={viewMonth} />}>
             <Head title={t('expenses.head_title')} />
             <div className="space-y-6">
                 <section className="rounded-xl border bg-card p-3 text-card-foreground shadow-sm sm:p-4">

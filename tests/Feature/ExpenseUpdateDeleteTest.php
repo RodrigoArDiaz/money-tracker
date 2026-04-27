@@ -34,7 +34,7 @@ class ExpenseUpdateDeleteTest extends TestCase
                 'description' => 'Después',
                 'amount' => 22.5,
             ])
-            ->assertRedirect(route('home'))
+            ->assertRedirect(route('home', ['year' => now()->year, 'month' => now()->month]))
             ->assertSessionHas('success', __('frontend.expenses.flash.updated'));
 
         $expense->refresh();
@@ -61,7 +61,7 @@ class ExpenseUpdateDeleteTest extends TestCase
                 'expense_category_id' => $category->id,
                 'amount' => 5,
             ])
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('home', ['year' => now()->year, 'month' => now()->month]));
 
         $this->assertSame('', $expense->fresh()->description);
     }
@@ -100,7 +100,7 @@ class ExpenseUpdateDeleteTest extends TestCase
 
         $this->actingAs($user)
             ->delete(route('expenses.destroy', $expense))
-            ->assertRedirect(route('home'))
+            ->assertRedirect(route('home', ['year' => now()->year, 'month' => now()->month]))
             ->assertSessionHas('success', __('frontend.expenses.flash.deleted'));
 
         $this->assertNull(Expense::query()->find($expense->id));
