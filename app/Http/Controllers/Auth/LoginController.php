@@ -44,6 +44,6 @@ class LoginController extends Controller
                 ->with('success', __('frontend.flash.verify_email_prompt'));
         }
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended(route('home'));
     }
 }

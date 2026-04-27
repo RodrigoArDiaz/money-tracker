@@ -152,10 +152,10 @@ Check sibling files, related controllers, models, or tests for established patte
 
 ### 16. Controller–Service–Repository → `rules/controller-service-repository.md`
 
-- Thin controllers (HTTP, auth, response); use cases in **Services**; **Repository** only when it reduces duplication or improves test seams (Eloquent alone is often enough)
-- `FormRequest` + `$request->validated()` into the service; no business logic or heavy queries in controllers
-- `DB::transaction` and orchestration in the service; inject dependencies, never `app()` for layers
-- Repositories do not know HTTP; feature tests for full flow, unit tests at service/repository boundaries when useful
+- **Siempre** las tres capas: thin controllers; casos de uso en **Services**; **todo acceso a persistencia/consultas de dominio** en **Repositories** (los services no llaman a `Model::` / `DB::` directamente para ese dominio)
+- `FormRequest` + `$request->validated()` hacia el service; sin lógica de negocio ni consultas pesadas en controllers
+- `DB::transaction` y orquestación en el service; inyección por constructor, nunca `app()` para estas capas
+- Los repositories no conocen HTTP; feature tests del flujo completo; unit tests con mock del contrato del repository cuando aplique
 
 ### 17. Migrations → `rules/migrations.md`
 

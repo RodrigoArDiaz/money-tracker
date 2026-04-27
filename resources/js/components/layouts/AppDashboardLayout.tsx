@@ -62,7 +62,7 @@ function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard">
+                            <Link href="/">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                                     <Wallet className="size-4" />
                                 </div>
@@ -83,10 +83,10 @@ function AppSidebar() {
                             <SidebarMenuItem>
                                 <SidebarMenuButton
                                     asChild
-                                    isActive={url.startsWith('/dashboard')}
+                                    isActive={url === '/' || url === ''}
                                     tooltip={t('layout.home_tooltip')}
                                 >
-                                    <Link href="/dashboard">
+                                    <Link href="/">
                                         <LayoutDashboard />
                                         <span>{t('dashboard.nav_home')}</span>
                                     </Link>

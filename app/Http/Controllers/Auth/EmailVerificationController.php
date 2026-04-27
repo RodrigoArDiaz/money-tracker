@@ -23,11 +23,11 @@ class EmailVerificationController extends Controller
             return redirect()->route('home');
         }
         if ($user->hasVerifiedEmail()) {
-            return redirect()->route('dashboard');
+            return redirect()->route('home');
         }
 
         if (! $user->requiresEmailVerificationCode()) {
-            return redirect()->route('dashboard');
+            return redirect()->route('home');
         }
 
         return Inertia::render('VerifyEmail', [
@@ -42,14 +42,12 @@ class EmailVerificationController extends Controller
     {
         $user = $request->user();
         if ($user === null || ! $user->requiresEmailVerificationCode()) {
-            return $user === null
-                ? redirect()->route('home')
-                : redirect()->route('dashboard');
+            return redirect()->route('home');
         }
 
         $service->verify($user, $request->validated('code'));
 
-        return redirect()->route('dashboard')->with('success', __('frontend.flash.email_verified'));
+        return redirect()->route('home')->with('success', __('frontend.flash.email_verified'));
     }
 
     /**
@@ -63,7 +61,7 @@ class EmailVerificationController extends Controller
         }
 
         if ($user->hasVerifiedEmail() || ! $user->requiresEmailVerificationCode()) {
-            return redirect()->route('dashboard');
+            return redirect()->route('home');
         }
 
         try {
