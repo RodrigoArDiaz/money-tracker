@@ -7,6 +7,11 @@ import PrimaryButton from '@/components/atoms/PrimaryButton';
 import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
+import { HomeExpenseListItem, type HomeExpenseListRow } from '@/components/molecules/HomeExpenseListItem';
+import {
+    HomeTodayTotalSummaryCard,
+    HOME_TODAY_EXPENSES_SECTION_HEADING_ID,
+} from '@/components/molecules/HomeTodayTotalSummaryCard';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -16,10 +21,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslate } from '@/hooks/use-translate';
+import { DEFAULT_EXPENSE_CATEGORY_ICON } from '@/lib/expense-card-surface';
+import { capitalizeFirstLetter, formatAmountDisplay } from '@/lib/expense-format';
 import { ExpenseCategoryIcon } from '@/lib/expense-category-icons';
-import { ChevronDown, Pencil, Sigma, Tags, Trash2 } from 'lucide-react';
+import { ChevronDown, Tags } from 'lucide-react';
 
 type CategoryOption = {
     id: number;
@@ -27,52 +33,10 @@ type CategoryOption = {
     icon: string | null;
 };
 
-type ExpenseRow = {
-    id: number;
-    expense_category_id: number;
-    description: string;
-    amount: string;
-    category_name: string;
-    category_icon: string | null;
-};
-
-const DEFAULT_CATEGORY_ICON = 'Tag';
-
 const LAST_EXPENSE_CATEGORY_STORAGE_KEY = 'money-tracker-last-expense-category-id';
-
-/** Cada fila de gasto (card estándar). */
-const expenseCardClassName =
-    'rounded-xl border border-border bg-card px-4 py-2 text-card-foreground shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-primary/20 motion-safe:hover:shadow-md motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-sm sm:px-5 sm:py-2';
-
-/** Resumen del día: más contraste que las cards de gasto (fondo atenuado). */
-const expenseTotalSummaryCardClassName =
-    'rounded-xl border border-muted-foreground/20 bg-muted/55 px-4 py-2 text-card-foreground shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-muted-foreground/35 motion-safe:hover:bg-muted/75 motion-safe:hover:shadow-md motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-sm sm:px-5 sm:py-2 dark:border-border dark:bg-muted/35 dark:motion-safe:hover:bg-muted/45';
-
-function formatAmountDisplay(amount: string, locale: string): string {
-    const n = Number.parseFloat(amount);
-    if (Number.isNaN(n)) {
-        return amount.startsWith('$') ? amount : `$ ${amount}`;
-    }
-
-    const formatted = new Intl.NumberFormat(locale === 'es' ? 'es' : 'en', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }).format(n);
-
-    return `$ ${formatted}`;
-}
 
 function compactLabelClass(): string {
     return 'mb-0.5 block text-xs font-medium text-muted-foreground';
-}
-
-/** Primera letra en mayúscula (p. ej. fecha en español: "lunes…" → "Lunes…"). */
-function capitalizeFirstLetter(value: string): string {
-    if (value.length === 0) {
-        return value;
-    }
-
-    return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export default function Home({
@@ -84,7 +48,7 @@ export default function Home({
     today: string;
     myCategories: CategoryOption[];
     defaultCategories: CategoryOption[];
-    expenses: ExpenseRow[];
+    expenses: HomeExpenseListRow[];
 }) {
     const { t, locale } = useTranslate();
 
@@ -134,8 +98,8 @@ export default function Home({
     const [categoryPickerOpen, setCategoryPickerOpen] = React.useState(false);
     const [editCategoryPickerOpen, setEditCategoryPickerOpen] = React.useState(false);
     const [editDialogOpen, setEditDialogOpen] = React.useState(false);
-    const [editingExpense, setEditingExpense] = React.useState<ExpenseRow | null>(null);
-    const [deletingExpense, setDeletingExpense] = React.useState<ExpenseRow | null>(null);
+    const [editingExpense, setEditingExpense] = React.useState<HomeExpenseListRow | null>(null);
+    const [deletingExpense, setDeletingExpense] = React.useState<HomeExpenseListRow | null>(null);
     const [deleteSubmitting, setDeleteSubmitting] = React.useState(false);
 
     const amountRef = React.useRef<HTMLInputElement | null>(null);
@@ -209,7 +173,7 @@ export default function Home({
         });
     }
 
-    function openEdit(row: ExpenseRow): void {
+    function openEdit(row: HomeExpenseListRow): void {
         setEditingExpense(row);
         editForm.setData({
             expense_category_id: String(row.expense_category_id),
@@ -285,7 +249,7 @@ export default function Home({
                                 {selectedCategory ? (
                                     <>
                                         <ExpenseCategoryIcon
-                                            name={selectedCategory.icon ?? DEFAULT_CATEGORY_ICON}
+                                            name={selectedCategory.icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
                                             className="size-4 shrink-0 text-muted-foreground"
                                         />
                                         <span className="min-w-0 flex-1 truncate text-left text-sm">
@@ -376,178 +340,27 @@ export default function Home({
 
                 <section
                     className="flex flex-col gap-2"
-                    aria-labelledby="today-expenses-date-heading"
+                    aria-labelledby={HOME_TODAY_EXPENSES_SECTION_HEADING_ID}
                 >
-                    <article className={expenseTotalSummaryCardClassName}>
-                        <h2 id="today-expenses-date-heading" className="sr-only">
-                            {t('expenses.date_heading', { date: formattedDateHeading })}
-                        </h2>
-                        <div className="flex flex-col gap-2 sm:hidden">
-                            <div className="flex items-center justify-between gap-2">
-                                <div className="flex min-w-0 flex-1 items-center gap-2">
-                                    <Sigma
-                                        className="size-5 shrink-0 text-primary/90"
-                                        aria-hidden
-                                    />
-                                    <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
-                                        {t('expenses.today_total_caption')}
-                                    </p>
-                                </div>
-                                <p
-                                    id="today-expenses-total"
-                                    className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground"
-                                    aria-label={t('expenses.today_total_aria', { amount: todayTotalDisplay })}
-                                >
-                                    {todayTotalDisplay}
-                                </p>
-                            </div>
-                            <div className="flex items-start justify-between gap-3">
-                                <p
-                                    className="min-w-0 flex-1 text-left text-sm font-medium leading-snug text-foreground"
-                                    aria-hidden
-                                >
-                                    {t('expenses.date_heading', { date: formattedDateHeading })}
-                                </p>
-                                <span
-                                    className="inline-flex w-[4.5rem] shrink-0"
-                                    aria-hidden
-                                />
-                            </div>
-                        </div>
-                        <header className="hidden items-center justify-between gap-3 sm:flex">
-                            <div className="flex min-w-0 flex-1 flex-col gap-1">
-                                <div className="flex items-center gap-2.5 sm:gap-3">
-                                    <Sigma
-                                        className="size-5 shrink-0 text-primary/90"
-                                        aria-hidden
-                                    />
-                                    <p
-                                        className="min-w-0 text-left text-lg font-semibold tabular-nums tracking-tight text-foreground"
-                                        aria-label={t('expenses.today_total_aria', { amount: todayTotalDisplay })}
-                                    >
-                                        {todayTotalDisplay}
-                                    </p>
-                                </div>
-                                <p className="max-w-[min(100%,16rem)] text-sm font-medium leading-snug text-muted-foreground sm:max-w-[20rem]">
-                                    {t('expenses.today_total_caption')}
-                                </p>
-                            </div>
-                            <p
-                                className="shrink-0 text-right text-sm font-semibold tracking-tight text-foreground sm:text-base"
-                                aria-hidden
-                            >
-                                {t('expenses.date_heading', { date: formattedDateHeading })}
-                            </p>
-                        </header>
-                    </article>
+                    <HomeTodayTotalSummaryCard
+                        formattedDateHeading={formattedDateHeading}
+                        todayTotalDisplay={todayTotalDisplay}
+                    />
                     {expenses.length === 0 ? (
                         <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
                             {t('expenses.empty_today')}
                         </p>
                     ) : (
                         <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-                            {expenses.map((row) => {
-                                const descriptionBlock =
-                                    row.description.trim() !== '' ? (
-                                        <p className="text-sm font-medium leading-snug text-foreground">
-                                            {row.description}
-                                        </p>
-                                    ) : (
-                                        <p className="text-sm italic text-muted-foreground">
-                                            {t('expenses.list_no_description')}
-                                        </p>
-                                    );
-
-                                const expenseCardActions = (
-                                    <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className="shrink-0"
-                                                    onClick={() => openEdit(row)}
-                                                    aria-label={t('expenses.card_edit_aria')}
-                                                >
-                                                    <Pencil className="size-4" aria-hidden />
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="top" sideOffset={4}>
-                                                {t('expenses.card_edit_tooltip')}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                                    onClick={() => setDeletingExpense(row)}
-                                                    aria-label={t('expenses.card_delete_aria')}
-                                                >
-                                                    <Trash2 className="size-4" aria-hidden />
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="top" sideOffset={4}>
-                                                {t('expenses.card_delete_tooltip')}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </div>
-                                );
-
-                                return (
-                                    <li key={row.id}>
-                                        <article className={expenseCardClassName}>
-                                            <div className="flex flex-col gap-2 sm:hidden">
-                                                <div className="flex items-center justify-between gap-2">
-                                                    <div className="flex min-w-0 flex-1 items-center gap-2">
-                                                        <ExpenseCategoryIcon
-                                                            name={row.category_icon ?? DEFAULT_CATEGORY_ICON}
-                                                            className="size-5 shrink-0 text-primary/90"
-                                                        />
-                                                        <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
-                                                            {row.category_name}
-                                                        </p>
-                                                    </div>
-                                                    <p className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground">
-                                                        {formatAmountDisplay(row.amount, locale)}
-                                                    </p>
-                                                </div>
-                                                <div className="flex items-start justify-between gap-3">
-                                                    <div className="min-w-0 flex-1 text-left">{descriptionBlock}</div>
-                                                    {expenseCardActions}
-                                                </div>
-                                            </div>
-
-                                            <div className="hidden items-center gap-1.5 sm:flex sm:gap-2">
-                                                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                                                    <div className="flex items-center gap-2.5 sm:gap-3">
-                                                        <ExpenseCategoryIcon
-                                                            name={row.category_icon ?? DEFAULT_CATEGORY_ICON}
-                                                            className="size-5 shrink-0 text-primary/90"
-                                                        />
-                                                        <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
-                                                            {formatAmountDisplay(row.amount, locale)}
-                                                        </p>
-                                                    </div>
-                                                    <p className="max-w-[min(100%,16rem)] text-sm font-medium leading-snug text-muted-foreground sm:max-w-[20rem]">
-                                                        {row.category_name}
-                                                    </p>
-                                                </div>
-                                                <div className="min-w-0 flex-1 basis-0 pl-1 text-right sm:pl-1.5">
-                                                    {descriptionBlock}
-                                                </div>
-                                                <div className="flex shrink-0 items-center gap-2 pl-1.5 sm:pl-2">
-                                                    <div className="w-px shrink-0 self-stretch bg-border" aria-hidden />
-                                                    {expenseCardActions}
-                                                </div>
-                                            </div>
-                                        </article>
-                                    </li>
-                                );
-                            })}
+                            {expenses.map((row) => (
+                                <li key={row.id}>
+                                    <HomeExpenseListItem
+                                        row={row}
+                                        onEdit={openEdit}
+                                        onDelete={setDeletingExpense}
+                                    />
+                                </li>
+                            ))}
                         </ul>
                     )}
                 </section>
@@ -586,7 +399,7 @@ export default function Home({
                                 {editSelectedCategory ? (
                                     <>
                                         <ExpenseCategoryIcon
-                                            name={editSelectedCategory.icon ?? DEFAULT_CATEGORY_ICON}
+                                            name={editSelectedCategory.icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
                                             className="size-4 shrink-0 text-muted-foreground"
                                         />
                                         <span className="min-w-0 flex-1 truncate text-left text-sm">
