@@ -36,6 +36,8 @@ class HomeMonthExpensesTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Home')
+                ->where('viewYear', 2026)
+                ->where('viewMonth', 4)
                 ->has('expensesByDay', 3)
                 ->where('expensesByDay.0.date', '2026-04-15')
                 ->has('expensesByDay.0.expenses', fn ($c) => $c->toArray() === [])
@@ -67,6 +69,8 @@ class HomeMonthExpensesTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Home')
+                ->where('viewYear', 2026)
+                ->where('viewMonth', 4)
                 ->has('expensesByDay', 2)
                 ->where('expensesByDay.0.date', '2026-04-15')
                 ->has('expensesByDay.0.expenses', fn ($c) => $c->toArray() === [])
@@ -94,9 +98,57 @@ class HomeMonthExpensesTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Home')
+                ->where('viewYear', 2026)
+                ->where('viewMonth', 4)
                 ->has('expensesByDay', 1)
                 ->where('expensesByDay.0.date', '2026-04-15')
                 ->has('expensesByDay.0.expenses', fn ($c) => $c->toArray() === []));
+
+        $this->travelBack();
+    }
+
+    #[Test]
+    public function home_accepts_year_and_month_query_to_show_that_month(): void
+    {
+        $this->travelTo(Carbon::parse('2026-04-15 12:00:00', 'UTC'));
+
+        $user = User::factory()->create();
+        $category = ExpenseCategory::factory()->for($user, 'user')->create();
+
+        $marchExpense = Expense::factory()->forUserAndCategory($user, $category)->create([
+            'spent_on' => '2026-03-10',
+            'amount' => 15,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('home', ['year' => 2026, 'month' => 3]))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Home')
+                ->where('viewYear', 2026)
+                ->where('viewMonth', 3)
+                ->has('expensesByDay', 1)
+                ->where('expensesByDay.0.date', '2026-03-10')
+                ->has('expensesByDay.0.expenses', 1)
+                ->where('expensesByDay.0.expenses.0.id', $marchExpense->id));
+
+        $this->travelBack();
+    }
+
+    #[Test]
+    public function home_clamps_future_month_to_current(): void
+    {
+        $this->travelTo(Carbon::parse('2026-04-15 12:00:00', 'UTC'));
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get(route('home', ['year' => 2027, 'month' => 1]))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Home')
+                ->where('viewYear', 2026)
+                ->where('viewMonth', 4));
 
         $this->travelBack();
     }

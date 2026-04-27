@@ -140,4 +140,10 @@
   html {
     @apply font-sans;
     }
+
+  /* Lista nativa de <select>: en oscuro el SO suele ignorar tokens; alineamos a popover. */
+  .dark select.home-month-picker-year option {
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+  }
 }

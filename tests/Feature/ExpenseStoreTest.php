@@ -37,7 +37,7 @@ class ExpenseStoreTest extends TestCase
                 'description' => 'Almuerzo',
                 'amount' => 12.5,
             ])
-            ->assertRedirect(route('home'))
+            ->assertRedirect(route('home', ['year' => now()->year, 'month' => now()->month]))
             ->assertSessionHas('success', __('frontend.expenses.flash.created'));
 
         $expense = Expense::query()->where('user_id', $user->id)->firstOrFail();
@@ -61,7 +61,7 @@ class ExpenseStoreTest extends TestCase
                 'description' => 'Taxi',
                 'amount' => 8,
             ])
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('home', ['year' => now()->year, 'month' => now()->month]));
 
         $this->assertSame(1, Expense::query()->where('user_id', $user->id)->count());
     }
@@ -79,7 +79,7 @@ class ExpenseStoreTest extends TestCase
                 'expense_category_id' => $category->id,
                 'amount' => 25,
             ])
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('home', ['year' => now()->year, 'month' => now()->month]));
 
         $expense = Expense::query()->where('user_id', $user->id)->firstOrFail();
         $this->assertSame('', $expense->description);

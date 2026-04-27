@@ -160,7 +160,7 @@ export default function AppDashboardLayout({
     title,
 }: {
     children: React.ReactNode;
-    title?: string;
+    title?: React.ReactNode;
 }) {
     const { auth } = usePage<{ auth: { user: AuthUser | null } }>().props;
     const { t } = useTranslate();
@@ -177,10 +177,10 @@ export default function AppDashboardLayout({
                         )}
                     >
                         <SidebarTrigger className="-ml-1" />
-                        <div className="flex flex-1 flex-col gap-0.5">
-                            <h1 className="text-sm font-semibold tracking-tight md:text-base">
+                        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                            <div className="min-w-0 text-sm font-semibold tracking-tight md:text-base">
                                 {title ?? t('dashboard.header_default')}
-                            </h1>
+                            </div>
                         </div>
                         <div className="flex items-center gap-1">
                             <LocaleSwitcher align="end" />

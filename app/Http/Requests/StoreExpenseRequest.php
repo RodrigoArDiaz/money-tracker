@@ -35,6 +35,8 @@ class StoreExpenseRequest extends FormRequest
             ],
             'description' => ['nullable', 'string', 'max:65535'],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:999999999999.99'],
+            'redirect_year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
+            'redirect_month' => ['nullable', 'integer', 'min:1', 'max:12'],
         ];
     }
 }
