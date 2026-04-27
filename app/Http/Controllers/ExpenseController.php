@@ -5,25 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
+use App\Services\Expense\ExpenseService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
     use AuthorizesRequests;
 
+    public function __construct(
+        private readonly ExpenseService $expenseService,
+    ) {}
+
     public function store(StoreExpenseRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-
-        Expense::query()->create([
-            'user_id' => $request->user()->id,
-            'expense_category_id' => $validated['expense_category_id'],
-            'description' => trim((string) ($validated['description'] ?? '')),
-            'amount' => $validated['amount'],
-            'spent_on' => now()->toDateString(),
-        ]);
+        $this->expenseService->createForToday($request->user(), $request->validated());
 
         return redirect()
             ->route('home')
@@ -32,24 +28,18 @@ class ExpenseController extends Controller
 
     public function update(UpdateExpenseRequest $request, Expense $expense): RedirectResponse
     {
-        $validated = $request->validated();
-
-        $expense->update([
-            'expense_category_id' => $validated['expense_category_id'],
-            'description' => trim((string) ($validated['description'] ?? '')),
-            'amount' => $validated['amount'],
-        ]);
+        $this->expenseService->update($expense, $request->validated());
 
         return redirect()
             ->route('home')
             ->with('success', __('frontend.expenses.flash.updated'));
     }
 
-    public function destroy(Request $request, Expense $expense): RedirectResponse
+    public function destroy(Expense $expense): RedirectResponse
     {
         $this->authorize('delete', $expense);
 
-        $expense->delete();
+        $this->expenseService->delete($expense);
 
         return redirect()
             ->route('home')
