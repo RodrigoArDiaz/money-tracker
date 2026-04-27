@@ -6,24 +6,25 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ExpenseCategoryController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    if (auth()->check()) {
-        return redirect()->route('dashboard');
+Route::get('/', function (Request $request) {
+    if (! auth()->check()) {
+        return Inertia::render('Welcome', [
+            'canLoginWithGoogle' => filled(config('services.google.client_id'))
+                && filled(config('services.google.client_secret')),
+        ]);
     }
 
-    return Inertia::render('Welcome', [
-        'canLoginWithGoogle' => filled(config('services.google.client_id'))
-            && filled(config('services.google.client_secret')),
-    ]);
+    return app(HomeController::class)($request);
 })->name('home');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware('auth')->name('dashboard');
+Route::get('/dashboard', fn () => redirect()->route('home'))->middleware('auth')->name('dashboard');
 
 Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
 
@@ -40,6 +41,7 @@ Route::middleware('auth')->group(function () {
 
     Route::redirect('expense-categories/create', '/expense-categories');
     Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show', 'create', 'edit']);
+    Route::post('expenses', [ExpenseController::class, 'store'])->name('expenses.store');
 });
 
 Route::middleware('guest')->group(function () {

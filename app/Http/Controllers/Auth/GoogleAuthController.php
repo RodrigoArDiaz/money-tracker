@@ -77,7 +77,7 @@ class GoogleAuthController extends Controller
         Auth::login($user, remember: true);
 
         return redirect()
-            ->route('dashboard')
+            ->route('home')
             ->with('success', __('frontend.flash.google_login_success'));
     }
 }

@@ -68,12 +68,37 @@ return [
     ],
 
     'dashboard' => [
-        'head_title' => 'Dashboard — Money Tracker',
+        'head_title' => 'Home — Money Tracker',
         'nav_home' => 'Home',
-        'header_default' => 'Dashboard',
+        'header_default' => 'Home',
         'title' => 'Home',
         'welcome_heading' => 'Welcome',
         'welcome_text' => 'This is your main dashboard. From here you will see your finance summary as we add more features.',
+    ],
+
+    'expenses' => [
+        'head_title' => 'Home — Money Tracker',
+        'title' => 'Today',
+        'date_heading' => 'Expenses for :date',
+        'add_heading' => 'Add expense',
+        'today_list_heading' => 'Today’s expenses',
+        'empty_today' => 'No expenses recorded for today yet.',
+        'category_label' => 'Category',
+        'category_placeholder' => 'Choose a category',
+        'category_picker_title' => 'Choose category',
+        'open_category_picker_aria' => 'Open category picker',
+        'description_label' => 'Description',
+        'description_placeholder' => 'e.g. Lunch, bus fare…',
+        'amount_label' => 'Amount',
+        'amount_placeholder' => '0.00',
+        'submit' => 'Save expense',
+        'submitting' => 'Saving…',
+        'list_description' => 'Description',
+        'list_category' => 'Category',
+        'list_amount' => 'Amount',
+        'flash' => [
+            'created' => 'Expense saved.',
+        ],
     ],
 
     'expense_categories' => [

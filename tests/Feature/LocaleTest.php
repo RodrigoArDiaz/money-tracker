@@ -29,7 +29,7 @@ class LocaleTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->from(route('dashboard'))
+            ->from(route('home'))
             ->post(route('locale.update'), ['locale' => 'en'])
             ->assertRedirect();
 
@@ -37,7 +37,7 @@ class LocaleTest extends TestCase
         $this->assertSame('en', $user->preferred_locale);
 
         $this->actingAs($user)
-            ->get(route('dashboard'))
+            ->get(route('home'))
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->where('locale', 'en'));

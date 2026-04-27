@@ -41,4 +41,22 @@ class ExpensePersistenceTest extends TestCase
         $this->assertSame('Comida', $expense->category->name);
         $this->assertSame('2026-04-26', $expense->spent_on->format('Y-m-d'));
     }
+
+    #[Test]
+    public function user_can_link_expense_to_system_category(): void
+    {
+        $this->artisan('default-expense-categories:sync');
+
+        $user = User::factory()->create();
+        $systemCategory = ExpenseCategory::query()->system()->firstOrFail();
+
+        $expense = Expense::factory()->forUserAndCategory($user, $systemCategory)->create([
+            'description' => 'Café',
+            'amount' => 3.25,
+            'spent_on' => '2026-04-26',
+        ]);
+
+        $this->assertSame($systemCategory->id, $expense->expense_category_id);
+        $this->assertTrue($expense->category->isSystem());
+    }
 }

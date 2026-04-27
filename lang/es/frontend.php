@@ -68,12 +68,37 @@ return [
     ],
 
     'dashboard' => [
-        'head_title' => 'Panel — Money Tracker',
+        'head_title' => 'Inicio — Money Tracker',
         'nav_home' => 'Inicio',
-        'header_default' => 'Panel',
+        'header_default' => 'Inicio',
         'title' => 'Inicio',
         'welcome_heading' => 'Bienvenido',
         'welcome_text' => 'Este es tu panel principal. Desde aquí podrás ver el resumen de tus finanzas cuando añadamos las siguientes funciones.',
+    ],
+
+    'expenses' => [
+        'head_title' => 'Inicio — Money Tracker',
+        'title' => 'Hoy',
+        'date_heading' => 'Gastos del :date',
+        'add_heading' => 'Agregar gasto',
+        'today_list_heading' => 'Gastos de hoy',
+        'empty_today' => 'Todavía no registraste gastos para hoy.',
+        'category_label' => 'Categoría',
+        'category_placeholder' => 'Elegí una categoría',
+        'category_picker_title' => 'Elegir categoría',
+        'open_category_picker_aria' => 'Abrir selector de categoría',
+        'description_label' => 'Descripción',
+        'description_placeholder' => 'Ej.: almuerzo, colectivo…',
+        'amount_label' => 'Monto',
+        'amount_placeholder' => '0,00',
+        'submit' => 'Guardar gasto',
+        'submitting' => 'Guardando…',
+        'list_description' => 'Descripción',
+        'list_category' => 'Categoría',
+        'list_amount' => 'Monto',
+        'flash' => [
+            'created' => 'Gasto guardado.',
+        ],
     ],
 
     'expense_categories' => [

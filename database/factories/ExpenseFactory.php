@@ -69,7 +69,9 @@ class ExpenseFactory extends Factory
             }
 
             $category = ExpenseCategory::query()->find($expense->expense_category_id);
-            if ($category === null || (int) $category->user_id !== (int) $user->id) {
+            $categoryOwnedByUser = $category !== null
+                && ($category->user_id === null || (int) $category->user_id === (int) $user->id);
+            if ($category === null || ! $categoryOwnedByUser) {
                 $expense->expense_category_id = ExpenseCategory::factory()
                     ->for($user, 'user')
                     ->create()
