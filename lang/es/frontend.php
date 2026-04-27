@@ -79,7 +79,9 @@ return [
     'expenses' => [
         'head_title' => 'Inicio — Money Tracker',
         'title' => 'Hoy',
-        'date_heading' => 'Gastos del :date',
+        'date_heading' => ':date',
+        'today_total_aria' => 'Total del día: :amount',
+        'today_total_caption' => 'Total de gastos',
         'add_heading' => 'Agregar gasto',
         'today_list_heading' => 'Gastos de hoy',
         'empty_today' => 'Todavía no registraste gastos para hoy.',

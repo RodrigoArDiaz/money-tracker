@@ -79,7 +79,9 @@ return [
     'expenses' => [
         'head_title' => 'Home — Money Tracker',
         'title' => 'Today',
-        'date_heading' => 'Expenses for :date',
+        'date_heading' => ':date',
+        'today_total_aria' => 'Today\'s total: :amount',
+        'today_total_caption' => 'Total expenses',
         'add_heading' => 'Add expense',
         'today_list_heading' => 'Today’s expenses',
         'empty_today' => 'No expenses recorded for today yet.',

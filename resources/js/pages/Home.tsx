@@ -19,7 +19,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslate } from '@/hooks/use-translate';
 import { ExpenseCategoryIcon } from '@/lib/expense-category-icons';
-import { ChevronDown, Pencil, Tags, Trash2 } from 'lucide-react';
+import { ChevronDown, Pencil, Sigma, Tags, Trash2 } from 'lucide-react';
 
 type CategoryOption = {
     id: number;
@@ -40,6 +40,14 @@ const DEFAULT_CATEGORY_ICON = 'Tag';
 
 const LAST_EXPENSE_CATEGORY_STORAGE_KEY = 'money-tracker-last-expense-category-id';
 
+/** Cada fila de gasto (card estándar). */
+const expenseCardClassName =
+    'rounded-xl border border-border bg-card px-4 py-2 text-card-foreground shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-primary/20 motion-safe:hover:shadow-md motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-sm sm:px-5 sm:py-2';
+
+/** Resumen del día: más contraste que las cards de gasto (fondo atenuado). */
+const expenseTotalSummaryCardClassName =
+    'rounded-xl border border-muted-foreground/20 bg-muted/55 px-4 py-2 text-card-foreground shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-muted-foreground/35 motion-safe:hover:bg-muted/75 motion-safe:hover:shadow-md motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-sm sm:px-5 sm:py-2 dark:border-border dark:bg-muted/35 dark:motion-safe:hover:bg-muted/45';
+
 function formatAmountDisplay(amount: string, locale: string): string {
     const n = Number.parseFloat(amount);
     if (Number.isNaN(n)) {
@@ -56,6 +64,15 @@ function formatAmountDisplay(amount: string, locale: string): string {
 
 function compactLabelClass(): string {
     return 'mb-0.5 block text-xs font-medium text-muted-foreground';
+}
+
+/** Primera letra en mayúscula (p. ej. fecha en español: "lunes…" → "Lunes…"). */
+function capitalizeFirstLetter(value: string): string {
+    if (value.length === 0) {
+        return value;
+    }
+
+    return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export default function Home({
@@ -81,8 +98,26 @@ export default function Home({
         }).format(d);
     }, [today, locale]);
 
+    const formattedDateHeading = React.useMemo(
+        () => capitalizeFirstLetter(formattedDateLabel),
+        [formattedDateLabel],
+    );
+
     const amountThousandSeparator = locale === 'es' ? '.' : ',';
     const amountDecimalSeparator = locale === 'es' ? ',' : '.';
+
+    const todayTotalNumeric = React.useMemo(() => {
+        return expenses.reduce((sum, row) => {
+            const n = Number.parseFloat(row.amount);
+
+            return sum + (Number.isNaN(n) ? 0 : n);
+        }, 0);
+    }, [expenses]);
+
+    const todayTotalDisplay = React.useMemo(
+        () => formatAmountDisplay(todayTotalNumeric.toFixed(2), locale),
+        [todayTotalNumeric, locale],
+    );
 
     const form = useForm({
         expense_category_id: '',
@@ -223,12 +258,6 @@ export default function Home({
         <AppDashboardLayout title={t('expenses.title')}>
             <Head title={t('expenses.head_title')} />
             <div className="space-y-6">
-                <header>
-                    <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-                        {t('expenses.date_heading', { date: formattedDateLabel })}
-                    </h1>
-                </header>
-
                 <section className="rounded-xl border bg-card p-3 text-card-foreground shadow-sm sm:p-4">
                     <h2 className="sr-only">{t('expenses.add_heading')}</h2>
                     <form onSubmit={submitExpense} className="flex flex-col gap-3 lg:flex-row lg:items-end lg:gap-2">
@@ -347,8 +376,70 @@ export default function Home({
 
                 <section
                     className="flex flex-col gap-2"
-                    aria-label={t('expenses.today_list_heading')}
+                    aria-labelledby="today-expenses-date-heading"
                 >
+                    <article className={expenseTotalSummaryCardClassName}>
+                        <h2 id="today-expenses-date-heading" className="sr-only">
+                            {t('expenses.date_heading', { date: formattedDateHeading })}
+                        </h2>
+                        <div className="flex flex-col gap-2 sm:hidden">
+                            <div className="flex items-center justify-between gap-2">
+                                <div className="flex min-w-0 flex-1 items-center gap-2">
+                                    <Sigma
+                                        className="size-5 shrink-0 text-primary/90"
+                                        aria-hidden
+                                    />
+                                    <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
+                                        {t('expenses.today_total_caption')}
+                                    </p>
+                                </div>
+                                <p
+                                    id="today-expenses-total"
+                                    className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground"
+                                    aria-label={t('expenses.today_total_aria', { amount: todayTotalDisplay })}
+                                >
+                                    {todayTotalDisplay}
+                                </p>
+                            </div>
+                            <div className="flex items-start justify-between gap-3">
+                                <p
+                                    className="min-w-0 flex-1 text-left text-sm font-medium leading-snug text-foreground"
+                                    aria-hidden
+                                >
+                                    {t('expenses.date_heading', { date: formattedDateHeading })}
+                                </p>
+                                <span
+                                    className="inline-flex w-[4.5rem] shrink-0"
+                                    aria-hidden
+                                />
+                            </div>
+                        </div>
+                        <header className="hidden items-center justify-between gap-3 sm:flex">
+                            <div className="flex min-w-0 flex-1 flex-col gap-1">
+                                <div className="flex items-center gap-2.5 sm:gap-3">
+                                    <Sigma
+                                        className="size-5 shrink-0 text-primary/90"
+                                        aria-hidden
+                                    />
+                                    <p
+                                        className="min-w-0 text-left text-lg font-semibold tabular-nums tracking-tight text-foreground"
+                                        aria-label={t('expenses.today_total_aria', { amount: todayTotalDisplay })}
+                                    >
+                                        {todayTotalDisplay}
+                                    </p>
+                                </div>
+                                <p className="max-w-[min(100%,16rem)] text-sm font-medium leading-snug text-muted-foreground sm:max-w-[20rem]">
+                                    {t('expenses.today_total_caption')}
+                                </p>
+                            </div>
+                            <p
+                                className="shrink-0 text-right text-sm font-semibold tracking-tight text-foreground sm:text-base"
+                                aria-hidden
+                            >
+                                {t('expenses.date_heading', { date: formattedDateHeading })}
+                            </p>
+                        </header>
+                    </article>
                     {expenses.length === 0 ? (
                         <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
                             {t('expenses.empty_today')}
@@ -408,9 +499,7 @@ export default function Home({
 
                                 return (
                                     <li key={row.id}>
-                                        <article
-                                            className="rounded-xl border border-border bg-card px-4 py-2 text-card-foreground shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-primary/20 motion-safe:hover:shadow-md motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-sm sm:px-5 sm:py-2"
-                                        >
+                                        <article className={expenseCardClassName}>
                                             <div className="flex flex-col gap-2 sm:hidden">
                                                 <div className="flex items-center justify-between gap-2">
                                                     <div className="flex min-w-0 flex-1 items-center gap-2">
