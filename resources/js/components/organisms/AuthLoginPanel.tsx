@@ -1,5 +1,5 @@
+import type { FormEvent } from 'react';
 import { Link, useForm } from '@inertiajs/react';
-
 import { useTranslate } from '@/hooks/use-translate';
 import AuthPanelDivider from '../atoms/AuthPanelDivider';
 import PasswordInput from '../atoms/PasswordInput';
@@ -8,7 +8,11 @@ import TextInput from '../atoms/TextInput';
 import FormField from '../molecules/FormField';
 import GoogleOAuthLink from '../molecules/GoogleOAuthLink';
 
-export default function AuthLoginPanel({ canLoginWithGoogle }) {
+type AuthLoginPanelProps = {
+    canLoginWithGoogle: boolean;
+};
+
+export default function AuthLoginPanel({ canLoginWithGoogle }: AuthLoginPanelProps) {
     const { t } = useTranslate();
     const { data, setData, post, processing, errors } = useForm({
         email: '',
@@ -16,7 +20,7 @@ export default function AuthLoginPanel({ canLoginWithGoogle }) {
         remember: false,
     });
 
-    function submit(e) {
+    function submit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         post('/login');
     }

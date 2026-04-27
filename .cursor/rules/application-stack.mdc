@@ -104,7 +104,7 @@ Related layout: [project-structure.mdc](mdc:.cursor/rules/project-structure.mdc)
 
 **Do**
 
-- Use **`@vite(['resources/css/app.css', 'resources/js/app.jsx'])`** (with `@viteReactRefresh` where needed) in the Blade root used by Inertia ([resources/views/app.blade.php](mdc:resources/views/app.blade.php)).
+- Use **`@vite(['resources/css/app.css', 'resources/js/app.tsx'])`** (with `@viteReactRefresh` where needed) in the Blade root used by Inertia ([resources/views/app.blade.php](mdc:resources/views/app.blade.php)).
 - Run **`npm run dev`** during development for HMR; **`npm run build`** for production assets in `public/build/`.
 - Align **`laravel-vite-plugin`** and **`vite`** major versions with the versions in [package.json](mdc:package.json).
 

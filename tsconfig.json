@@ -10,12 +10,12 @@
         "skipLibCheck": true,
         "isolatedModules": true,
         "resolveJsonModule": true,
-        "allowJs": true,
+        "allowJs": false,
         "checkJs": false,
         "baseUrl": ".",
         "paths": {
             "@/*": ["./resources/js/*"]
         }
     },
-    "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "resources/js/**/*.jsx"]
+    "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "resources/js/**/*.d.ts"]
 }

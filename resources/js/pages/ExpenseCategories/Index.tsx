@@ -83,7 +83,7 @@ export default function Index({
         editForm.reset();
     }
 
-    function submitCreate(e: React.FormEvent): void {
+    function submitCreate(e: React.SubmitEvent<HTMLFormElement>): void {
         e.preventDefault();
         createForm.post('/expense-categories', {
             preserveScroll: true,
@@ -91,7 +91,7 @@ export default function Index({
         });
     }
 
-    function submitEdit(e: React.FormEvent): void {
+    function submitEdit(e: React.SubmitEvent<HTMLFormElement>): void {
         e.preventDefault();
         if (editingCategory === null) {
             return;
@@ -153,7 +153,9 @@ export default function Index({
                                 id="new-category-name"
                                 type="text"
                                 value={createForm.data.name}
-                                onChange={(e) => createForm.setData('name', e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    createForm.setData('name', e.target.value)
+                                }
                                 autoComplete="off"
                                 required
                                 maxLength={255}
@@ -323,7 +325,9 @@ export default function Index({
                                 id="edit-category-name"
                                 type="text"
                                 value={editForm.data.name}
-                                onChange={(e) => editForm.setData('name', e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    editForm.setData('name', e.target.value)
+                                }
                                 autoComplete="off"
                                 required
                                 maxLength={255}
