@@ -16,4 +16,14 @@ class ExpensePolicy
     {
         return (int) $expense->user_id === (int) $user->id;
     }
+
+    public function update(User $user, Expense $expense): bool
+    {
+        return (int) $expense->user_id === (int) $user->id;
+    }
+
+    public function delete(User $user, Expense $expense): bool
+    {
+        return (int) $expense->user_id === (int) $user->id;
+    }
 }

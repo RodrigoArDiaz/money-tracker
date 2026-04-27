@@ -6,11 +6,15 @@ use App\Models\Expense;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreExpenseRequest extends FormRequest
+class UpdateExpenseRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null && $this->user()->can('create', Expense::class);
+        $expense = $this->route('expense');
+
+        return $expense instanceof Expense
+            && $this->user() !== null
+            && $this->user()->can('update', $expense);
     }
 
     /**

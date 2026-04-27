@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Expense;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -20,6 +23,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Route::bind('expense', function (string $value): Expense {
+            return Expense::query()
+                ->whereKey($value)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+        });
+
         Password::defaults(function () {
             $rule = Password::min(12)
                 ->mixedCase()

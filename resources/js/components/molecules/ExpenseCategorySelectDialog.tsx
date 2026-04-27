@@ -105,7 +105,7 @@ export function ExpenseCategorySelectDialog({
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>
-                <div className="max-h-[min(65vh,28rem)] overflow-y-auto overscroll-contain pr-1">
+                <div className="max-h-[min(65vh,28rem)] overflow-y-auto overscroll-contain px-3 pt-2 pb-6 sm:px-4">
                     {!hasAny ? (
                         <p className="rounded-xl border border-border bg-muted/10 p-6 text-center text-sm text-muted-foreground">
                             {t('expense_categories.empty')}

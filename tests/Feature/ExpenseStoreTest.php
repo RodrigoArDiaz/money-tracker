@@ -67,6 +67,26 @@ class ExpenseStoreTest extends TestCase
     }
 
     #[Test]
+    public function user_can_store_expense_without_description(): void
+    {
+        $this->artisan('default-expense-categories:sync');
+
+        $user = User::factory()->create();
+        $category = ExpenseCategory::query()->system()->firstOrFail();
+
+        $this->actingAs($user)
+            ->post(route('expenses.store'), [
+                'expense_category_id' => $category->id,
+                'amount' => 25,
+            ])
+            ->assertRedirect(route('home'));
+
+        $expense = Expense::query()->where('user_id', $user->id)->firstOrFail();
+        $this->assertSame('', $expense->description);
+        $this->assertSame('25.00', $expense->amount);
+    }
+
+    #[Test]
     public function user_cannot_store_expense_with_another_users_category(): void
     {
         $owner = User::factory()->create();

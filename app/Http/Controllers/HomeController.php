@@ -45,6 +45,7 @@ class HomeController extends Controller
             ->get()
             ->map(fn (Expense $expense): array => [
                 'id' => $expense->id,
+                'expense_category_id' => $expense->expense_category_id,
                 'description' => $expense->description,
                 'amount' => (string) $expense->amount,
                 'category_name' => $expense->category->localizedName($locale),

@@ -42,6 +42,8 @@ Route::middleware('auth')->group(function () {
     Route::redirect('expense-categories/create', '/expense-categories');
     Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show', 'create', 'edit']);
     Route::post('expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+    Route::put('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
+    Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
 });
 
 Route::middleware('guest')->group(function () {
