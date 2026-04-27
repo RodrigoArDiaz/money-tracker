@@ -29,6 +29,24 @@ In addition, [Laracasts](https://laracasts.com) contains thousands of video tuto
 
 You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
 
+## Docker
+
+The stack is defined in [`docker-compose.yml`](docker-compose.yml). The **`app`** service (`money-tracker-app`) runs PHP **8.4** and mounts the project at `/var/www/html`. Use **Composer** and **Artisan inside the container** so the runtime matches `composer.json` (avoid relying on the host PHP version).
+
+### Running tests
+
+With the stack up (`docker compose up -d`):
+
+```bash
+docker compose exec app php artisan test --compact
+```
+
+Or via the Composer script (also runs inside the container):
+
+```bash
+docker compose exec app composer test
+```
+
 ## Agentic Development
 
 Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:

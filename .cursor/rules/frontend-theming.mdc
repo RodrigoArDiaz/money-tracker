@@ -13,7 +13,7 @@ El proyecto usa **Tailwind v4** con la variante personalizada `@custom-variant d
 ## Comportamiento global
 
 - **Persistencia:** `localStorage` con clave **`money-tracker-theme`** (`light` | `dark` | `system`). Debe coincidir con `THEME_STORAGE_KEY` en [resources/js/components/theme-provider.tsx](mdc:resources/js/components/theme-provider.tsx) y con el script inline en [resources/views/app.blade.php](mdc:resources/views/app.blade.php) (evitar FOUC).
-- **React:** Toda la app Inertia va envuelta en **`ThemeProvider`** en [resources/js/app.jsx](mdc:resources/js/app.jsx). Usá **`useTheme()`** solo bajo ese árbol.
+- **React:** Toda la app Inertia va envuelta en **`ThemeProvider`** en [resources/js/app.tsx](mdc:resources/js/app.tsx). Usá **`useTheme()`** solo bajo ese árbol.
 - **UI reutilizable:** Preferí el menú **[ThemeMenu](mdc:resources/js/components/molecules/ThemeMenu.tsx)** para el conmutador (Claro / Oscuro / Sistema).
 
 ## Al crear o editar componentes (JSX/TSX)

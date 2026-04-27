@@ -34,7 +34,7 @@ money-tracker/
 ├── resources/
 │   ├── css/app.css
 │   ├── js/
-│   │   ├── app.jsx         # Inertia / Vite bootstrap
+│   │   ├── app.tsx         # Inertia / Vite bootstrap
 │   │   ├── components/     # atoms/, molecules/ (UI reutilizable)
 │   │   └── pages/          # React pages (e.g. Welcome.jsx)
 │   └── views/              # app.blade.php (Inertia shell), welcome.blade.php
@@ -58,7 +58,7 @@ money-tracker/
 | Area | Where to look first |
 |------|---------------------|
 | HTTP entry | [routes/web.php](mdc:routes/web.php) |
-| Inertia SPA | [resources/js/app.jsx](mdc:resources/js/app.jsx), [resources/views/app.blade.php](mdc:resources/views/app.blade.php), [app/Http/Middleware/HandleInertiaRequests.php](mdc:app/Http/Middleware/HandleInertiaRequests.php) |
+| Inertia SPA | [resources/js/app.tsx](mdc:resources/js/app.tsx), [resources/views/app.blade.php](mdc:resources/views/app.blade.php), [app/Http/Middleware/HandleInertiaRequests.php](mdc:app/Http/Middleware/HandleInertiaRequests.php) |
 | Front build | [vite.config.js](mdc:vite.config.js), output in `public/build/` |
 | Models | [app/Models/](mdc:app/Models/) |
 | API auth | [config/passport.php](mdc:config/passport.php), [config/auth.php](mdc:config/auth.php) |

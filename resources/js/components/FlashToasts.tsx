@@ -50,7 +50,7 @@ export function FlashToasts(): null {
     const lastSigRef = React.useRef<string>('');
     const lastAtRef = React.useRef<number>(0);
 
-    const emit = React.useCallback((page: GlobalEvent<'navigate'>['detail']['page']) => {
+    const emit = React.useCallback((page: { flash?: unknown; props?: Record<string, unknown> }) => {
         const { success, error } = mergeFlashFromPage(page);
         if (!success && !error) {
             return;

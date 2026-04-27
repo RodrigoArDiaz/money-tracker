@@ -11,7 +11,7 @@ alwaysApply: false
 ## Obligatorio
 
 - Para mensajes **transitorios** de éxito, error o aviso (incluidos los que vienen de **sesión flash** `success` / `error` en Inertia), usar **Sonner** (`toast` desde `sonner`), no bloques `Alert` embebidos en la página por ese motivo.
-- El **`Toaster`** global y el listener de flash están en la raíz de la SPA: [resources/js/components/AppToaster.tsx](mdc:resources/js/components/AppToaster.tsx) y [resources/js/components/FlashToasts.tsx](mdc:resources/js/components/FlashToasts.tsx), montados en [resources/js/app.jsx](mdc:resources/js/app.jsx) dentro de `ThemeProvider`.
+- El **`Toaster`** global y el listener de flash están en la raíz de la SPA: [resources/js/components/AppToaster.tsx](mdc:resources/js/components/AppToaster.tsx) y [resources/js/components/FlashToasts.tsx](mdc:resources/js/components/FlashToasts.tsx), montados en [resources/js/app.tsx](mdc:resources/js/app.tsx) dentro de `ThemeProvider`.
 
 ## Backend (Laravel)
 

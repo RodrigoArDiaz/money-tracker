@@ -1,6 +1,12 @@
+import type { ReactNode } from 'react';
 import { Globe } from 'lucide-react';
 
-export default function GoogleOAuthLink({ href, children }) {
+type GoogleOAuthLinkProps = {
+    href: string;
+    children: ReactNode;
+};
+
+export default function GoogleOAuthLink({ href, children }: GoogleOAuthLinkProps) {
     return (
         <a
             href={href}

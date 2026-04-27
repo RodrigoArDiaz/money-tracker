@@ -1,16 +1,20 @@
+import type { FormEvent } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-
 import LocaleSwitcher from '@/components/molecules/LocaleSwitcher';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
+import AuthPanelDivider from '@/components/atoms/AuthPanelDivider';
+import PasswordInput from '@/components/atoms/PasswordInput';
+import PrimaryButton from '@/components/atoms/PrimaryButton';
+import TextInput from '@/components/atoms/TextInput';
+import FormField from '@/components/molecules/FormField';
+import GoogleOAuthLink from '@/components/molecules/GoogleOAuthLink';
 import { useTranslate } from '@/hooks/use-translate';
-import AuthPanelDivider from '../components/atoms/AuthPanelDivider';
-import PasswordInput from '../components/atoms/PasswordInput';
-import PrimaryButton from '../components/atoms/PrimaryButton';
-import TextInput from '../components/atoms/TextInput';
-import FormField from '../components/molecules/FormField';
-import GoogleOAuthLink from '../components/molecules/GoogleOAuthLink';
 
-export default function Register({ canRegisterWithGoogle }) {
+type RegisterProps = {
+    canRegisterWithGoogle: boolean;
+};
+
+export default function Register({ canRegisterWithGoogle }: RegisterProps) {
     const { t } = useTranslate();
     const { data, setData, post, processing, errors } = useForm({
         first_name: '',
@@ -20,7 +24,7 @@ export default function Register({ canRegisterWithGoogle }) {
         password_confirmation: '',
     });
 
-    function submit(e) {
+    function submit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         post('/register');
     }
@@ -34,8 +38,8 @@ export default function Register({ canRegisterWithGoogle }) {
             <Head title={t('register.head_title')} />
             <div className="w-full max-w-md">
                 <div className="rounded-2xl border border-border bg-card/90 p-8 text-card-foreground shadow-sm backdrop-blur-sm">
-                    <h1 className="text-xl font-semibold mb-1 text-center">{t('register.title')}</h1>
-                    <p className="text-sm text-muted-foreground text-center mb-6">{t('register.subtitle')}</p>
+                    <h1 className="mb-1 text-center text-xl font-semibold">{t('register.title')}</h1>
+                    <p className="mb-6 text-center text-sm text-muted-foreground">{t('register.subtitle')}</p>
 
                     {canRegisterWithGoogle && (
                         <GoogleOAuthLink href="/auth/google">{t('auth.continue_google')}</GoogleOAuthLink>

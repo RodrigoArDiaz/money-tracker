@@ -1,7 +1,14 @@
-import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
-
+import type { ChangeEvent, InputHTMLAttributes } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { inputWithTrailingActionClassName } from './inputStyles';
+
+type PasswordInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
+    value: string;
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    toggleShowAriaLabel: string;
+    toggleHideAriaLabel: string;
+};
 
 export default function PasswordInput({
     id,
@@ -11,7 +18,9 @@ export default function PasswordInput({
     required = false,
     toggleShowAriaLabel,
     toggleHideAriaLabel,
-}) {
+    className = '',
+    ...props
+}: PasswordInputProps) {
     const [visible, setVisible] = useState(false);
 
     return (
@@ -21,9 +30,10 @@ export default function PasswordInput({
                 type={visible ? 'text' : 'password'}
                 value={value}
                 onChange={onChange}
-                className={inputWithTrailingActionClassName}
+                className={`${inputWithTrailingActionClassName} ${className}`.trim()}
                 autoComplete={autoComplete}
                 required={required}
+                {...props}
             />
             <button
                 type="button"

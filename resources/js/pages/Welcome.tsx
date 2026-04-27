@@ -1,15 +1,18 @@
 import { Head } from '@inertiajs/react';
-
 import LocaleSwitcher from '@/components/molecules/LocaleSwitcher';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
+import AuthLoginPanel from '@/components/organisms/AuthLoginPanel';
 import { useTranslate } from '@/hooks/use-translate';
-import AuthLoginPanel from '../components/organisms/AuthLoginPanel';
 
-export default function Welcome({ canLoginWithGoogle }) {
+type WelcomeProps = {
+    canLoginWithGoogle: boolean;
+};
+
+export default function Welcome({ canLoginWithGoogle }: WelcomeProps) {
     const { t } = useTranslate();
 
     return (
-        <div className="relative min-h-screen flex flex-col bg-background text-foreground lg:flex-row">
+        <div className="relative flex min-h-screen flex-col bg-background text-foreground lg:flex-row">
             <div className="fixed right-4 top-4 z-50 flex items-center gap-1">
                 <LocaleSwitcher align="end" />
                 <ThemeMenu align="end" />
@@ -17,8 +20,8 @@ export default function Welcome({ canLoginWithGoogle }) {
             <Head title={t('welcome.head_title')} />
             <aside className="flex flex-1 flex-col justify-center border-b border-border px-6 py-12 lg:w-1/2 lg:border-b-0 lg:border-r lg:px-12 lg:py-16">
                 <div className="mx-auto max-w-md text-center lg:text-left">
-                    <h1 className="text-3xl font-semibold tracking-tight mb-3 lg:text-4xl">Money Tracker</h1>
-                    <p className="text-muted-foreground text-balance text-base leading-relaxed">{t('welcome.hero_text')}</p>
+                    <h1 className="mb-3 text-3xl font-semibold tracking-tight lg:text-4xl">Money Tracker</h1>
+                    <p className="text-balance text-base leading-relaxed text-muted-foreground">{t('welcome.hero_text')}</p>
                 </div>
             </aside>
             <main className="flex flex-1 flex-col justify-center px-4 py-10 lg:w-1/2 lg:px-8 lg:py-16">
