@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\ChartController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\HomeController;
@@ -41,6 +42,7 @@ Route::middleware('auth')->group(function () {
 
     Route::redirect('expense-categories/create', '/expense-categories');
     Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show', 'create', 'edit']);
+    Route::get('charts', ChartController::class)->name('charts');
     Route::post('expenses', [ExpenseController::class, 'store'])->name('expenses.store');
     Route::put('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
