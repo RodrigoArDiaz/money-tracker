@@ -29,9 +29,18 @@ function isMonthInFuture(year: number, month: number): boolean {
 export function HomeMonthPicker({
     viewYear,
     viewMonth,
+    navigatePath = '/',
+    extraQuery,
+    monthPickerAriaLabel,
 }: {
     viewYear: number;
     viewMonth: number;
+    /** Ruta base para `router.get` (por defecto la home). */
+    navigatePath?: string;
+    /** Parámetros de query además de `year` y `month` (p. ej. `{ period: 'month' }` en gráficos). */
+    extraQuery?: Record<string, string | number | boolean>;
+    /** Si se pasa, sustituye la etiqueta accesible del botón (p. ej. gráficos por mes). */
+    monthPickerAriaLabel?: string;
 }): React.ReactElement {
     const { t, locale } = useTranslate();
     const [open, setOpen] = React.useState(false);
@@ -71,7 +80,12 @@ export function HomeMonthPicker({
             return;
         }
         setOpen(false);
-        router.get('/', { year: y, month: m }, { preserveScroll: true });
+        const query: Record<string, string | number | boolean> = {
+            ...(extraQuery ?? {}),
+            year: y,
+            month: m,
+        };
+        router.get(navigatePath, query, { preserveScroll: true });
     }
 
     return (
@@ -84,7 +98,7 @@ export function HomeMonthPicker({
                     className={cn(
                         'h-9 max-w-[min(100%,18rem)] justify-start gap-2 px-2.5 font-normal md:h-10 md:max-w-[20rem]',
                     )}
-                    aria-label={t('expenses.month_picker_aria')}
+                    aria-label={monthPickerAriaLabel ?? t('expenses.month_picker_aria')}
                     aria-expanded={open}
                     aria-haspopup="dialog"
                 >

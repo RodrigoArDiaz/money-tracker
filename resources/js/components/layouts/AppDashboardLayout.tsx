@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { LayoutDashboard, LogOut, Tags, Wallet } from 'lucide-react';
+import { LayoutDashboard, LogOut, PieChart, Tags, Wallet } from 'lucide-react';
 import * as React from 'react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -101,6 +101,18 @@ function AppSidebar() {
                                     <Link href="/expense-categories">
                                         <Tags />
                                         <span>{t('expense_categories.nav_label')}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={url.startsWith('/charts')}
+                                    tooltip={t('layout.charts_nav_tooltip')}
+                                >
+                                    <Link href="/charts">
+                                        <PieChart />
+                                        <span>{t('layout.charts_nav')}</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
