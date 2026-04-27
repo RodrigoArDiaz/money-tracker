@@ -78,10 +78,13 @@ return [
 
     'expenses' => [
         'head_title' => 'Home — Money Tracker',
-        'title' => 'Today',
+        'title' => 'This month',
+        'month_expenses_section_aria' => 'Expenses this month, by day',
         'date_heading' => ':date',
         'today_total_aria' => 'Today\'s total: :amount',
         'today_total_caption' => 'Total expenses',
+        'day_total_aria' => 'Day total: :amount',
+        'day_total_caption' => 'Day total',
         'add_heading' => 'Add expense',
         'today_list_heading' => 'Today’s expenses',
         'empty_today' => 'No expenses recorded for today yet.',
