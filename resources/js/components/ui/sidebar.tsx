@@ -26,6 +26,32 @@ import { PanelLeftIcon } from "lucide-react"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
+
+/**
+ * Lee la preferencia guardada (misma cookie que se escribe al colapsar/expandir).
+ * Devuelve null si no hay valor válido aún.
+ */
+function readSidebarStateCookie(): boolean | null {
+  if (typeof document === "undefined") {
+    return null
+  }
+  for (const part of document.cookie.split(";")) {
+    const [rawName, ...valueParts] = part.trim().split("=")
+    if (rawName === SIDEBAR_COOKIE_NAME) {
+      const value = valueParts.join("=")
+      if (value === "true") {
+        return true
+      }
+      if (value === "false") {
+        return false
+      }
+
+      return null
+    }
+  }
+
+  return null
+}
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
@@ -70,7 +96,15 @@ function SidebarProvider({
 
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(defaultOpen)
+  // Preferir cookie (persiste entre recargas e inicios de sesión en este navegador).
+  const [_open, _setOpen] = React.useState(() => {
+    const fromCookie = readSidebarStateCookie()
+    if (fromCookie !== null) {
+      return fromCookie
+    }
+
+    return defaultOpen
+  })
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
