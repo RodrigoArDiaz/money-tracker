@@ -248,7 +248,7 @@ export default function Home({
         <AppDashboardLayout
             title={
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <HomeMonthPicker viewYear={viewYear} viewMonth={viewMonth} />
+                    <HomeMonthPicker viewYear={viewYear} viewMonth={viewMonth} highlightCalendarNextMonth={false} />
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <div

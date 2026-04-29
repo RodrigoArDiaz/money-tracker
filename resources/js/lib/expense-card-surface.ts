@@ -8,3 +8,7 @@ export const EXPENSE_CARD_CLASS_NAME =
 /** Resumen del día: verde claro (Alert success / toasts Sonner). */
 export const EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME =
     'rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-card-foreground shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-emerald-300 motion-safe:hover:bg-emerald-100 motion-safe:hover:shadow-md motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-sm sm:px-5 sm:py-2 dark:border-emerald-800 dark:bg-emerald-950/45 dark:motion-safe:hover:border-emerald-700 dark:motion-safe:hover:bg-emerald-900/55';
+
+/** Misma card de totales cuando aún hay monto pendiente (tono rojo alerta). */
+export const EXPENSE_TOTAL_SUMMARY_CARD_UNPAID_ALERT_CLASS_NAME =
+    'rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-card-foreground shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-red-300 motion-safe:hover:bg-red-100 motion-safe:hover:shadow-md motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-sm sm:px-5 sm:py-2 dark:border-red-800 dark:bg-red-950/45 dark:motion-safe:hover:border-red-700 dark:motion-safe:hover:bg-red-900/55';

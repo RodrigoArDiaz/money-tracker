@@ -84,4 +84,12 @@ class User extends Authenticatable implements OAuthenticatable
     {
         return $this->hasMany(Expense::class);
     }
+
+    /**
+     * @return HasMany<UpcomingExpense, $this>
+     */
+    public function upcomingExpenses(): HasMany
+    {
+        return $this->hasMany(UpcomingExpense::class);
+    }
 }
