@@ -44,6 +44,21 @@ export function UpcomingExpenseListItem({
             <p className="text-sm leading-snug text-muted-foreground">{row.note}</p>
         ) : null;
 
+    const paymentStatusSelectTriggerTone =
+        row.payment_status === 'paid'
+            ? cn(
+                  'border-emerald-600/55 bg-emerald-500/[0.14] text-emerald-950',
+                  'hover:bg-emerald-500/22 dark:border-emerald-400/40 dark:bg-emerald-950/45 dark:text-emerald-50 dark:hover:bg-emerald-950/55',
+                  'focus-visible:border-emerald-600 focus-visible:ring-emerald-500/35 dark:focus-visible:border-emerald-400',
+                  '[&_[data-slot=select-value]]:text-inherit [&>svg:last-of-type]:text-emerald-800 dark:[&>svg:last-of-type]:text-emerald-200',
+              )
+            : cn(
+                  'border-red-600/50 bg-red-500/[0.11] text-red-950',
+                  'hover:bg-red-500/[0.17] dark:border-red-400/40 dark:bg-red-950/40 dark:text-red-50 dark:hover:bg-red-950/52',
+                  'focus-visible:border-red-600 focus-visible:ring-red-500/30 dark:focus-visible:border-red-500',
+                  '[&_[data-slot=select-value]]:text-inherit [&>svg:last-of-type]:text-red-800 dark:[&>svg:last-of-type]:text-red-200',
+              );
+
     return (
         <article className={cn(EXPENSE_CARD_CLASS_NAME, 'min-w-0 overflow-x-clip')}>
             <div className="flex flex-col gap-3 sm:hidden">
@@ -74,7 +89,7 @@ export function UpcomingExpenseListItem({
                             <SelectTrigger
                                 size="md"
                                 aria-label={t('upcoming_expenses.payment_select_aria')}
-                                className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full')}
+                                className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full', paymentStatusSelectTriggerTone)}
                             >
                                 <SelectValue />
                             </SelectTrigger>
@@ -137,7 +152,7 @@ export function UpcomingExpenseListItem({
                             <SelectTrigger
                                 size="md"
                                 aria-label={t('upcoming_expenses.payment_select_aria')}
-                                className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full')}
+                                className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full', paymentStatusSelectTriggerTone)}
                             >
                                 <SelectValue />
                             </SelectTrigger>
