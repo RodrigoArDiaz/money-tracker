@@ -122,6 +122,8 @@ return [
         'delete_modal_description' => 'The amount and details will be removed. This cannot be undone.',
         'delete_confirm' => 'Delete',
         'deleting' => 'Deleting…',
+        'from_upcoming_tooltip' => 'This expense was created when you marked a planned expense as paid. Edit it or delete it from Upcoming expenses.',
+        'from_upcoming_info_aria' => 'Information: expense comes from upcoming planned expenses',
         'flash' => [
             'created' => 'Expense saved.',
             'updated' => 'Expense updated.',

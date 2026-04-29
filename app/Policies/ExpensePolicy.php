@@ -19,11 +19,19 @@ class ExpensePolicy
 
     public function update(User $user, Expense $expense): bool
     {
+        if ($expense->upcoming_expense_id !== null) {
+            return false;
+        }
+
         return (int) $expense->user_id === (int) $user->id;
     }
 
     public function delete(User $user, Expense $expense): bool
     {
+        if ($expense->upcoming_expense_id !== null) {
+            return false;
+        }
+
         return (int) $expense->user_id === (int) $user->id;
     }
 }

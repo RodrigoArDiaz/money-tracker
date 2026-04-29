@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Enums\UpcomingExpenseKind;
 use App\Enums\UpcomingExpensePaymentStatus;
+use App\Models\Expense;
+use App\Models\ExpenseCategory;
 use App\Models\UpcomingExpense;
 use App\Models\User;
 use Carbon\Carbon;
@@ -34,6 +36,8 @@ class UpcomingExpensesTest extends TestCase
                 ->component('UpcomingExpenses')
                 ->where('viewYear', 2026)
                 ->where('viewMonth', 7)
+                ->has('myCategories')
+                ->has('defaultCategories')
                 ->where('total_amount', '0.00')
                 ->where('unpaid_total', '0.00')
                 ->has('expenses', 0));
@@ -42,9 +46,14 @@ class UpcomingExpensesTest extends TestCase
     #[Test]
     public function user_can_store_upcoming_expense_and_totals_reflect_amounts(): void
     {
+        $this->artisan('default-expense-categories:sync');
+
         $this->travelTo(Carbon::parse('2026-05-10 12:00:00', 'UTC'));
 
         $user = User::factory()->create();
+
+        /** @var ExpenseCategory $category */
+        $category = ExpenseCategory::query()->system()->firstOrFail();
 
         $response = $this->actingAs($user)->post(route('upcoming-expenses.store'), [
             'year' => 2026,
@@ -53,6 +62,7 @@ class UpcomingExpensesTest extends TestCase
             'note' => 'Recordatorio',
             'amount' => '150.50',
             'kind' => UpcomingExpenseKind::Fixed->value,
+            'expense_category_id' => $category->id,
             'redirect_year' => 2026,
             'redirect_month' => 8,
         ]);
@@ -64,6 +74,7 @@ class UpcomingExpensesTest extends TestCase
             'user_id' => $user->id,
             'year' => 2026,
             'month' => 8,
+            'expense_category_id' => $category->id,
             'description' => 'Alquiler',
             'amount' => '150.50',
             'kind' => UpcomingExpenseKind::Fixed->value,
@@ -93,6 +104,7 @@ class UpcomingExpensesTest extends TestCase
         ]);
 
         $this->actingAs($user)->put(route('upcoming-expenses.update', $expense), [
+            'expense_category_id' => $expense->expense_category_id,
             'description' => $expense->description,
             'note' => '',
             'amount' => '40.00',
@@ -121,6 +133,7 @@ class UpcomingExpensesTest extends TestCase
         ]);
 
         $this->actingAs($other)->put(route('upcoming-expenses.update', $expense), [
+            'expense_category_id' => $expense->expense_category_id,
             'description' => 'Hack',
             'note' => '',
             'amount' => '1.00',
@@ -147,5 +160,99 @@ class UpcomingExpensesTest extends TestCase
         ])->assertRedirect(route('upcoming-expenses.index', ['year' => 2026, 'month' => 11]));
 
         $this->assertDatabaseMissing('upcoming_expenses', ['id' => $expense->id]);
+    }
+
+    #[Test]
+    public function marking_upcoming_as_paid_creates_expense_with_spent_on_matching_change_date(): void
+    {
+        $this->artisan('default-expense-categories:sync');
+
+        $this->travelTo(Carbon::parse('2026-08-03 14:30:00', 'UTC'));
+
+        $user = User::factory()->create();
+
+        /** @var ExpenseCategory $category */
+        $category = ExpenseCategory::query()->system()->firstOrFail();
+
+        $upcoming = UpcomingExpense::factory()->forUser($user)->create([
+            'year' => 2026,
+            'month' => 8,
+            'payment_status' => UpcomingExpensePaymentStatus::Unpaid,
+            'amount' => 25,
+            'expense_category_id' => $category->id,
+            'description' => 'Luz',
+        ]);
+
+        $this->actingAs($user)->put(route('upcoming-expenses.update', $upcoming), [
+            'expense_category_id' => $category->id,
+            'description' => $upcoming->description,
+            'note' => '',
+            'amount' => '25.00',
+            'kind' => UpcomingExpenseKind::Fixed->value,
+            'payment_status' => UpcomingExpensePaymentStatus::Paid->value,
+            'redirect_year' => 2026,
+            'redirect_month' => 8,
+        ])->assertRedirect(route('upcoming-expenses.index', ['year' => 2026, 'month' => 8]));
+
+        /** @var Expense $persistedExpense */
+        $persistedExpense = Expense::query()->where('upcoming_expense_id', $upcoming->id)->firstOrFail();
+        $this->assertSame((int) $user->id, (int) $persistedExpense->user_id);
+        $this->assertSame((int) $category->id, (int) $persistedExpense->expense_category_id);
+        $this->assertSame('2026-08-03', $persistedExpense->spent_on->toDateString());
+        $this->assertSame('25.00', (string) $persistedExpense->amount);
+        $this->assertSame('Luz', $persistedExpense->description);
+
+        $this->travelBack();
+    }
+
+    #[Test]
+    public function toggling_upcoming_paid_unpaid_creates_and_removes_linked_expense(): void
+    {
+        $this->artisan('default-expense-categories:sync');
+
+        $this->travelTo(Carbon::parse('2026-02-02 09:00:00', 'UTC'));
+
+        $user = User::factory()->create();
+
+        /** @var ExpenseCategory $category */
+        $category = ExpenseCategory::query()->system()->firstOrFail();
+
+        $upcoming = UpcomingExpense::factory()->forUser($user)->create([
+            'year' => 2026,
+            'month' => 2,
+            'payment_status' => UpcomingExpensePaymentStatus::Unpaid,
+            'amount' => 10,
+            'expense_category_id' => $category->id,
+            'description' => 'Uno',
+        ]);
+
+        $this->actingAs($user)->put(route('upcoming-expenses.update', $upcoming), [
+            'expense_category_id' => $category->id,
+            'description' => $upcoming->description,
+            'note' => '',
+            'amount' => '10.00',
+            'kind' => UpcomingExpenseKind::Fixed->value,
+            'payment_status' => UpcomingExpensePaymentStatus::Paid->value,
+            'redirect_year' => 2026,
+            'redirect_month' => 2,
+        ])->assertRedirect();
+
+        $upcoming->refresh();
+        $this->assertDatabaseHas('expenses', ['upcoming_expense_id' => $upcoming->id]);
+
+        $this->actingAs($user)->put(route('upcoming-expenses.update', $upcoming), [
+            'expense_category_id' => $category->id,
+            'description' => $upcoming->description,
+            'note' => '',
+            'amount' => '10.00',
+            'kind' => UpcomingExpenseKind::Fixed->value,
+            'payment_status' => UpcomingExpensePaymentStatus::Unpaid->value,
+            'redirect_year' => 2026,
+            'redirect_month' => 2,
+        ])->assertRedirect();
+
+        $this->assertDatabaseMissing('expenses', ['upcoming_expense_id' => $upcoming->id]);
+
+        $this->travelBack();
     }
 }

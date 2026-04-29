@@ -13,6 +13,7 @@ class UpcomingExpenseRepository
      *     user_id: int,
      *     year: int,
      *     month: int,
+     *     expense_category_id: int|null,
      *     description: string,
      *     note: string|null,
      *     amount: float|int|string,
@@ -27,6 +28,7 @@ class UpcomingExpenseRepository
 
     /**
      * @param  array{
+     *     expense_category_id?: int|null,
      *     description: string,
      *     note: string|null,
      *     amount: float|int|string,
@@ -55,6 +57,7 @@ class UpcomingExpenseRepository
             ->where('user_id', $user->id)
             ->where('year', $year)
             ->where('month', $month)
+            ->with(['category'])
             ->latest('id')
             ->get();
     }

@@ -10,13 +10,17 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useTranslate } from '@/hooks/use-translate';
-import { EXPENSE_CARD_CLASS_NAME } from '@/lib/expense-card-surface';
+import { EXPENSE_CARD_CLASS_NAME, DEFAULT_EXPENSE_CATEGORY_ICON } from '@/lib/expense-card-surface';
 import { formatAmountDisplay } from '@/lib/expense-format';
+import { ExpenseCategoryIcon } from '@/lib/expense-category-icons';
 import { INLINE_FORM_SELECT_TRIGGER_CLASS } from '@/lib/inline-form-select-trigger';
 import { cn } from '@/lib/utils';
 
 export type UpcomingExpenseRow = {
     id: number;
+    expense_category_id: number | null;
+    category_name: string;
+    category_icon: string | null;
     description: string;
     amount: string;
     note: string | null;
@@ -44,6 +48,22 @@ export function UpcomingExpenseListItem({
             <p className="text-sm leading-snug text-muted-foreground">{row.note}</p>
         ) : null;
 
+    const categoryBadge =
+        row.category_name !== '' ? (
+            <Badge
+                variant="outline"
+                className={cn('max-w-[min(100%,18rem)] min-w-0 justify-start gap-1.5 truncate pl-2 pr-3')}
+                title={`${row.category_name}`}
+            >
+                <ExpenseCategoryIcon
+                    name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                    className="size-3.5 shrink-0 opacity-85"
+                    aria-hidden
+                />
+                <span className="truncate">{row.category_name}</span>
+            </Badge>
+        ) : null;
+
     const paymentStatusSelectTriggerTone =
         row.payment_status === 'paid'
             ? cn(
@@ -66,6 +86,7 @@ export function UpcomingExpenseListItem({
                     <span className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
                         {formatAmountDisplay(row.amount, locale)}
                     </span>
+                    {categoryBadge}
                     <Badge
                         variant="default"
                         className={cn('max-w-[min(100%,18rem)] min-w-0 justify-start truncate')}
@@ -75,7 +96,7 @@ export function UpcomingExpenseListItem({
                     </Badge>
                     <Badge variant="secondary">{kindLabel}</Badge>
                 </div>
-                {noteParagraph && <div className="text-sm">{noteParagraph}</div>}
+                {noteParagraph ? <div className="text-sm">{noteParagraph}</div> : null}
                 <div className="flex flex-row flex-nowrap items-center gap-x-2 gap-y-0">
                     <div className="min-w-0 flex-1">
                         <Select
@@ -123,6 +144,7 @@ export function UpcomingExpenseListItem({
                         <span className="text-lg font-semibold tabular-nums tracking-tight text-foreground lg:text-xl">
                             {formatAmountDisplay(row.amount, locale)}
                         </span>
+                        {categoryBadge}
                         <Badge
                             variant="default"
                             className={cn('max-w-[min(100%,18rem)] min-w-0 justify-start truncate')}
@@ -132,7 +154,7 @@ export function UpcomingExpenseListItem({
                         </Badge>
                         <Badge variant="secondary">{kindLabel}</Badge>
                     </div>
-                    {noteParagraph && <div className="min-w-0 text-start text-sm">{noteParagraph}</div>}
+                    {noteParagraph ? <div className="min-w-0 text-start text-sm">{noteParagraph}</div> : null}
                 </div>
                 <div
                     className={cn(

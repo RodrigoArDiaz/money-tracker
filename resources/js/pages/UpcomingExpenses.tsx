@@ -1,12 +1,13 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import * as React from 'react';
 import { NumericFormat } from 'react-number-format';
-import { Sigma } from 'lucide-react';
+import { ChevronDown, Sigma, Tags } from 'lucide-react';
 
 import FieldError from '@/components/atoms/FieldError';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
 import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
+import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
 import { HomeMonthPicker } from '@/components/molecules/HomeMonthPicker';
 import {
     UpcomingExpenseListItem,
@@ -30,10 +31,23 @@ import {
 } from '@/components/ui/select';
 import { useAutosizeTextarea } from '@/hooks/use-autosize-textarea';
 import { useTranslate } from '@/hooks/use-translate';
-import { EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME, EXPENSE_TOTAL_SUMMARY_CARD_UNPAID_ALERT_CLASS_NAME } from '@/lib/expense-card-surface';
+import {
+    EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME,
+    EXPENSE_TOTAL_SUMMARY_CARD_UNPAID_ALERT_CLASS_NAME,
+    DEFAULT_EXPENSE_CATEGORY_ICON,
+} from '@/lib/expense-card-surface';
+import { ExpenseCategoryIcon } from '@/lib/expense-category-icons';
 import { formatAmountDisplay } from '@/lib/expense-format';
 import { INLINE_FORM_SELECT_TRIGGER_CLASS } from '@/lib/inline-form-select-trigger';
 import { cn } from '@/lib/utils';
+
+type CategoryOption = {
+    id: number;
+    name: string;
+    icon: string | null;
+};
+
+const LAST_EXPENSE_CATEGORY_STORAGE_KEY = 'money-tracker-last-expense-category-id';
 
 function compactLabelClass(): string {
     return 'mb-0.5 block text-xs font-medium text-muted-foreground';
@@ -42,12 +56,16 @@ function compactLabelClass(): string {
 export default function UpcomingExpenses({
     viewYear,
     viewMonth,
+    myCategories,
+    defaultCategories,
     expenses,
     total_amount,
     unpaid_total,
 }: {
     viewYear: number;
     viewMonth: number;
+    myCategories: CategoryOption[];
+    defaultCategories: CategoryOption[];
     expenses: UpcomingExpenseRow[];
     total_amount: string;
     unpaid_total: string;
@@ -69,6 +87,7 @@ export default function UpcomingExpenses({
     const form = useForm({
         year: String(viewYear),
         month: String(viewMonth),
+        expense_category_id: '',
         description: '',
         note: '',
         amount: '',
@@ -78,6 +97,7 @@ export default function UpcomingExpenses({
     });
 
     const editForm = useForm({
+        expense_category_id: '',
         description: '',
         note: '',
         amount: '',
@@ -101,6 +121,8 @@ export default function UpcomingExpenses({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [viewYear, viewMonth]);
 
+    const [categoryPickerOpen, setCategoryPickerOpen] = React.useState(false);
+    const [editCategoryPickerOpen, setEditCategoryPickerOpen] = React.useState(false);
     const [editDialogOpen, setEditDialogOpen] = React.useState(false);
     const [editingExpense, setEditingExpense] = React.useState<UpcomingExpenseRow | null>(null);
     const [deletingExpense, setDeletingExpense] = React.useState<UpcomingExpenseRow | null>(null);
@@ -115,6 +137,51 @@ export default function UpcomingExpenses({
         enabled: editDialogOpen,
     });
 
+    const allCategoryOptions = React.useMemo(
+        () => [...myCategories, ...defaultCategories],
+        [myCategories, defaultCategories],
+    );
+
+    const selectedCategory = React.useMemo(() => {
+        const raw = form.data.expense_category_id;
+        if (raw === '') {
+            return null;
+        }
+        const id = Number(raw);
+        return allCategoryOptions.find((c) => c.id === id) ?? null;
+    }, [form.data.expense_category_id, allCategoryOptions]);
+
+    const editSelectedCategory = React.useMemo(() => {
+        const raw = editForm.data.expense_category_id;
+        if (raw === '') {
+            return null;
+        }
+        const id = Number(raw);
+        return allCategoryOptions.find((c) => c.id === id) ?? null;
+    }, [editForm.data.expense_category_id, allCategoryOptions]);
+
+    React.useEffect(() => {
+        const raw = localStorage.getItem(LAST_EXPENSE_CATEGORY_STORAGE_KEY);
+        if (raw === null || raw === '') {
+            return;
+        }
+        const id = Number.parseInt(raw, 10);
+        if (!Number.isFinite(id)) {
+            localStorage.removeItem(LAST_EXPENSE_CATEGORY_STORAGE_KEY);
+
+            return;
+        }
+        const exists = allCategoryOptions.some((c) => c.id === id);
+        if (!exists) {
+            localStorage.removeItem(LAST_EXPENSE_CATEGORY_STORAGE_KEY);
+
+            return;
+        }
+        form.setData('expense_category_id', String(id));
+        queueMicrotask(() => amountRef.current?.focus());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     function focusAmount(): void {
         queueMicrotask(() => amountRef.current?.focus());
     }
@@ -128,6 +195,10 @@ export default function UpcomingExpenses({
         form.post('/upcoming-expenses', {
             preserveScroll: true,
             onSuccess: () => {
+                const cat = form.data.expense_category_id;
+                if (cat !== '') {
+                    localStorage.setItem(LAST_EXPENSE_CATEGORY_STORAGE_KEY, cat);
+                }
                 form.reset('description', 'note', 'amount');
                 focusAmount();
             },
@@ -137,6 +208,7 @@ export default function UpcomingExpenses({
     function openEdit(row: UpcomingExpenseRow): void {
         setEditingExpense(row);
         editForm.setData({
+            expense_category_id: row.expense_category_id !== null ? String(row.expense_category_id) : '',
             description: row.description,
             note: row.note ?? '',
             amount: row.amount,
@@ -146,12 +218,14 @@ export default function UpcomingExpenses({
             redirect_month: String(viewMonth),
         });
         editForm.clearErrors();
+        setEditCategoryPickerOpen(false);
         setEditDialogOpen(true);
     }
 
     function closeEditDialog(): void {
         setEditDialogOpen(false);
         setEditingExpense(null);
+        setEditCategoryPickerOpen(false);
         editForm.reset();
     }
 
@@ -193,9 +267,13 @@ export default function UpcomingExpenses({
         if (payment_status === row.payment_status) {
             return;
         }
+        if (row.expense_category_id === null) {
+            return;
+        }
         router.put(
             `/upcoming-expenses/${row.id}`,
             {
+                expense_category_id: row.expense_category_id,
                 description: row.description,
                 note: row.note ?? '',
                 amount: row.amount,
@@ -228,6 +306,63 @@ export default function UpcomingExpenses({
                     <h2 className="sr-only">{t('upcoming_expenses.add_heading')}</h2>
                     <form onSubmit={submitExpense} className="flex flex-col gap-3">
                         <div className="flex flex-col gap-3 lg:flex-row lg:flex-nowrap lg:items-end lg:gap-2 xl:gap-3">
+                            <div className="flex w-full shrink-0 flex-col gap-0.5 lg:w-[12rem] lg:max-w-[14rem]">
+                                <label htmlFor="upcoming_category_trigger" className={compactLabelClass()}>
+                                    {t('expenses.category_label')}
+                                </label>
+                                <Button
+                                    type="button"
+                                    id="upcoming_category_trigger"
+                                    variant="outline"
+                                    className="h-9 w-full justify-start gap-2 px-2.5 font-normal"
+                                    onClick={() => setCategoryPickerOpen(true)}
+                                    aria-expanded={categoryPickerOpen}
+                                    aria-haspopup="dialog"
+                                    aria-invalid={form.errors.expense_category_id ? true : undefined}
+                                    aria-required
+                                    aria-label={
+                                        selectedCategory
+                                            ? `${t('expenses.category_label')}: ${selectedCategory.name}. ${t(
+                                                  'expenses.open_category_picker_aria',
+                                              )}`
+                                            : t('expenses.open_category_picker_aria')
+                                    }
+                                >
+                                    <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                    {selectedCategory ? (
+                                        <>
+                                            <ExpenseCategoryIcon
+                                                name={selectedCategory.icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                                                className="size-4 shrink-0 text-muted-foreground"
+                                            />
+                                            <span className="min-w-0 flex-1 truncate text-left text-sm">
+                                                {selectedCategory.name}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <span className="min-w-0 flex-1 truncate text-left text-sm text-muted-foreground">
+                                            {t('expenses.category_placeholder')}
+                                        </span>
+                                    )}
+                                    <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+                                </Button>
+                                <FieldError message={form.errors.expense_category_id} />
+
+                                <ExpenseCategorySelectDialog
+                                    open={categoryPickerOpen}
+                                    onOpenChange={setCategoryPickerOpen}
+                                    defaultCategories={defaultCategories}
+                                    myCategories={myCategories}
+                                    selectedId={form.data.expense_category_id}
+                                    onSelect={(id) => {
+                                        form.setData('expense_category_id', String(id));
+                                        focusAmount();
+                                    }}
+                                    title={t('expenses.category_picker_title')}
+                                    closeAriaLabel={t('expense_categories.close_dialog')}
+                                />
+                            </div>
+
                             <div className="flex min-w-0 flex-col gap-0.5 lg:min-w-[7rem] lg:max-w-[13rem] lg:flex-1">
                                 <label htmlFor="upcoming_description" className={compactLabelClass()}>
                                     {t('upcoming_expenses.description_label')}
@@ -408,6 +543,62 @@ export default function UpcomingExpenses({
                         <DialogDescription className="sr-only">{t('upcoming_expenses.edit_heading')}</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={submitEdit} className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="edit_upcoming_category_trigger" className={compactLabelClass()}>
+                                {t('expenses.category_label')}
+                            </label>
+                            <Button
+                                type="button"
+                                id="edit_upcoming_category_trigger"
+                                variant="outline"
+                                className="h-9 w-full justify-start gap-2 px-2.5 font-normal"
+                                onClick={() => setEditCategoryPickerOpen(true)}
+                                aria-expanded={editCategoryPickerOpen}
+                                aria-haspopup="dialog"
+                                aria-required
+                                aria-label={
+                                    editSelectedCategory
+                                        ? `${t('expenses.category_label')}: ${editSelectedCategory.name}. ${t(
+                                              'expenses.open_category_picker_aria',
+                                          )}`
+                                        : t('expenses.open_category_picker_aria')
+                                }
+                                aria-invalid={editForm.errors.expense_category_id ? true : undefined}
+                            >
+                                <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                {editSelectedCategory ? (
+                                    <>
+                                        <ExpenseCategoryIcon
+                                            name={editSelectedCategory.icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                                            className="size-4 shrink-0 text-muted-foreground"
+                                        />
+                                        <span className="min-w-0 flex-1 truncate text-left text-sm">
+                                            {editSelectedCategory.name}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="min-w-0 flex-1 truncate text-left text-sm text-muted-foreground">
+                                        {t('expenses.category_placeholder')}
+                                    </span>
+                                )}
+                                <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+                            </Button>
+                            <FieldError message={editForm.errors.expense_category_id} />
+                            <ExpenseCategorySelectDialog
+                                open={editCategoryPickerOpen}
+                                onOpenChange={setEditCategoryPickerOpen}
+                                defaultCategories={defaultCategories}
+                                myCategories={myCategories}
+                                selectedId={editForm.data.expense_category_id}
+                                onSelect={(id) => {
+                                    editForm.setData('expense_category_id', String(id));
+                                    focusEditAmount();
+                                }}
+                                title={t('expenses.category_picker_title')}
+                                closeAriaLabel={t('expense_categories.close_dialog')}
+                            />
+                        </div>
+
                         <div className="flex flex-col gap-0.5">
                             <label htmlFor="edit_upcoming_description" className={compactLabelClass()}>
                                 {t('upcoming_expenses.description_label')}

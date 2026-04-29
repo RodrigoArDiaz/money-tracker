@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
     'user_id',
     'year',
     'month',
+    'expense_category_id',
     'description',
     'note',
     'amount',
@@ -45,5 +47,23 @@ class UpcomingExpense extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo<ExpenseCategory, $this>
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(ExpenseCategory::class, 'expense_category_id');
+    }
+
+    /**
+     * Gasto efectivo cuando el estado es «pagado» (como máximo uno).
+     *
+     * @return HasOne<Expense, $this>
+     */
+    public function linkedExpense(): HasOne
+    {
+        return $this->hasOne(Expense::class, 'upcoming_expense_id');
     }
 }

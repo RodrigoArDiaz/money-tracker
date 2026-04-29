@@ -22,12 +22,26 @@ class UpdateUpcomingExpenseRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->user()?->id;
+
         return [
             'description' => ['required', 'string', 'max:255'],
             'note' => ['nullable', 'string', 'max:65535'],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:999999999999.99'],
             'kind' => ['required', 'string', Rule::in(['fixed', 'variable'])],
             'payment_status' => ['required', 'string', Rule::in(['paid', 'unpaid'])],
+            'expense_category_id' => [
+                'required',
+                'integer',
+                Rule::exists('expense_categories', 'id')->where(function ($query) use ($userId): void {
+                    $query->where(function ($q) use ($userId): void {
+                        $q->whereNull('user_id');
+                        if ($userId !== null) {
+                            $q->orWhere('user_id', $userId);
+                        }
+                    });
+                }),
+            ],
             'redirect_year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
             'redirect_month' => ['nullable', 'integer', 'min:1', 'max:12'],
         ];
