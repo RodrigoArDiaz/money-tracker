@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/select';
 import { useAutosizeTextarea } from '@/hooks/use-autosize-textarea';
 import { useTranslate } from '@/hooks/use-translate';
-import { EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME } from '@/lib/expense-card-surface';
+import { EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME, EXPENSE_TOTAL_SUMMARY_CARD_UNPAID_ALERT_CLASS_NAME } from '@/lib/expense-card-surface';
 import { formatAmountDisplay } from '@/lib/expense-format';
 import { INLINE_FORM_SELECT_TRIGGER_CLASS } from '@/lib/inline-form-select-trigger';
 import { cn } from '@/lib/utils';
@@ -56,6 +56,12 @@ export default function UpcomingExpenses({
 
     const totalDisplay = React.useMemo(() => formatAmountDisplay(total_amount, locale), [total_amount, locale]);
     const unpaidDisplay = React.useMemo(() => formatAmountDisplay(unpaid_total, locale), [unpaid_total, locale]);
+
+    const hasUnpaidBalance = React.useMemo(() => {
+        const unpaid = Number.parseFloat(unpaid_total);
+
+        return Number.isFinite(unpaid) && unpaid > 0;
+    }, [unpaid_total]);
 
     const amountThousandSeparator = locale === 'es' ? '.' : ',';
     const amountDecimalSeparator = locale === 'es' ? ',' : '.';
@@ -219,7 +225,9 @@ export default function UpcomingExpenses({
             <Head title={t('upcoming_expenses.head_title')} />
             <div className="space-y-6">
                 <section aria-label={t('upcoming_expenses.totals_section_aria')}>
-                    <article className={EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME}>
+                    <article
+                        className={hasUnpaidBalance ? EXPENSE_TOTAL_SUMMARY_CARD_UNPAID_ALERT_CLASS_NAME : EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME}
+                    >
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div className="flex items-start justify-between gap-3">
                                 <div className="flex min-w-0 flex-1 items-start gap-2">
