@@ -97,7 +97,12 @@ export function UpcomingExpenseListItem({
                 </div>
             </div>
 
-            <div className="hidden min-w-0 sm:flex sm:w-full sm:flex-row sm:items-start sm:justify-between sm:gap-x-4 sm:gap-y-3 lg:gap-x-6">
+            <div
+                className={cn(
+                    'hidden min-h-0 min-w-0 sm:flex sm:w-full sm:flex-row sm:justify-between sm:gap-x-4 sm:gap-y-3 lg:gap-x-6',
+                    noteParagraph ? 'sm:items-start' : 'sm:items-center',
+                )}
+            >
                 <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 pr-4 lg:pr-6">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-left lg:gap-x-3">
                         <span className="text-lg font-semibold tabular-nums tracking-tight text-foreground lg:text-xl">
@@ -114,7 +119,12 @@ export function UpcomingExpenseListItem({
                     </div>
                     {noteParagraph && <div className="min-w-0 text-start text-sm">{noteParagraph}</div>}
                 </div>
-                <div className="flex shrink-0 flex-row flex-nowrap items-center gap-x-2 self-start pt-0.5 lg:gap-x-3">
+                <div
+                    className={cn(
+                        'flex shrink-0 flex-row flex-nowrap items-center gap-x-2 lg:gap-x-3',
+                        noteParagraph && 'self-start pt-0.5',
+                    )}
+                >
                     <div className="w-[10.75rem] shrink-0 lg:w-[11rem]">
                         <Select
                             value={row.payment_status}
