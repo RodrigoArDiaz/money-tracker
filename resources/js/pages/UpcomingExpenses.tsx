@@ -373,7 +373,7 @@ export default function UpcomingExpenses({
                             {t('upcoming_expenses.empty')}
                         </p>
                     ) : (
-                        <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
+                        <ul className="m-0 flex min-w-0 max-w-full list-none flex-col gap-1.5 p-0">
                             {expenses.map((row) => (
                                 <li key={row.id}>
                                     <UpcomingExpenseListItem

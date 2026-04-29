@@ -166,7 +166,7 @@ return [
         'delete_modal_description' => 'It will be removed from your plan. This cannot be undone.',
         'delete_confirm' => 'Delete',
         'deleting' => 'Deleting…',
-        'list_no_note' => 'No note',
+
         'flash' => [
             'created' => 'Upcoming expense saved.',
             'updated' => 'Upcoming expense updated.',

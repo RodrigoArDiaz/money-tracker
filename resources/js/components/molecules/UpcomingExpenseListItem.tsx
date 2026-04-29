@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { ExpenseRowActions } from '@/components/molecules/ExpenseRowActions';
+import { Badge } from '@/components/ui/badge';
 import {
     Select,
     SelectContent,
@@ -38,100 +39,104 @@ export function UpcomingExpenseListItem({
 
     const kindLabel = row.kind === 'fixed' ? t('upcoming_expenses.kind_fixed') : t('upcoming_expenses.kind_variable');
 
-    const noteBlock =
+    const noteParagraph =
         row.note !== null && row.note.trim() !== '' ? (
             <p className="text-sm leading-snug text-muted-foreground">{row.note}</p>
-        ) : (
-            <p className="text-sm italic text-muted-foreground">{t('upcoming_expenses.list_no_note')}</p>
-        );
+        ) : null;
 
     return (
-        <article className={EXPENSE_CARD_CLASS_NAME}>
+        <article className={cn(EXPENSE_CARD_CLASS_NAME, 'min-w-0 overflow-x-clip')}>
             <div className="flex flex-col gap-3 sm:hidden">
-                <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <span
-                                className={cn(
-                                    'inline-flex rounded-md border border-border bg-muted/40 px-2 py-0.5 text-xs font-medium text-muted-foreground',
-                                )}
-                            >
-                                {kindLabel}
-                            </span>
-                        </div>
-                        <p className="text-base font-semibold leading-snug text-foreground">{row.description}</p>
-                        {noteBlock}
-                    </div>
-                    <p className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-left lg:gap-x-3">
+                    <span className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
                         {formatAmountDisplay(row.amount, locale)}
-                    </p>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <Select
-                        value={row.payment_status}
-                        onValueChange={(value) => {
-                            if (value === 'paid' || value === 'unpaid') {
-                                onPaymentStatusChange(row, value);
-                            }
-                        }}
+                    </span>
+                    <Badge
+                        variant="default"
+                        className={cn('max-w-[min(100%,18rem)] min-w-0 justify-start truncate')}
+                        title={row.description}
                     >
-                        <SelectTrigger
-                            size="md"
-                            aria-label={t('upcoming_expenses.payment_select_aria')}
-                            className={INLINE_FORM_SELECT_TRIGGER_CLASS}
+                        {row.description}
+                    </Badge>
+                    <Badge variant="secondary">{kindLabel}</Badge>
+                </div>
+                {noteParagraph && <div className="text-sm">{noteParagraph}</div>}
+                <div className="flex flex-row flex-nowrap items-center gap-x-2 gap-y-0">
+                    <div className="min-w-0 flex-1">
+                        <Select
+                            value={row.payment_status}
+                            onValueChange={(value) => {
+                                if (value === 'paid' || value === 'unpaid') {
+                                    onPaymentStatusChange(row, value);
+                                }
+                            }}
                         >
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="paid">{t('upcoming_expenses.status_paid')}</SelectItem>
-                            <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <ExpenseRowActions
-                        onEdit={() => onEdit(row)}
-                        onDelete={() => onDelete(row)}
-                        editAriaLabel={t('upcoming_expenses.card_edit_aria')}
-                        deleteAriaLabel={t('upcoming_expenses.card_delete_aria')}
-                        editTooltip={t('upcoming_expenses.card_edit_tooltip')}
-                        deleteTooltip={t('upcoming_expenses.card_delete_tooltip')}
-                    />
+                            <SelectTrigger
+                                size="md"
+                                aria-label={t('upcoming_expenses.payment_select_aria')}
+                                className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full')}
+                            >
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="paid">{t('upcoming_expenses.status_paid')}</SelectItem>
+                                <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="shrink-0">
+                        <ExpenseRowActions
+                            onEdit={() => onEdit(row)}
+                            onDelete={() => onDelete(row)}
+                            editAriaLabel={t('upcoming_expenses.card_edit_aria')}
+                            deleteAriaLabel={t('upcoming_expenses.card_delete_aria')}
+                            editTooltip={t('upcoming_expenses.card_edit_tooltip')}
+                            deleteTooltip={t('upcoming_expenses.card_delete_tooltip')}
+                        />
+                    </div>
                 </div>
             </div>
 
-            <div className="hidden items-start gap-3 sm:flex">
-                <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex rounded-md border border-border bg-muted/40 px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                            {kindLabel}
+            <div className="hidden min-w-0 sm:flex sm:w-full sm:flex-row sm:items-start sm:justify-between sm:gap-x-4 sm:gap-y-3 lg:gap-x-6">
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 pr-4 lg:pr-6">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-left lg:gap-x-3">
+                        <span className="text-lg font-semibold tabular-nums tracking-tight text-foreground lg:text-xl">
+                            {formatAmountDisplay(row.amount, locale)}
                         </span>
-                    </div>
-                    <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
-                        {formatAmountDisplay(row.amount, locale)}
-                    </p>
-                    <p className="text-sm font-medium leading-snug text-foreground">{row.description}</p>
-                    <div className="max-w-none text-left sm:max-w-[24rem]">{noteBlock}</div>
-                </div>
-                <div className="flex w-full max-w-[min(100%,14rem)] shrink-0 flex-col items-stretch gap-2 sm:items-end">
-                    <Select
-                        value={row.payment_status}
-                        onValueChange={(value) => {
-                            if (value === 'paid' || value === 'unpaid') {
-                                onPaymentStatusChange(row, value);
-                            }
-                        }}
-                    >
-                        <SelectTrigger
-                            size="md"
-                            aria-label={t('upcoming_expenses.payment_select_aria')}
-                            className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'min-w-[10rem]')}
+                        <Badge
+                            variant="default"
+                            className={cn('max-w-[min(100%,18rem)] min-w-0 justify-start truncate')}
+                            title={row.description}
                         >
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent align="end">
-                            <SelectItem value="paid">{t('upcoming_expenses.status_paid')}</SelectItem>
-                            <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
-                        </SelectContent>
-                    </Select>
+                            {row.description}
+                        </Badge>
+                        <Badge variant="secondary">{kindLabel}</Badge>
+                    </div>
+                    {noteParagraph && <div className="min-w-0 text-start text-sm">{noteParagraph}</div>}
+                </div>
+                <div className="flex shrink-0 flex-row flex-nowrap items-center gap-x-2 self-start pt-0.5 lg:gap-x-3">
+                    <div className="w-[10.75rem] shrink-0 lg:w-[11rem]">
+                        <Select
+                            value={row.payment_status}
+                            onValueChange={(value) => {
+                                if (value === 'paid' || value === 'unpaid') {
+                                    onPaymentStatusChange(row, value);
+                                }
+                            }}
+                        >
+                            <SelectTrigger
+                                size="md"
+                                aria-label={t('upcoming_expenses.payment_select_aria')}
+                                className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full')}
+                            >
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent align="end">
+                                <SelectItem value="paid">{t('upcoming_expenses.status_paid')}</SelectItem>
+                                <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                     <ExpenseRowActions
                         onEdit={() => onEdit(row)}
                         onDelete={() => onDelete(row)}

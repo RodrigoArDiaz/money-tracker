@@ -166,7 +166,7 @@ return [
         'delete_modal_description' => 'Se quitará de tu planificación. No se puede deshacer.',
         'delete_confirm' => 'Eliminar',
         'deleting' => 'Eliminando…',
-        'list_no_note' => 'Sin nota',
+
         'flash' => [
             'created' => 'Gasto futuro guardado.',
             'updated' => 'Gasto futuro actualizado.',
