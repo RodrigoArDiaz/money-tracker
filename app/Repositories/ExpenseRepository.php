@@ -17,12 +17,27 @@ class ExpenseRepository
      *     expense_category_id: int,
      *     description: string,
      *     amount: float|int|string,
-     *     spent_on: string
+     *     spent_on: string,
+     *     upcoming_expense_id?: int|null,
      * }  $attributes
      */
     public function create(array $attributes): Expense
     {
-        return Expense::query()->create($attributes);
+        return Expense::query()->create([
+            'user_id' => $attributes['user_id'],
+            'expense_category_id' => $attributes['expense_category_id'],
+            'description' => $attributes['description'],
+            'amount' => $attributes['amount'],
+            'spent_on' => $attributes['spent_on'],
+            'upcoming_expense_id' => $attributes['upcoming_expense_id'] ?? null,
+        ]);
+    }
+
+    public function deleteByUpcomingExpenseId(int $upcomingExpenseId): void
+    {
+        Expense::query()
+            ->where('upcoming_expense_id', $upcomingExpenseId)
+            ->delete();
     }
 
     /**

@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Enums\UpcomingExpensePaymentStatus;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
+use App\Models\UpcomingExpense;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -121,6 +123,62 @@ class ExpenseUpdateDeleteTest extends TestCase
         $this->actingAs($intruder)
             ->delete(route('expenses.destroy', $expense))
             ->assertNotFound();
+
+        $this->assertNotNull(Expense::query()->find($expense->id));
+    }
+
+    #[Test]
+    public function user_cannot_update_expense_linked_to_upcoming_plan(): void
+    {
+        $this->artisan('default-expense-categories:sync');
+
+        $user = User::factory()->create();
+        $categoryA = ExpenseCategory::query()->system()->firstOrFail();
+        $categoryB = ExpenseCategory::query()->system()->skip(1)->firstOrFail();
+
+        $upcoming = UpcomingExpense::factory()->forUser($user)->create([
+            'payment_status' => UpcomingExpensePaymentStatus::Paid,
+        ]);
+
+        $expense = Expense::factory()->forUserAndCategory($user, $categoryA)->create([
+            'description' => 'Desde plan',
+            'amount' => 10,
+            'spent_on' => now()->toDateString(),
+            'upcoming_expense_id' => $upcoming->id,
+        ]);
+
+        $this->actingAs($user)
+            ->put(route('expenses.update', $expense), [
+                'expense_category_id' => $categoryB->id,
+                'description' => 'Cambio',
+                'amount' => 22.5,
+            ])
+            ->assertForbidden();
+
+        $expense->refresh();
+        $this->assertSame('Desde plan', $expense->description);
+    }
+
+    #[Test]
+    public function user_cannot_delete_expense_linked_to_upcoming_plan(): void
+    {
+        $this->artisan('default-expense-categories:sync');
+
+        $user = User::factory()->create();
+        $category = ExpenseCategory::query()->system()->firstOrFail();
+
+        $upcoming = UpcomingExpense::factory()->forUser($user)->create([
+            'payment_status' => UpcomingExpensePaymentStatus::Paid,
+        ]);
+
+        $expense = Expense::factory()->forUserAndCategory($user, $category)->create([
+            'spent_on' => now()->toDateString(),
+            'upcoming_expense_id' => $upcoming->id,
+        ]);
+
+        $this->actingAs($user)
+            ->delete(route('expenses.destroy', $expense))
+            ->assertForbidden();
 
         $this->assertNotNull(Expense::query()->find($expense->id));
     }

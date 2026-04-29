@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\UpcomingExpensePaymentStatus;
 use App\Models\UpcomingExpense;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateUpcomingExpenseRequest extends FormRequest
 {
@@ -22,14 +24,54 @@ class UpdateUpcomingExpenseRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->user()?->id;
+
         return [
             'description' => ['required', 'string', 'max:255'],
             'note' => ['nullable', 'string', 'max:65535'],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:999999999999.99'],
             'kind' => ['required', 'string', Rule::in(['fixed', 'variable'])],
             'payment_status' => ['required', 'string', Rule::in(['paid', 'unpaid'])],
+            'expense_category_id' => [
+                'required',
+                'integer',
+                Rule::exists('expense_categories', 'id')->where(function ($query) use ($userId): void {
+                    $query->where(function ($q) use ($userId): void {
+                        $q->whereNull('user_id');
+                        if ($userId !== null) {
+                            $q->orWhere('user_id', $userId);
+                        }
+                    });
+                }),
+            ],
             'redirect_year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
             'redirect_month' => ['nullable', 'integer', 'min:1', 'max:12'],
         ];
+    }
+
+    protected function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $v): void {
+            $upcoming = $this->route('upcoming_expense');
+
+            if (! $upcoming instanceof UpcomingExpense) {
+                return;
+            }
+
+            $targetStatus = UpcomingExpensePaymentStatus::tryFrom((string) $this->input('payment_status'));
+            if ($targetStatus !== UpcomingExpensePaymentStatus::Paid) {
+                return;
+            }
+
+            $plannedYm = ((int) $upcoming->year) * 12 + (int) $upcoming->month;
+            $currentYm = (int) now()->year * 12 + (int) now()->month;
+
+            if ($plannedYm > $currentYm) {
+                $v->errors()->add(
+                    'payment_status',
+                    __('frontend.upcoming_expenses.validation.cannot_mark_paid_future_month'),
+                );
+            }
+        });
     }
 }

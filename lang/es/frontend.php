@@ -122,6 +122,8 @@ return [
         'delete_modal_description' => 'Se quitará el monto y los datos. No se puede deshacer.',
         'delete_confirm' => 'Eliminar',
         'deleting' => 'Eliminando…',
+        'from_upcoming_tooltip' => 'Este gasto se registró cuando marcaste un gasto futuro como pagado. Para editarlo o borrarlo, usá la sección Gastos futuros.',
+        'from_upcoming_info_aria' => 'Información: gasto creado desde gastos futuros',
         'flash' => [
             'created' => 'Gasto guardado.',
             'updated' => 'Gasto actualizado.',
@@ -168,6 +170,11 @@ return [
         'delete_modal_description' => 'Se quitará de tu planificación. No se puede deshacer.',
         'delete_confirm' => 'Eliminar',
         'deleting' => 'Eliminando…',
+        'paid_disabled_future_month_title' => 'Todavía no podés marcar como pagados los gastos de un mes futuro.',
+        'payment_paid_blocked_info_aria' => 'Información: por qué no podés marcar como pagado',
+        'validation' => [
+            'cannot_mark_paid_future_month' => 'No podés marcar como pagado un gasto planificado de un mes posterior al actual.',
+        ],
 
         'flash' => [
             'created' => 'Gasto futuro guardado.',

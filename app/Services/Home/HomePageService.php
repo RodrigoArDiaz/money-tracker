@@ -33,7 +33,8 @@ class HomePageService
      *             description: string,
      *             amount: string,
      *             category_name: string,
-     *             category_icon: string|null
+     *             category_icon: string|null,
+     *             from_upcoming: bool
      *         }>
      *     }>
      * }
@@ -97,6 +98,7 @@ class HomePageService
                             'amount' => (string) $expense->amount,
                             'category_name' => $expense->category->localizedName($locale),
                             'category_icon' => $expense->category->icon,
+                            'from_upcoming' => $expense->upcoming_expense_id !== null,
                         ])
                         ->values()
                         ->all(),
