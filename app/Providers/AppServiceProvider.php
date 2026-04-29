@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Expense;
+use App\Models\UpcomingExpense;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +26,13 @@ class AppServiceProvider extends ServiceProvider
     {
         Route::bind('expense', function (string $value): Expense {
             return Expense::query()
+                ->whereKey($value)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+        });
+
+        Route::bind('upcoming_expense', function (string $value): UpcomingExpense {
+            return UpcomingExpense::query()
                 ->whereKey($value)
                 ->where('user_id', Auth::id())
                 ->firstOrFail();

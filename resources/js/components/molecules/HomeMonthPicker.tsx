@@ -32,6 +32,7 @@ export function HomeMonthPicker({
     navigatePath = '/',
     extraQuery,
     monthPickerAriaLabel,
+    allowFutureMonths = false,
 }: {
     viewYear: number;
     viewMonth: number;
@@ -41,6 +42,8 @@ export function HomeMonthPicker({
     extraQuery?: Record<string, string | number | boolean>;
     /** Si se pasa, sustituye la etiqueta accesible del botón (p. ej. gráficos por mes). */
     monthPickerAriaLabel?: string;
+    /** Permite elegir meses futuros y años hasta ~10 años adelante (p. ej. gastos planificados). */
+    allowFutureMonths?: boolean;
 }): React.ReactElement {
     const { t, locale } = useTranslate();
     const [open, setOpen] = React.useState(false);
@@ -55,14 +58,16 @@ export function HomeMonthPicker({
     );
 
     const yearOptions = React.useMemo(() => {
-        const maxY = new Date().getFullYear();
+        const nowY = new Date().getFullYear();
+        const ceiling = allowFutureMonths ? Math.min(2100, nowY + 10) : nowY;
+        const top = Math.min(2100, Math.max(ceiling, viewYear));
         const out: number[] = [];
-        for (let y = maxY; y >= 2000; y--) {
+        for (let y = top; y >= 2000; y--) {
             out.push(y);
         }
 
         return out;
-    }, []);
+    }, [allowFutureMonths, viewYear]);
 
     React.useEffect(() => {
         if (open) {
@@ -71,7 +76,7 @@ export function HomeMonthPicker({
     }, [open, viewYear]);
 
     function goToMonth(y: number, m: number): void {
-        if (isMonthInFuture(y, m)) {
+        if (!allowFutureMonths && isMonthInFuture(y, m)) {
             return;
         }
         if (y === viewYear && m === viewMonth) {
@@ -139,7 +144,7 @@ export function HomeMonthPicker({
                         className="grid grid-cols-3 gap-1"
                     >
                         {MONTH_INDEXES.map((m) => {
-                            const disabled = isMonthInFuture(draftYear, m);
+                            const disabled = !allowFutureMonths && isMonthInFuture(draftYear, m);
                             const isActive = draftYear === viewYear && m === viewMonth;
 
                             return (
