@@ -82,6 +82,8 @@ return [
         'month_picker_aria' => 'Elegir mes para ver gastos',
         'month_picker_year_label' => 'Año',
         'month_picker_months_region' => 'Meses',
+        'month_picker_legend_current' => 'Mes actual',
+        'month_picker_legend_next' => 'Mes siguiente',
         'month_total_nav_aria' => 'Total gastado en este mes: :amount',
         'month_total_nav_tooltip' => 'Total de gasto del mes',
         'month_expenses_section_aria' => 'Gastos del mes, por día',

@@ -82,6 +82,8 @@ return [
         'month_picker_aria' => 'Choose month to view expenses',
         'month_picker_year_label' => 'Year',
         'month_picker_months_region' => 'Months',
+        'month_picker_legend_current' => 'Current month',
+        'month_picker_legend_next' => 'Next month',
         'month_total_nav_aria' => 'Total spent in this month: :amount',
         'month_total_nav_tooltip' => 'Total expenses for the month',
         'month_expenses_section_aria' => 'Expenses this month, by day',

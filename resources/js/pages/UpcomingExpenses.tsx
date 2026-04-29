@@ -224,49 +224,6 @@ export default function UpcomingExpenses({
         >
             <Head title={t('upcoming_expenses.head_title')} />
             <div className="space-y-6">
-                <section aria-label={t('upcoming_expenses.totals_section_aria')}>
-                    <article
-                        className={hasUnpaidBalance ? EXPENSE_TOTAL_SUMMARY_CARD_UNPAID_ALERT_CLASS_NAME : EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME}
-                    >
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="flex min-w-0 flex-1 items-start gap-2">
-                                    <Sigma className="mt-0.5 size-5 shrink-0 text-primary/90" aria-hidden />
-                                    <div className="min-w-0 space-y-0.5">
-                                        <p className="text-sm font-medium text-muted-foreground">
-                                            {t('upcoming_expenses.total_all_caption')}
-                                        </p>
-                                        <p
-                                            className="text-xl font-semibold tabular-nums tracking-tight text-foreground"
-                                            aria-label={t('upcoming_expenses.total_all_aria', { amount: totalDisplay })}
-                                        >
-                                            {totalDisplay}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="flex min-w-0 flex-1 items-start gap-2">
-                                    <Sigma className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-500/90" aria-hidden />
-                                    <div className="min-w-0 space-y-0.5">
-                                        <p className="text-sm font-medium text-muted-foreground">
-                                            {t('upcoming_expenses.total_unpaid_caption')}
-                                        </p>
-                                        <p
-                                            className="text-xl font-semibold tabular-nums tracking-tight text-foreground"
-                                            aria-label={t('upcoming_expenses.total_unpaid_aria', {
-                                                amount: unpaidDisplay,
-                                            })}
-                                        >
-                                            {unpaidDisplay}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-                </section>
-
                 <section className="rounded-xl border bg-card p-3 text-card-foreground shadow-sm sm:p-4">
                     <h2 className="sr-only">{t('upcoming_expenses.add_heading')}</h2>
                     <form onSubmit={submitExpense} className="flex flex-col gap-3">
@@ -372,10 +329,50 @@ export default function UpcomingExpenses({
                     </form>
                 </section>
 
-                <section className="flex flex-col gap-3" aria-labelledby="upcoming-expenses-list-heading">
-                    <h2 id="upcoming-expenses-list-heading" className="text-base font-semibold tracking-tight">
-                        {t('upcoming_expenses.list_heading')}
-                    </h2>
+                <section aria-label={t('upcoming_expenses.totals_section_aria')}>
+                    <article
+                        className={hasUnpaidBalance ? EXPENSE_TOTAL_SUMMARY_CARD_UNPAID_ALERT_CLASS_NAME : EXPENSE_TOTAL_SUMMARY_CARD_CLASS_NAME}
+                    >
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="flex min-w-0 flex-1 items-start gap-2">
+                                    <Sigma className="mt-0.5 size-5 shrink-0 text-primary/90" aria-hidden />
+                                    <div className="min-w-0 space-y-0.5">
+                                        <p className="text-sm font-medium text-muted-foreground">
+                                            {t('upcoming_expenses.total_all_caption')}
+                                        </p>
+                                        <p
+                                            className="text-xl font-semibold tabular-nums tracking-tight text-foreground"
+                                            aria-label={t('upcoming_expenses.total_all_aria', { amount: totalDisplay })}
+                                        >
+                                            {totalDisplay}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="flex min-w-0 flex-1 items-start gap-2">
+                                    <Sigma className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-500/90" aria-hidden />
+                                    <div className="min-w-0 space-y-0.5">
+                                        <p className="text-sm font-medium text-muted-foreground">
+                                            {t('upcoming_expenses.total_unpaid_caption')}
+                                        </p>
+                                        <p
+                                            className="text-xl font-semibold tabular-nums tracking-tight text-foreground"
+                                            aria-label={t('upcoming_expenses.total_unpaid_aria', {
+                                                amount: unpaidDisplay,
+                                            })}
+                                        >
+                                            {unpaidDisplay}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+
+                <section className="flex flex-col gap-3" aria-label={t('upcoming_expenses.list_heading')}>
                     {expenses.length === 0 ? (
                         <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
                             {t('upcoming_expenses.empty')}

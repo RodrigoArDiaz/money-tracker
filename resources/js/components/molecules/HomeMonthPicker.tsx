@@ -26,6 +26,19 @@ function isMonthInFuture(year: number, month: number): boolean {
     return false;
 }
 
+function getCalendarTodayYearMonth(): { year: number; month: number } {
+    const d = new Date();
+
+    return { year: d.getFullYear(), month: d.getMonth() + 1 };
+}
+
+/** Añade meses naturales respecto del primero del mes ( año/mes válidos ). */
+function addCalendarMonths(year: number, month: number, deltaMonths: number): { year: number; month: number } {
+    const d = new Date(year, month - 1 + deltaMonths, 1);
+
+    return { year: d.getFullYear(), month: d.getMonth() + 1 };
+}
+
 export function HomeMonthPicker({
     viewYear,
     viewMonth,
@@ -33,6 +46,7 @@ export function HomeMonthPicker({
     extraQuery,
     monthPickerAriaLabel,
     allowFutureMonths = false,
+    highlightCalendarNextMonth = true,
 }: {
     viewYear: number;
     viewMonth: number;
@@ -44,6 +58,8 @@ export function HomeMonthPicker({
     monthPickerAriaLabel?: string;
     /** Permite elegir meses futuros y años hasta ~10 años adelante (p. ej. gastos planificados). */
     allowFutureMonths?: boolean;
+    /** Marca en amarillo el mes calendario siguiente; desactívalo p. ej. en “Tus gastos”. */
+    highlightCalendarNextMonth?: boolean;
 }): React.ReactElement {
     const { t, locale } = useTranslate();
     const [open, setOpen] = React.useState(false);
@@ -68,6 +84,13 @@ export function HomeMonthPicker({
 
         return out;
     }, [allowFutureMonths, viewYear]);
+
+    const { calendarCurrent, calendarNext } = React.useMemo(() => {
+        const today = getCalendarTodayYearMonth();
+        const next = addCalendarMonths(today.year, today.month, 1);
+
+        return { calendarCurrent: today, calendarNext: next };
+    }, [open]);
 
     React.useEffect(() => {
         if (open) {
@@ -146,15 +169,37 @@ export function HomeMonthPicker({
                         {MONTH_INDEXES.map((m) => {
                             const disabled = !allowFutureMonths && isMonthInFuture(draftYear, m);
                             const isActive = draftYear === viewYear && m === viewMonth;
+                            const isCalendarCurrentMonth =
+                                draftYear === calendarCurrent.year && m === calendarCurrent.month;
+                            const isCalendarNextMonth =
+                                highlightCalendarNextMonth &&
+                                draftYear === calendarNext.year &&
+                                m === calendarNext.month;
 
                             return (
                                 <Button
                                     key={m}
                                     type="button"
-                                    variant={isActive ? 'secondary' : 'outline'}
+                                    variant={
+                                        !disabled &&
+                                        !isCalendarCurrentMonth &&
+                                        !isCalendarNextMonth &&
+                                        isActive
+                                            ? 'secondary'
+                                            : 'outline'
+                                    }
                                     size="sm"
                                     disabled={disabled}
-                                    className="h-9 px-1 text-xs font-normal"
+                                    className={cn(
+                                        'h-9 px-1 text-xs font-normal transition-colors',
+                                        !disabled &&
+                                            isCalendarCurrentMonth &&
+                                            'border-2 border-emerald-600/65 bg-emerald-500/[0.15] font-medium text-emerald-950 hover:bg-emerald-500/[0.24] hover:text-emerald-950 dark:border-emerald-500/55 dark:bg-emerald-950/45 dark:text-emerald-50 dark:hover:bg-emerald-950/65 dark:hover:text-emerald-50',
+                                        !disabled &&
+                                            !isCalendarCurrentMonth &&
+                                            isCalendarNextMonth &&
+                                            'border-2 border-amber-500/70 bg-amber-400/[0.16] font-medium text-amber-950 hover:bg-amber-400/[0.26] hover:text-amber-950 dark:border-amber-400/55 dark:bg-amber-950/40 dark:text-amber-50 dark:hover:bg-amber-950/55 dark:hover:text-amber-50',
+                                    )}
                                     onClick={() => {
                                         goToMonth(draftYear, m);
                                     }}
@@ -165,6 +210,27 @@ export function HomeMonthPicker({
                                 </Button>
                             );
                         })}
+                    </div>
+                    <div
+                        role="presentation"
+                        className="flex flex-wrap gap-x-4 gap-y-1.5 border-t border-border pt-2.5 text-xs text-muted-foreground"
+                    >
+                        <span className="inline-flex items-center gap-2">
+                            <span
+                                className="inline-block size-3 shrink-0 rounded-[3px] border-2 border-emerald-600/75 bg-emerald-500/20 dark:border-emerald-500/65 dark:bg-emerald-950/50"
+                                aria-hidden
+                            />
+                            {t('expenses.month_picker_legend_current')}
+                        </span>
+                        {highlightCalendarNextMonth ? (
+                            <span className="inline-flex items-center gap-2">
+                                <span
+                                    className="inline-block size-3 shrink-0 rounded-[3px] border-2 border-amber-500/85 bg-amber-400/[0.28] dark:border-amber-400/65 dark:bg-amber-950/35"
+                                    aria-hidden
+                                />
+                                {t('expenses.month_picker_legend_next')}
+                            </span>
+                        ) : null}
                     </div>
                 </div>
             </PopoverContent>
