@@ -170,6 +170,11 @@ return [
         'delete_modal_description' => 'It will be removed from your plan. This cannot be undone.',
         'delete_confirm' => 'Delete',
         'deleting' => 'Deleting…',
+        'paid_disabled_future_month_title' => 'Planned expenses for future months can’t be marked as paid yet.',
+        'payment_paid_blocked_info_aria' => 'Information: why Paid is not available for this month',
+        'validation' => [
+            'cannot_mark_paid_future_month' => 'You can’t mark a planned expense as paid for a calendar month later than this one.',
+        ],
 
         'flash' => [
             'created' => 'Upcoming expense saved.',

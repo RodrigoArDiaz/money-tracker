@@ -9,6 +9,7 @@ import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
 import { HomeMonthPicker } from '@/components/molecules/HomeMonthPicker';
+import { PaymentStatusPaidBlockedHint } from '@/components/molecules/PaymentStatusPaidBlockedHint';
 import {
     UpcomingExpenseListItem,
     type UpcomingExpenseRow,
@@ -61,6 +62,7 @@ export default function UpcomingExpenses({
     expenses,
     total_amount,
     unpaid_total,
+    can_mark_planned_expenses_paid,
 }: {
     viewYear: number;
     viewMonth: number;
@@ -69,6 +71,7 @@ export default function UpcomingExpenses({
     expenses: UpcomingExpenseRow[];
     total_amount: string;
     unpaid_total: string;
+    can_mark_planned_expenses_paid: boolean;
 }) {
     const { t, locale } = useTranslate();
 
@@ -159,6 +162,11 @@ export default function UpcomingExpenses({
         const id = Number(raw);
         return allCategoryOptions.find((c) => c.id === id) ?? null;
     }, [editForm.data.expense_category_id, allCategoryOptions]);
+
+    const editPaidOptionDisabled = React.useMemo(
+        () => !can_mark_planned_expenses_paid && editForm.data.payment_status === 'unpaid',
+        [can_mark_planned_expenses_paid, editForm.data.payment_status],
+    );
 
     React.useEffect(() => {
         const raw = localStorage.getItem(LAST_EXPENSE_CATEGORY_STORAGE_KEY);
@@ -518,6 +526,7 @@ export default function UpcomingExpenses({
                                 <li key={row.id}>
                                     <UpcomingExpenseListItem
                                         row={row}
+                                        canMarkPaid={can_mark_planned_expenses_paid}
                                         onEdit={openEdit}
                                         onDelete={setDeletingExpense}
                                         onPaymentStatusChange={handlePaymentStatusChange}
@@ -696,27 +705,42 @@ export default function UpcomingExpenses({
                                 <label htmlFor="edit_upcoming_payment" className={compactLabelClass()}>
                                     {t('upcoming_expenses.payment_status_label')}
                                 </label>
-                                <Select
-                                    value={editForm.data.payment_status}
-                                    onValueChange={(value) => {
-                                        if (value === 'paid' || value === 'unpaid') {
-                                            editForm.setData('payment_status', value);
-                                        }
-                                    }}
-                                >
-                                    <SelectTrigger
-                                        id="edit_upcoming_payment"
-                                        size="md"
-                                        aria-label={t('upcoming_expenses.payment_select_aria')}
-                                        className={INLINE_FORM_SELECT_TRIGGER_CLASS}
-                                    >
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="paid">{t('upcoming_expenses.status_paid')}</SelectItem>
-                                        <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-2">
+                                    <div className="min-w-0 flex-1">
+                                        <Select
+                                            value={editForm.data.payment_status}
+                                            onValueChange={(value) => {
+                                                if (value === 'paid' || value === 'unpaid') {
+                                                    editForm.setData('payment_status', value);
+                                                }
+                                            }}
+                                        >
+                                            <SelectTrigger
+                                                id="edit_upcoming_payment"
+                                                size="md"
+                                                aria-label={t('upcoming_expenses.payment_select_aria')}
+                                                className={INLINE_FORM_SELECT_TRIGGER_CLASS}
+                                            >
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem
+                                                    value="paid"
+                                                    disabled={editPaidOptionDisabled}
+                                                    title={
+                                                        editPaidOptionDisabled
+                                                            ? t('upcoming_expenses.paid_disabled_future_month_title')
+                                                            : undefined
+                                                    }
+                                                >
+                                                    {t('upcoming_expenses.status_paid')}
+                                                </SelectItem>
+                                                <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <PaymentStatusPaidBlockedHint visible={editPaidOptionDisabled} />
+                                </div>
                                 <FieldError message={editForm.errors.payment_status} />
                             </div>
                         </div>

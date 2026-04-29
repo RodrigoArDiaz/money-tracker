@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Repositories\ExpenseCategoryRepository;
 use App\Repositories\ExpenseRepository;
 use App\Repositories\UpcomingExpenseRepository;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -102,11 +103,15 @@ class UpcomingExpenseService
      *     }>,
      *     total_amount: string,
      *     unpaid_total: string,
+     *     can_mark_planned_expenses_paid: bool,
      * }
      */
     public function pageDataForMonth(User $user, int $year, int $month): array
     {
         $locale = app()->getLocale();
+
+        $plannedYm = $year * 12 + $month;
+        $currentYm = (int) now()->year * 12 + (int) now()->month;
 
         /** @var Collection<int, UpcomingExpense> $collection */
         $collection = $this->upcomingExpenseRepository->forUserInMonth($user, $year, $month);
@@ -167,6 +172,7 @@ class UpcomingExpenseService
                 ->all(),
             'total_amount' => number_format($totalAmount, 2, '.', ''),
             'unpaid_total' => number_format($unpaidTotal, 2, '.', ''),
+            'can_mark_planned_expenses_paid' => $plannedYm <= $currentYm,
         ];
     }
 
@@ -215,8 +221,25 @@ class UpcomingExpenseService
             'expense_category_id' => $upcoming->expense_category_id,
             'description' => $upcoming->description,
             'amount' => $upcoming->amount,
-            'spent_on' => now()->toDateString(),
+            'spent_on' => $this->resolveSpentOnDateForLinkedExpense($upcoming),
             'upcoming_expense_id' => $upcoming->id,
         ]);
+    }
+
+    /**
+     * Mes del plan anterior al mes actual: último día calendario de ese mes.
+     * Mes del plan igual al mes actual: día en que se marca pagado.
+     * Mes futuro no debería llegar aquí si la validación está alineada.
+     */
+    private function resolveSpentOnDateForLinkedExpense(UpcomingExpense $upcoming): string
+    {
+        $plannedYm = ((int) $upcoming->year) * 12 + (int) $upcoming->month;
+        $currentYm = (int) now()->year * 12 + (int) now()->month;
+
+        if ($plannedYm < $currentYm) {
+            return Carbon::create((int) $upcoming->year, (int) $upcoming->month, 1)->endOfMonth()->toDateString();
+        }
+
+        return now()->toDateString();
     }
 }

@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { ExpenseRowActions } from '@/components/molecules/ExpenseRowActions';
+import { PaymentStatusPaidBlockedHint } from '@/components/molecules/PaymentStatusPaidBlockedHint';
 import { Badge } from '@/components/ui/badge';
 import {
     Select,
@@ -30,17 +31,21 @@ export type UpcomingExpenseRow = {
 
 export function UpcomingExpenseListItem({
     row,
+    canMarkPaid,
     onEdit,
     onDelete,
     onPaymentStatusChange,
 }: {
     row: UpcomingExpenseRow;
+    /** Si es false (mes vista > mes actual), «Pagado» no está disponible mientras siga sin pagar. */
+    canMarkPaid: boolean;
     onEdit: (row: UpcomingExpenseRow) => void;
     onDelete: (row: UpcomingExpenseRow) => void;
     onPaymentStatusChange: (row: UpcomingExpenseRow, paymentStatus: UpcomingExpenseRow['payment_status']) => void;
 }): React.ReactElement {
     const { t, locale } = useTranslate();
 
+    const paidOptionDisabled = !canMarkPaid && row.payment_status === 'unpaid';
     const kindLabel = row.kind === 'fixed' ? t('upcoming_expenses.kind_fixed') : t('upcoming_expenses.kind_variable');
 
     const noteParagraph =
@@ -98,27 +103,36 @@ export function UpcomingExpenseListItem({
                 </div>
                 {noteParagraph ? <div className="text-sm">{noteParagraph}</div> : null}
                 <div className="flex flex-row flex-nowrap items-center gap-x-2 gap-y-0">
-                    <div className="min-w-0 flex-1">
-                        <Select
-                            value={row.payment_status}
-                            onValueChange={(value) => {
-                                if (value === 'paid' || value === 'unpaid') {
-                                    onPaymentStatusChange(row, value);
-                                }
-                            }}
-                        >
-                            <SelectTrigger
-                                size="md"
-                                aria-label={t('upcoming_expenses.payment_select_aria')}
-                                className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full', paymentStatusSelectTriggerTone)}
+                    <div className="flex min-w-0 flex-1 flex-row items-center gap-2">
+                        <div className="min-w-0 flex-1">
+                            <Select
+                                value={row.payment_status}
+                                onValueChange={(value) => {
+                                    if (value === 'paid' || value === 'unpaid') {
+                                        onPaymentStatusChange(row, value);
+                                    }
+                                }}
                             >
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="paid">{t('upcoming_expenses.status_paid')}</SelectItem>
-                                <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
-                            </SelectContent>
-                        </Select>
+                                <SelectTrigger
+                                    size="md"
+                                    aria-label={t('upcoming_expenses.payment_select_aria')}
+                                    className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full', paymentStatusSelectTriggerTone)}
+                                >
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem
+                                        value="paid"
+                                        disabled={paidOptionDisabled}
+                                        title={paidOptionDisabled ? t('upcoming_expenses.paid_disabled_future_month_title') : undefined}
+                                    >
+                                        {t('upcoming_expenses.status_paid')}
+                                    </SelectItem>
+                                    <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
                     </div>
                     <div className="shrink-0">
                         <ExpenseRowActions
@@ -162,27 +176,38 @@ export function UpcomingExpenseListItem({
                         noteParagraph && 'self-start pt-0.5',
                     )}
                 >
-                    <div className="w-[10.75rem] shrink-0 lg:w-[11rem]">
-                        <Select
-                            value={row.payment_status}
-                            onValueChange={(value) => {
-                                if (value === 'paid' || value === 'unpaid') {
-                                    onPaymentStatusChange(row, value);
-                                }
-                            }}
-                        >
-                            <SelectTrigger
-                                size="md"
-                                aria-label={t('upcoming_expenses.payment_select_aria')}
-                                className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full', paymentStatusSelectTriggerTone)}
+                    <div className="flex min-w-0 items-center gap-2">
+                        <div className="w-[10.75rem] shrink-0 lg:w-[11rem]">
+                            <Select
+                                value={row.payment_status}
+                                onValueChange={(value) => {
+                                    if (value === 'paid' || value === 'unpaid') {
+                                        onPaymentStatusChange(row, value);
+                                    }
+                                }}
                             >
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent align="end">
-                                <SelectItem value="paid">{t('upcoming_expenses.status_paid')}</SelectItem>
-                                <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
-                            </SelectContent>
-                        </Select>
+                                <SelectTrigger
+                                    size="md"
+                                    aria-label={t('upcoming_expenses.payment_select_aria')}
+                                    className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full', paymentStatusSelectTriggerTone)}
+                                >
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent align="end">
+                                    <SelectItem
+                                        value="paid"
+                                        disabled={paidOptionDisabled}
+                                        title={
+                                            paidOptionDisabled ? t('upcoming_expenses.paid_disabled_future_month_title') : undefined
+                                        }
+                                    >
+                                        {t('upcoming_expenses.status_paid')}
+                                    </SelectItem>
+                                    <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
                     </div>
                     <ExpenseRowActions
                         onEdit={() => onEdit(row)}
