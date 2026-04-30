@@ -4,12 +4,16 @@ namespace App\Services\UpcomingExpense;
 
 use App\Enums\UpcomingExpenseKind;
 use App\Enums\UpcomingExpensePaymentStatus;
+use App\Enums\UpcomingExpenseRecurrenceCadence;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\UpcomingExpense;
+use App\Models\UpcomingExpenseRecurringTemplate;
 use App\Models\User;
 use App\Repositories\ExpenseCategoryRepository;
 use App\Repositories\ExpenseRepository;
+use App\Repositories\UpcomingExpenseRecurringMonthSkipRepository;
+use App\Repositories\UpcomingExpenseRecurringTemplateRepository;
 use App\Repositories\UpcomingExpenseRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -19,6 +23,8 @@ class UpcomingExpenseService
 {
     public function __construct(
         private readonly UpcomingExpenseRepository $upcomingExpenseRepository,
+        private readonly UpcomingExpenseRecurringTemplateRepository $recurringTemplateRepository,
+        private readonly UpcomingExpenseRecurringMonthSkipRepository $recurringMonthSkipRepository,
         private readonly ExpenseRepository $expenseRepository,
         private readonly ExpenseCategoryRepository $expenseCategoryRepository,
     ) {}
@@ -38,6 +44,7 @@ class UpcomingExpenseService
     {
         return $this->upcomingExpenseRepository->create([
             'user_id' => $user->id,
+            'recurring_template_id' => null,
             'year' => $validated['year'],
             'month' => $validated['month'],
             'expense_category_id' => $validated['expense_category_id'],
@@ -57,10 +64,19 @@ class UpcomingExpenseService
      *     kind: string,
      *     payment_status: string,
      *     expense_category_id: int,
+     *     update_scope?: string,
      * }  $validated
      */
     public function update(UpcomingExpense $upcomingExpense, array $validated): void
     {
+        $scope = $validated['update_scope'] ?? 'this_month_only';
+
+        if ($scope === 'this_and_future_unpaid') {
+            $this->updateUpcomingExpenseSeriesFromAnchor($upcomingExpense, $validated);
+
+            return;
+        }
+
         DB::transaction(function () use ($upcomingExpense, $validated): void {
             $this->upcomingExpenseRepository->update($upcomingExpense, [
                 'description' => trim($validated['description']),
@@ -79,35 +95,160 @@ class UpcomingExpenseService
 
     public function delete(UpcomingExpense $upcomingExpense): void
     {
-        $this->upcomingExpenseRepository->delete($upcomingExpense);
+        DB::transaction(function () use ($upcomingExpense): void {
+            $templateId = $upcomingExpense->recurring_template_id;
+            if ($templateId !== null) {
+                $this->recurringMonthSkipRepository->record(
+                    (int) $upcomingExpense->user_id,
+                    (int) $templateId,
+                    (int) $upcomingExpense->year,
+                    (int) $upcomingExpense->month,
+                );
+            }
+
+            $this->upcomingExpenseRepository->delete($upcomingExpense);
+        });
+    }
+
+    public function makeRecurringFromUpcoming(UpcomingExpense $upcomingExpense): void
+    {
+        if ($upcomingExpense->recurring_template_id !== null) {
+            return;
+        }
+
+        DB::transaction(function () use ($upcomingExpense): void {
+            $nowY = (int) now()->year;
+            $nowM = (int) now()->month;
+            $nowE = $nowY * 12 + $nowM;
+            $expE = (int) $upcomingExpense->year * 12 + (int) $upcomingExpense->month;
+            $startYear = (int) $upcomingExpense->year;
+            $startMonth = (int) $upcomingExpense->month;
+            if ($expE < $nowE) {
+                $startYear = $nowY;
+                $startMonth = $nowM;
+            }
+
+            $template = $this->recurringTemplateRepository->create([
+                'user_id' => $upcomingExpense->user_id,
+                'expense_category_id' => (int) $upcomingExpense->expense_category_id,
+                'description' => $upcomingExpense->description,
+                'note' => $upcomingExpense->note,
+                'amount' => $upcomingExpense->amount,
+                'kind' => $upcomingExpense->kind->value,
+                'cadence' => UpcomingExpenseRecurrenceCadence::Monthly->value,
+                'start_year' => $startYear,
+                'start_month' => $startMonth,
+                'end_year' => null,
+                'end_month' => null,
+                'is_active' => true,
+            ]);
+
+            $this->upcomingExpenseRepository->update($upcomingExpense, [
+                'recurring_template_id' => $template->id,
+            ]);
+        });
     }
 
     /**
-     * Datos para la página Inertia de gastos futuros.
-     *
-     * @return array{
-     *     viewYear: int,
-     *     viewMonth: int,
-     *     myCategories: list<array{id: int, name: string, icon: string|null}>,
-     *     defaultCategories: list<array{id: int, name: string, icon: string|null}>,
-     *     expenses: list<array{
-     *         id: int,
-     *         expense_category_id: int|null,
-     *         category_name: string,
-     *         category_icon: string|null,
-     *         description: string,
-     *         amount: string,
-     *         note: string|null,
-     *         kind: string,
-     *         payment_status: string,
-     *     }>,
-     *     total_amount: string,
-     *     unpaid_total: string,
-     *     can_mark_planned_expenses_paid: bool,
-     * }
+     * @param  array{
+     *     description: string,
+     *     note?: string|null,
+     *     amount: float|int|string,
+     *     kind: string,
+     *     expense_category_id: int,
+     *     start_year: int,
+     *     start_month: int,
+     *     end_year?: int|null,
+     *     end_month?: int|null,
+     * }  $validated
      */
+    public function createRecurringTemplate(User $user, array $validated): void
+    {
+        DB::transaction(function () use ($user, $validated): void {
+            $template = $this->recurringTemplateRepository->create([
+                'user_id' => $user->id,
+                'expense_category_id' => $validated['expense_category_id'],
+                'description' => trim($validated['description']),
+                'note' => $this->normalizeNote($validated['note'] ?? null),
+                'amount' => $validated['amount'],
+                'kind' => UpcomingExpenseKind::from($validated['kind'])->value,
+                'cadence' => UpcomingExpenseRecurrenceCadence::Monthly->value,
+                'start_year' => $validated['start_year'],
+                'start_month' => $validated['start_month'],
+                'end_year' => $validated['end_year'] ?? null,
+                'end_month' => $validated['end_month'] ?? null,
+                'is_active' => true,
+            ]);
+
+            $this->materializeRecurringTemplateIfMissing(
+                $template,
+                $validated['start_year'],
+                $validated['start_month'],
+            );
+        });
+    }
+
+    /**
+     * @param  array{
+     *     description: string,
+     *     note?: string|null,
+     *     amount: float|int|string,
+     *     kind: string,
+     *     expense_category_id: int,
+     *     is_active: bool,
+     *     end_year?: int|null,
+     *     end_month?: int|null,
+     * }  $validated
+     */
+    public function updateOwnedRecurringTemplate(UpcomingExpenseRecurringTemplate $template, array $validated): void
+    {
+        DB::transaction(function () use ($template, $validated): void {
+            $this->recurringTemplateRepository->update($template, [
+                'description' => trim($validated['description']),
+                'note' => $this->normalizeNote($validated['note'] ?? null),
+                'amount' => $validated['amount'],
+                'kind' => UpcomingExpenseKind::from($validated['kind'])->value,
+                'expense_category_id' => $validated['expense_category_id'],
+                'is_active' => $validated['is_active'],
+                'end_year' => $validated['end_year'] ?? null,
+                'end_month' => $validated['end_month'] ?? null,
+            ]);
+
+            $template->refresh();
+
+            $shared = [
+                'expense_category_id' => $template->expense_category_id,
+                'description' => $template->description,
+                'note' => $template->note,
+                'amount' => $template->amount,
+                'kind' => $template->kind->value,
+            ];
+
+            /** @var Collection<int, UpcomingExpense> $unpaid */
+            $unpaid = UpcomingExpense::query()
+                ->where('recurring_template_id', $template->id)
+                ->where('payment_status', UpcomingExpensePaymentStatus::Unpaid)
+                ->get();
+
+            foreach ($unpaid as $row) {
+                $this->upcomingExpenseRepository->update($row, $shared);
+                $row->refresh();
+                $this->syncLinkedExpenseForUpcomingRow($row);
+            }
+        });
+    }
+
+    public function deleteOwnedRecurringTemplate(UpcomingExpenseRecurringTemplate $template): void
+    {
+        $this->recurringTemplateRepository->delete($template);
+    }
+
     public function pageDataForMonth(User $user, int $year, int $month): array
     {
+        DB::transaction(function () use ($user, $year, $month): void {
+            $this->ensureRecurringInstancesForMonth($user, $year, $month);
+        });
+
         $locale = app()->getLocale();
 
         $plannedYm = $year * 12 + $month;
@@ -156,6 +297,7 @@ class UpcomingExpenseService
 
                     return [
                         'id' => $e->id,
+                        'recurring_template_id' => $e->recurring_template_id,
                         'expense_category_id' => $e->expense_category_id,
                         'category_name' => $category instanceof ExpenseCategory
                             ? $category->localizedName($locale)
@@ -176,6 +318,90 @@ class UpcomingExpenseService
         ];
     }
 
+    /**
+     * Datos Inertia para la página de plantillas recurrentes (sin materializar un mes de plan).
+     *
+     * @return array{
+     *     defaultYear: int,
+     *     defaultMonth: int,
+     *     myCategories: list<array{id: int, name: string, icon: string|null}>,
+     *     defaultCategories: list<array{id: int, name: string, icon: string|null}>,
+     *     recurringTemplates: list<array{
+     *         id: int,
+     *         expense_category_id: int,
+     *         description: string,
+     *         note: string|null,
+     *         category_name: string,
+     *         category_icon: string|null,
+     *         amount: string,
+     *         kind: string,
+     *         cadence: string,
+     *         is_active: bool,
+     *         start_year: int,
+     *         start_month: int,
+     *         end_year: int|null,
+     *         end_month: int|null,
+     *     }>,
+     * }
+     */
+    public function recurringTemplatesPageData(User $user, int $defaultYear, int $defaultMonth): array
+    {
+        $locale = app()->getLocale();
+
+        $myCategories = $this->expenseCategoryRepository
+            ->ownedByUserOrdered($user)
+            ->map(fn (ExpenseCategory $category): array => [
+                'id' => $category->id,
+                'name' => $category->localizedName($locale),
+                'icon' => $category->icon,
+            ])
+            ->all();
+
+        $defaultCategories = $this->expenseCategoryRepository
+            ->systemOrdered()
+            ->map(fn (ExpenseCategory $row): array => [
+                'id' => $row->id,
+                'name' => $row->localizedName($locale),
+                'icon' => $row->icon,
+            ])
+            ->all();
+
+        $recurringTemplates = $this->recurringTemplateRepository
+            ->orderedForUser($user)
+            ->map(function (UpcomingExpenseRecurringTemplate $t) use ($locale): array {
+                $category = $t->category;
+
+                return [
+                    'id' => $t->id,
+                    'expense_category_id' => $t->expense_category_id,
+                    'description' => $t->description,
+                    'note' => $t->note,
+                    'category_name' => $category instanceof ExpenseCategory
+                        ? $category->localizedName($locale)
+                        : '',
+                    'category_icon' => $category?->icon,
+                    'amount' => number_format((float) $t->amount, 2, '.', ''),
+                    'kind' => $t->kind->value,
+                    'cadence' => $t->cadence->value,
+                    'is_active' => $t->is_active,
+                    'start_year' => $t->start_year,
+                    'start_month' => $t->start_month,
+                    'end_year' => $t->end_year,
+                    'end_month' => $t->end_month,
+                ];
+            })
+            ->values()
+            ->all();
+
+        return [
+            'defaultYear' => $defaultYear,
+            'defaultMonth' => $defaultMonth,
+            'myCategories' => $myCategories,
+            'defaultCategories' => $defaultCategories,
+            'recurringTemplates' => $recurringTemplates,
+        ];
+    }
+
     private function normalizeNote(mixed $note): ?string
     {
         if ($note === null) {
@@ -185,6 +411,105 @@ class UpcomingExpenseService
         $trimmed = trim((string) $note);
 
         return $trimmed === '' ? null : $trimmed;
+    }
+
+    private function ensureRecurringInstancesForMonth(User $user, int $year, int $month): void
+    {
+        $templates = $this->recurringTemplateRepository->activeMonthlyCoveringMonth($user, $year, $month);
+
+        foreach ($templates as $template) {
+            $this->materializeRecurringTemplateIfMissing($template, $year, $month);
+        }
+    }
+
+    private function materializeRecurringTemplateIfMissing(
+        UpcomingExpenseRecurringTemplate $template,
+        int $year,
+        int $month,
+    ): void {
+        $templateId = (int) $template->id;
+
+        if ($this->recurringMonthSkipRepository->existsForTemplateMonth($templateId, $year, $month)) {
+            return;
+        }
+
+        if ($this->upcomingExpenseRepository->existsForRecurringTemplateInMonth($templateId, $year, $month)) {
+            return;
+        }
+
+        $this->upcomingExpenseRepository->create([
+            'user_id' => $template->user_id,
+            'recurring_template_id' => $template->id,
+            'year' => $year,
+            'month' => $month,
+            'expense_category_id' => $template->expense_category_id,
+            'description' => $template->description,
+            'note' => $template->note,
+            'amount' => $template->amount,
+            'kind' => $template->kind->value,
+            'payment_status' => UpcomingExpensePaymentStatus::Unpaid->value,
+        ]);
+    }
+
+    /**
+     * @param  array{
+     *     description: string,
+     *     note?: string|null,
+     *     amount: float|int|string,
+     *     kind: string,
+     *     payment_status: string,
+     *     expense_category_id: int,
+     * }  $validated
+     */
+    private function updateUpcomingExpenseSeriesFromAnchor(UpcomingExpense $anchor, array $validated): void
+    {
+        $templateId = $anchor->recurring_template_id;
+        if ($templateId === null) {
+            return;
+        }
+
+        DB::transaction(function () use ($anchor, $validated, $templateId): void {
+            $template = UpcomingExpenseRecurringTemplate::query()
+                ->whereKey($templateId)
+                ->where('user_id', $anchor->user_id)
+                ->firstOrFail();
+
+            $this->recurringTemplateRepository->update($template, [
+                'description' => trim($validated['description']),
+                'note' => $this->normalizeNote($validated['note'] ?? null),
+                'amount' => $validated['amount'],
+                'kind' => UpcomingExpenseKind::from($validated['kind'])->value,
+                'expense_category_id' => $validated['expense_category_id'],
+            ]);
+
+            $template->refresh();
+
+            $shared = [
+                'expense_category_id' => $validated['expense_category_id'],
+                'description' => trim($validated['description']),
+                'note' => $this->normalizeNote($validated['note'] ?? null),
+                'amount' => $validated['amount'],
+                'kind' => UpcomingExpenseKind::from($validated['kind'])->value,
+            ];
+
+            $rows = $this->upcomingExpenseRepository->forRecurringTemplateFromMonthForSeriesUpdate(
+                (int) $templateId,
+                (int) $anchor->year,
+                (int) $anchor->month,
+                (int) $anchor->id,
+            );
+
+            foreach ($rows as $row) {
+                $payload = $shared;
+                if ((int) $row->id === (int) $anchor->id) {
+                    $payload['payment_status'] = UpcomingExpensePaymentStatus::from($validated['payment_status'])->value;
+                }
+
+                $this->upcomingExpenseRepository->update($row, $payload);
+                $row->refresh();
+                $this->syncLinkedExpenseForUpcomingRow($row);
+            }
+        });
     }
 
     /**

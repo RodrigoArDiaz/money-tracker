@@ -11,6 +11,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\UpcomingExpenseController;
+use App\Http\Controllers\UpcomingExpenseRecurringTemplateController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -44,10 +45,20 @@ Route::middleware('auth')->group(function () {
     Route::redirect('expense-categories/create', '/expense-categories');
     Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show', 'create', 'edit']);
     Route::get('charts', ChartController::class)->name('charts');
+    Route::get('upcoming-expenses/recurring', [UpcomingExpenseRecurringTemplateController::class, 'index'])
+        ->name('upcoming-expenses.recurring');
     Route::get('upcoming-expenses', [UpcomingExpenseController::class, 'index'])->name('upcoming-expenses.index');
     Route::post('upcoming-expenses', [UpcomingExpenseController::class, 'store'])->name('upcoming-expenses.store');
+    Route::post('upcoming-expenses/{upcoming_expense}/make-recurring', [UpcomingExpenseController::class, 'makeRecurring'])
+        ->name('upcoming-expenses.make-recurring');
     Route::put('upcoming-expenses/{upcoming_expense}', [UpcomingExpenseController::class, 'update'])->name('upcoming-expenses.update');
     Route::delete('upcoming-expenses/{upcoming_expense}', [UpcomingExpenseController::class, 'destroy'])->name('upcoming-expenses.destroy');
+    Route::post('upcoming-expense-recurring-templates', [UpcomingExpenseRecurringTemplateController::class, 'store'])
+        ->name('upcoming-expense-recurring-templates.store');
+    Route::put('upcoming-expense-recurring-templates/{recurring_template}', [UpcomingExpenseRecurringTemplateController::class, 'update'])
+        ->name('upcoming-expense-recurring-templates.update');
+    Route::delete('upcoming-expense-recurring-templates/{recurring_template}', [UpcomingExpenseRecurringTemplateController::class, 'destroy'])
+        ->name('upcoming-expense-recurring-templates.destroy');
     Route::post('expenses', [ExpenseController::class, 'store'])->name('expenses.store');
     Route::put('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');

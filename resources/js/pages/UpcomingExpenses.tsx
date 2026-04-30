@@ -106,6 +106,7 @@ export default function UpcomingExpenses({
         amount: '',
         kind: 'fixed' as 'fixed' | 'variable',
         payment_status: 'unpaid' as 'paid' | 'unpaid',
+        update_scope: 'this_month_only' as 'this_month_only' | 'this_and_future_unpaid',
         redirect_year: String(viewYear),
         redirect_month: String(viewMonth),
     });
@@ -222,6 +223,7 @@ export default function UpcomingExpenses({
             amount: row.amount,
             kind: row.kind,
             payment_status: row.payment_status,
+            update_scope: 'this_month_only',
             redirect_year: String(viewYear),
             redirect_month: String(viewMonth),
         });
@@ -266,6 +268,17 @@ export default function UpcomingExpenses({
                 setDeletingExpense(null);
             },
         });
+    }
+
+    function makeRecurring(row: UpcomingExpenseRow): void {
+        router.post(
+            `/upcoming-expenses/${row.id}/make-recurring`,
+            {
+                redirect_year: viewYear,
+                redirect_month: viewMonth,
+            },
+            { preserveScroll: true },
+        );
     }
 
     function handlePaymentStatusChange(
@@ -530,6 +543,7 @@ export default function UpcomingExpenses({
                                         onEdit={openEdit}
                                         onDelete={setDeletingExpense}
                                         onPaymentStatusChange={handlePaymentStatusChange}
+                                        onMakeRecurring={makeRecurring}
                                     />
                                 </li>
                             ))}
@@ -744,6 +758,35 @@ export default function UpcomingExpenses({
                                 <FieldError message={editForm.errors.payment_status} />
                             </div>
                         </div>
+
+                        {editingExpense !== null && editingExpense.recurring_template_id !== null ? (
+                            <div className="flex flex-col gap-0.5">
+                                <label htmlFor="edit_update_scope" className={compactLabelClass()}>
+                                    {t('upcoming_expenses.recurring.update_scope_label')}
+                                </label>
+                                <Select
+                                    value={editForm.data.update_scope}
+                                    onValueChange={(value) => {
+                                        if (value === 'this_month_only' || value === 'this_and_future_unpaid') {
+                                            editForm.setData('update_scope', value);
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger id="edit_update_scope" className={INLINE_FORM_SELECT_TRIGGER_CLASS}>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="this_month_only">
+                                            {t('upcoming_expenses.recurring.update_scope_this_month')}
+                                        </SelectItem>
+                                        <SelectItem value="this_and_future_unpaid">
+                                            {t('upcoming_expenses.recurring.update_scope_series')}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FieldError message={editForm.errors.update_scope} />
+                            </div>
+                        ) : null}
 
                         <DialogFooter className="gap-2 sm:gap-3">
                             <Button type="button" variant="outline" onClick={() => closeEditDialog()}>

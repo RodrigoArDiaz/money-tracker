@@ -24,6 +24,9 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
     SidebarProvider,
     SidebarRail,
     SidebarSeparator,
@@ -55,6 +58,9 @@ function initialsFromName(name: string): string {
 function AppSidebar() {
     const { url } = usePage();
     const { t } = useTranslate();
+    const pathOnly = url.split('?')[0] ?? '';
+    const isUpcomingRecurring = pathOnly === '/upcoming-expenses/recurring';
+    const isUpcomingPlanned = pathOnly === '/upcoming-expenses';
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -95,7 +101,7 @@ function AppSidebar() {
                             <SidebarMenuItem>
                                 <SidebarMenuButton
                                     asChild
-                                    isActive={url.startsWith('/upcoming-expenses')}
+                                    isActive={isUpcomingPlanned}
                                     tooltip={t('upcoming_expenses.nav_label')}
                                 >
                                     <Link href="/upcoming-expenses">
@@ -103,6 +109,15 @@ function AppSidebar() {
                                         <span>{t('upcoming_expenses.nav_label')}</span>
                                     </Link>
                                 </SidebarMenuButton>
+                                <SidebarMenuSub>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton asChild isActive={isUpcomingRecurring} size="sm">
+                                            <Link href="/upcoming-expenses/recurring">
+                                                <span>{t('upcoming_expenses.recurring.nav_sublabel')}</span>
+                                            </Link>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                </SidebarMenuSub>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton

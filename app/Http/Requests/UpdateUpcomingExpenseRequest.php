@@ -46,6 +46,7 @@ class UpdateUpcomingExpenseRequest extends FormRequest
             ],
             'redirect_year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
             'redirect_month' => ['nullable', 'integer', 'min:1', 'max:12'],
+            'update_scope' => ['nullable', 'string', Rule::in(['this_month_only', 'this_and_future_unpaid'])],
         ];
     }
 
@@ -56,6 +57,14 @@ class UpdateUpcomingExpenseRequest extends FormRequest
 
             if (! $upcoming instanceof UpcomingExpense) {
                 return;
+            }
+
+            $scope = (string) $this->input('update_scope', 'this_month_only');
+            if ($scope === 'this_and_future_unpaid' && $upcoming->recurring_template_id === null) {
+                $v->errors()->add(
+                    'update_scope',
+                    __('frontend.upcoming_expenses.recurring.validation.series_requires_template'),
+                );
             }
 
             $targetStatus = UpcomingExpensePaymentStatus::tryFrom((string) $this->input('payment_status'));

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { ExpenseRowActions } from '@/components/molecules/ExpenseRowActions';
 import { PaymentStatusPaidBlockedHint } from '@/components/molecules/PaymentStatusPaidBlockedHint';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     Select,
     SelectContent,
@@ -10,15 +11,18 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslate } from '@/hooks/use-translate';
 import { EXPENSE_CARD_CLASS_NAME, DEFAULT_EXPENSE_CATEGORY_ICON } from '@/lib/expense-card-surface';
 import { formatAmountDisplay } from '@/lib/expense-format';
 import { ExpenseCategoryIcon } from '@/lib/expense-category-icons';
 import { INLINE_FORM_SELECT_TRIGGER_CLASS } from '@/lib/inline-form-select-trigger';
 import { cn } from '@/lib/utils';
+import { RefreshCw } from 'lucide-react';
 
 export type UpcomingExpenseRow = {
     id: number;
+    recurring_template_id: number | null;
     expense_category_id: number | null;
     category_name: string;
     category_icon: string | null;
@@ -35,6 +39,7 @@ export function UpcomingExpenseListItem({
     onEdit,
     onDelete,
     onPaymentStatusChange,
+    onMakeRecurring,
 }: {
     row: UpcomingExpenseRow;
     /** Si es false (mes vista > mes actual), «Pagado» no está disponible mientras siga sin pagar. */
@@ -42,6 +47,7 @@ export function UpcomingExpenseListItem({
     onEdit: (row: UpcomingExpenseRow) => void;
     onDelete: (row: UpcomingExpenseRow) => void;
     onPaymentStatusChange: (row: UpcomingExpenseRow, paymentStatus: UpcomingExpenseRow['payment_status']) => void;
+    onMakeRecurring?: (row: UpcomingExpenseRow) => void;
 }): React.ReactElement {
     const { t, locale } = useTranslate();
 
@@ -67,6 +73,34 @@ export function UpcomingExpenseListItem({
                 />
                 <span className="truncate">{row.category_name}</span>
             </Badge>
+        ) : null;
+
+    const recurringBadge =
+        row.recurring_template_id !== null ? (
+            <Badge variant="secondary" className="shrink-0">
+                {t('upcoming_expenses.recurring.badge_recurring')}
+            </Badge>
+        ) : null;
+
+    const makeRecurringControl =
+        onMakeRecurring !== undefined && row.recurring_template_id === null ? (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="size-8 shrink-0"
+                        onClick={() => onMakeRecurring(row)}
+                        aria-label={t('upcoming_expenses.recurring.make_recurring_aria')}
+                    >
+                        <RefreshCw className="size-4" aria-hidden />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top" sideOffset={4}>
+                    {t('upcoming_expenses.recurring.make_recurring_tooltip')}
+                </TooltipContent>
+            </Tooltip>
         ) : null;
 
     const paymentStatusSelectTriggerTone =
@@ -100,6 +134,7 @@ export function UpcomingExpenseListItem({
                         {row.description}
                     </Badge>
                     <Badge variant="secondary">{kindLabel}</Badge>
+                    {recurringBadge}
                 </div>
                 {noteParagraph ? <div className="text-sm">{noteParagraph}</div> : null}
                 <div className="flex flex-row flex-nowrap items-center gap-x-2 gap-y-0">
@@ -134,6 +169,7 @@ export function UpcomingExpenseListItem({
                         </div>
                         <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
                     </div>
+                    {makeRecurringControl}
                     <div className="shrink-0">
                         <ExpenseRowActions
                             onEdit={() => onEdit(row)}
@@ -167,6 +203,7 @@ export function UpcomingExpenseListItem({
                             {row.description}
                         </Badge>
                         <Badge variant="secondary">{kindLabel}</Badge>
+                        {recurringBadge}
                     </div>
                     {noteParagraph ? <div className="min-w-0 text-start text-sm">{noteParagraph}</div> : null}
                 </div>
@@ -209,6 +246,7 @@ export function UpcomingExpenseListItem({
                         </div>
                         <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
                     </div>
+                    {makeRecurringControl}
                     <ExpenseRowActions
                         onEdit={() => onEdit(row)}
                         onDelete={() => onDelete(row)}
