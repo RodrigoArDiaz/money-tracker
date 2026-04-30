@@ -142,6 +142,7 @@ return [
         'total_unpaid_aria' => 'Total sin pagar del mes: :amount',
         'add_heading' => 'Agregar gasto futuro',
         'list_heading' => 'Gastos planificados',
+        'list_no_category' => 'Sin categoría',
         'empty' => 'No hay gastos planificados para este mes.',
         'description_label' => 'Descripción',
         'optional_suffix' => '(opcional)',

@@ -54,33 +54,48 @@ export function UpcomingExpenseListItem({
     const paidOptionDisabled = !canMarkPaid && row.payment_status === 'unpaid';
     const kindLabel = row.kind === 'fixed' ? t('upcoming_expenses.kind_fixed') : t('upcoming_expenses.kind_variable');
 
-    const noteParagraph =
-        row.note !== null && row.note.trim() !== '' ? (
-            <p className="text-sm leading-snug text-muted-foreground">{row.note}</p>
-        ) : null;
+    const categoryDisplayName =
+        row.category_name.trim() !== '' ? row.category_name : t('upcoming_expenses.list_no_category');
 
-    const categoryBadge =
-        row.category_name !== '' ? (
+    const descriptionBadge =
+        row.description.trim() !== '' ? (
             <Badge
-                variant="outline"
-                className={cn('max-w-[min(100%,18rem)] min-w-0 justify-start gap-1.5 truncate pl-2 pr-3')}
-                title={`${row.category_name}`}
+                variant="default"
+                className="max-w-[min(100%,18rem)] min-w-0 justify-start truncate font-normal"
+                title={row.description}
             >
-                <ExpenseCategoryIcon
-                    name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
-                    className="size-3.5 shrink-0 opacity-85"
-                    aria-hidden
-                />
-                <span className="truncate">{row.category_name}</span>
+                {row.description}
             </Badge>
-        ) : null;
+        ) : (
+            <Badge variant="outline" className="max-w-[min(100%,18rem)] border-dashed font-normal italic text-muted-foreground">
+                {t('expenses.list_no_description')}
+            </Badge>
+        );
+
+    const kindBadge = (
+        <Badge variant="secondary" className="max-w-[min(100%,12rem)] shrink-0 truncate font-normal" title={kindLabel}>
+            {kindLabel}
+        </Badge>
+    );
 
     const recurringBadge =
         row.recurring_template_id !== null ? (
-            <Badge variant="secondary" className="shrink-0">
+            <Badge variant="secondary" className="shrink-0 font-normal">
                 {t('upcoming_expenses.recurring.badge_recurring')}
             </Badge>
         ) : null;
+
+    const noteBlock =
+        row.note !== null && row.note.trim() !== '' ? (
+            <p className="min-w-0 whitespace-pre-wrap break-words text-sm leading-snug text-muted-foreground">{row.note}</p>
+        ) : null;
+
+    const extraBadgesRow = (
+        <div className="flex flex-wrap gap-2 sm:justify-end">
+            {kindBadge}
+            {recurringBadge}
+        </div>
+    );
 
     const makeRecurringControl =
         onMakeRecurring !== undefined && row.recurring_template_id === null ? (
@@ -118,143 +133,120 @@ export function UpcomingExpenseListItem({
                   '[&_[data-slot=select-value]]:text-inherit [&>svg:last-of-type]:text-red-800 dark:[&>svg:last-of-type]:text-red-200',
               );
 
+    const paymentSelect = (
+        <Select
+            value={row.payment_status}
+            onValueChange={(value) => {
+                if (value === 'paid' || value === 'unpaid') {
+                    onPaymentStatusChange(row, value);
+                }
+            }}
+        >
+            <SelectTrigger
+                size="md"
+                aria-label={t('upcoming_expenses.payment_select_aria')}
+                className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full min-w-[10.75rem]', paymentStatusSelectTriggerTone)}
+            >
+                <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+                <SelectItem
+                    value="paid"
+                    disabled={paidOptionDisabled}
+                    title={paidOptionDisabled ? t('upcoming_expenses.paid_disabled_future_month_title') : undefined}
+                >
+                    {t('upcoming_expenses.status_paid')}
+                </SelectItem>
+                <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
+            </SelectContent>
+        </Select>
+    );
+
+    const expenseActions = (
+        <ExpenseRowActions
+            onEdit={() => onEdit(row)}
+            onDelete={() => onDelete(row)}
+            editAriaLabel={t('upcoming_expenses.card_edit_aria')}
+            deleteAriaLabel={t('upcoming_expenses.card_delete_aria')}
+            editTooltip={t('upcoming_expenses.card_edit_tooltip')}
+            deleteTooltip={t('upcoming_expenses.card_delete_tooltip')}
+        />
+    );
+
     return (
         <article className={cn(EXPENSE_CARD_CLASS_NAME, 'min-w-0 overflow-x-clip')}>
-            <div className="flex flex-col gap-3 sm:hidden">
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-left lg:gap-x-3">
-                    <span className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
-                        {formatAmountDisplay(row.amount, locale)}
-                    </span>
-                    {categoryBadge}
-                    <Badge
-                        variant="default"
-                        className={cn('max-w-[min(100%,18rem)] min-w-0 justify-start truncate')}
-                        title={row.description}
-                    >
-                        {row.description}
-                    </Badge>
-                    <Badge variant="secondary">{kindLabel}</Badge>
-                    {recurringBadge}
-                </div>
-                {noteParagraph ? <div className="text-sm">{noteParagraph}</div> : null}
-                <div className="flex flex-row flex-nowrap items-center gap-x-2 gap-y-0">
-                    <div className="flex min-w-0 flex-1 flex-row items-center gap-2">
-                        <div className="min-w-0 flex-1">
-                            <Select
-                                value={row.payment_status}
-                                onValueChange={(value) => {
-                                    if (value === 'paid' || value === 'unpaid') {
-                                        onPaymentStatusChange(row, value);
-                                    }
-                                }}
-                            >
-                                <SelectTrigger
-                                    size="md"
-                                    aria-label={t('upcoming_expenses.payment_select_aria')}
-                                    className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full', paymentStatusSelectTriggerTone)}
-                                >
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem
-                                        value="paid"
-                                        disabled={paidOptionDisabled}
-                                        title={paidOptionDisabled ? t('upcoming_expenses.paid_disabled_future_month_title') : undefined}
-                                    >
-                                        {t('upcoming_expenses.status_paid')}
-                                    </SelectItem>
-                                    <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
-                    </div>
-                    {makeRecurringControl}
-                    <div className="shrink-0">
-                        <ExpenseRowActions
-                            onEdit={() => onEdit(row)}
-                            onDelete={() => onDelete(row)}
-                            editAriaLabel={t('upcoming_expenses.card_edit_aria')}
-                            deleteAriaLabel={t('upcoming_expenses.card_delete_aria')}
-                            editTooltip={t('upcoming_expenses.card_edit_tooltip')}
-                            deleteTooltip={t('upcoming_expenses.card_delete_tooltip')}
+            <div className="flex flex-col gap-2 sm:hidden">
+                <div className="flex items-start justify-between gap-2">
+                    <div className="flex min-w-0 flex-1 items-start gap-2">
+                        <ExpenseCategoryIcon
+                            name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                            className="size-5 shrink-0 text-primary/90"
                         />
+                        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
+                            <p className="min-w-0 max-w-full shrink truncate text-sm font-medium leading-snug text-muted-foreground">
+                                {categoryDisplayName}
+                            </p>
+                            <div className="min-w-0 shrink">{descriptionBadge}</div>
+                        </div>
+                    </div>
+                    <p className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground">
+                        {formatAmountDisplay(row.amount, locale)}
+                    </p>
+                </div>
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-start justify-between gap-3">
+                        <div className="flex min-w-0 flex-1 flex-col gap-2 text-left">
+                            {extraBadgesRow}
+                            {noteBlock}
+                        </div>
+                        <div className="flex shrink-0 items-start gap-2">
+                            {makeRecurringControl}
+                            {expenseActions}
+                        </div>
+                    </div>
+                    <div className="flex flex-row flex-nowrap items-center gap-x-2 gap-y-0">
+                        <div className="flex min-w-0 flex-1 flex-row items-center gap-2">
+                            <div className="min-w-0 flex-1">{paymentSelect}</div>
+                            <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div
-                className={cn(
-                    'hidden min-h-0 min-w-0 sm:flex sm:w-full sm:flex-row sm:justify-between sm:gap-x-4 sm:gap-y-3 lg:gap-x-6',
-                    noteParagraph ? 'sm:items-start' : 'sm:items-center',
-                )}
-            >
-                <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 pr-4 lg:pr-6">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-left lg:gap-x-3">
-                        <span className="text-lg font-semibold tabular-nums tracking-tight text-foreground lg:text-xl">
+            <div className="hidden items-start gap-1.5 sm:flex sm:gap-2">
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                        <ExpenseCategoryIcon
+                            name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                            className="size-5 shrink-0 text-primary/90"
+                        />
+                        <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
                             {formatAmountDisplay(row.amount, locale)}
-                        </span>
-                        {categoryBadge}
-                        <Badge
-                            variant="default"
-                            className={cn('max-w-[min(100%,18rem)] min-w-0 justify-start truncate')}
-                            title={row.description}
-                        >
-                            {row.description}
-                        </Badge>
-                        <Badge variant="secondary">{kindLabel}</Badge>
-                        {recurringBadge}
+                        </p>
                     </div>
-                    {noteParagraph ? <div className="min-w-0 text-start text-sm">{noteParagraph}</div> : null}
+                    <div className="flex max-w-[min(100%,16rem)] flex-wrap items-center gap-x-2 gap-y-1 sm:max-w-[min(100%,24rem)]">
+                        <p className="min-w-0 shrink truncate text-sm font-medium leading-snug text-muted-foreground">
+                            {categoryDisplayName}
+                        </p>
+                        <div className="min-w-0 shrink">{descriptionBadge}</div>
+                    </div>
                 </div>
-                <div
-                    className={cn(
-                        'flex shrink-0 flex-row flex-nowrap items-center gap-x-2 lg:gap-x-3',
-                        noteParagraph && 'self-start pt-0.5',
-                    )}
-                >
-                    <div className="flex min-w-0 items-center gap-2">
-                        <div className="w-[10.75rem] shrink-0 lg:w-[11rem]">
-                            <Select
-                                value={row.payment_status}
-                                onValueChange={(value) => {
-                                    if (value === 'paid' || value === 'unpaid') {
-                                        onPaymentStatusChange(row, value);
-                                    }
-                                }}
-                            >
-                                <SelectTrigger
-                                    size="md"
-                                    aria-label={t('upcoming_expenses.payment_select_aria')}
-                                    className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full', paymentStatusSelectTriggerTone)}
-                                >
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent align="end">
-                                    <SelectItem
-                                        value="paid"
-                                        disabled={paidOptionDisabled}
-                                        title={
-                                            paidOptionDisabled ? t('upcoming_expenses.paid_disabled_future_month_title') : undefined
-                                        }
-                                    >
-                                        {t('upcoming_expenses.status_paid')}
-                                    </SelectItem>
-                                    <SelectItem value="unpaid">{t('upcoming_expenses.status_unpaid')}</SelectItem>
-                                </SelectContent>
-                            </Select>
+                <div className="flex min-h-0 min-w-0 flex-1 basis-0 flex-col gap-2 self-start pl-1 pt-0.5 text-right sm:pl-1.5">
+                    {extraBadgesRow}
+                    {noteBlock !== null ? <div className="min-w-0 w-full text-right">{noteBlock}</div> : null}
+                </div>
+                <div className="flex shrink-0 flex-col items-stretch gap-2 self-stretch sm:flex-row sm:items-center sm:gap-2 sm:self-auto sm:pl-2">
+                    <div className="w-px shrink-0 self-stretch bg-border" aria-hidden />
+                    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                            <div className="w-[10.75rem] shrink-0 lg:w-[11rem]">{paymentSelect}</div>
+                            <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
                         </div>
-                        <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
+                        <div className="flex shrink-0 items-center gap-2 sm:justify-end">
+                            {makeRecurringControl}
+                            {expenseActions}
+                        </div>
                     </div>
-                    {makeRecurringControl}
-                    <ExpenseRowActions
-                        onEdit={() => onEdit(row)}
-                        onDelete={() => onDelete(row)}
-                        editAriaLabel={t('upcoming_expenses.card_edit_aria')}
-                        deleteAriaLabel={t('upcoming_expenses.card_delete_aria')}
-                        editTooltip={t('upcoming_expenses.card_edit_tooltip')}
-                        deleteTooltip={t('upcoming_expenses.card_delete_tooltip')}
-                    />
                 </div>
             </div>
         </article>

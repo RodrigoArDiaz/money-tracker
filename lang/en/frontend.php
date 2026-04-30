@@ -142,6 +142,7 @@ return [
         'total_unpaid_aria' => 'Total unpaid for the month: :amount',
         'add_heading' => 'Add upcoming expense',
         'list_heading' => 'Planned expenses',
+        'list_no_category' => 'No category',
         'empty' => 'No planned expenses for this month.',
         'description_label' => 'Description',
         'optional_suffix' => '(optional)',
