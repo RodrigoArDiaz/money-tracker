@@ -93,6 +93,8 @@ return [
         'day_total_aria' => 'Day total: :amount',
         'day_total_caption' => 'Day total',
         'add_heading' => 'Add expense',
+        'new_expense_button' => ' New expense',
+        'open_new_expense_modal_aria' => 'Open form to record a new expense',
         'today_list_heading' => 'Today’s expenses',
         'empty_today' => 'No expenses recorded for today yet.',
         'category_label' => 'Category',

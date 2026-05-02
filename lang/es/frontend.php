@@ -93,6 +93,8 @@ return [
         'day_total_aria' => 'Total del día: :amount',
         'day_total_caption' => 'Total del día',
         'add_heading' => 'Agregar gasto',
+        'new_expense_button' => ' Nuevo gasto',
+        'open_new_expense_modal_aria' => 'Abrir formulario para registrar un nuevo gasto',
         'today_list_heading' => 'Gastos de hoy',
         'empty_today' => 'Todavía no registraste gastos para hoy.',
         'category_label' => 'Categoría',
