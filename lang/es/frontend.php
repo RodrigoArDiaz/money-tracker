@@ -188,6 +188,8 @@ return [
             'nav_sublabel' => 'Recurrentes',
             'section_intro' => 'Creá una plantilla una sola vez; la agregamos en cada mes que abras. Los meses pasados no cambian cuando más adelante ajustás el monto.',
             'add_heading' => 'Nuevo gasto recurrente',
+            'new_recurring_button' => ' Nuevo gasto recurrente',
+            'open_new_recurring_modal_aria' => 'Abrir formulario para crear una plantilla de gasto recurrente',
             'list_heading' => 'Tus plantillas recurrentes',
             'empty' => 'Todavía no tenés plantillas recurrentes. Convertí un gasto planificado o agregá uno abajo.',
             'plan_month_placeholder' => 'Elegir mes',

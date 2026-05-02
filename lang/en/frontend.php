@@ -188,6 +188,8 @@ return [
             'nav_sublabel' => 'Recurring',
             'section_intro' => 'Create a template once; we add it to each month you open. Past months stay unchanged when you edit later amounts.',
             'add_heading' => 'New recurring expense',
+            'new_recurring_button' => ' New recurring expense',
+            'open_new_recurring_modal_aria' => 'Open form to create a recurring expense template',
             'list_heading' => 'Your recurring templates',
             'empty' => 'You have no recurring templates yet. Convert a planned row or add one below.',
             'plan_month_placeholder' => 'Select month',

@@ -1,10 +1,9 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import * as React from 'react';
 import { NumericFormat } from 'react-number-format';
-import { ChevronDown, Tags } from 'lucide-react';
+import { ChevronDown, Plus, Tags } from 'lucide-react';
 
 import FieldError from '@/components/atoms/FieldError';
-import PrimaryButton from '@/components/atoms/PrimaryButton';
 import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
@@ -171,6 +170,7 @@ export default function UpcomingExpensesRecurring({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [recurringForm.data.start_year, recurringForm.data.start_month]);
 
+    const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
     const [recurringCategoryPickerOpen, setRecurringCategoryPickerOpen] = React.useState(false);
     const [templateEditCategoryPickerOpen, setTemplateEditCategoryPickerOpen] = React.useState(false);
     const [recurringTemplateEditOpen, setRecurringTemplateEditOpen] = React.useState(false);
@@ -181,7 +181,10 @@ export default function UpcomingExpensesRecurring({
     const recurringAmountRef = React.useRef<HTMLInputElement | null>(null);
     const templateEditAmountRef = React.useRef<HTMLInputElement | null>(null);
 
-    const recurringNoteTextareaRef = useAutosizeTextarea(recurringForm.data.note);
+    const recurringNoteTextareaRef = useAutosizeTextarea(recurringForm.data.note, {
+        maxHeightPx: 280,
+        enabled: createDialogOpen,
+    });
     const templateEditNoteTextareaRef = useAutosizeTextarea(templateEditForm.data.note, {
         maxHeightPx: 280,
         enabled: recurringTemplateEditOpen,
@@ -247,9 +250,40 @@ export default function UpcomingExpensesRecurring({
             return;
         }
         recurringForm.setData('expense_category_id', String(id));
-        queueMicrotask(() => recurringAmountRef.current?.focus());
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    function focusRecurringAmount(): void {
+        queueMicrotask(() => recurringAmountRef.current?.focus());
+    }
+
+    function openCreateDialog(): void {
+        recurringForm.clearErrors();
+        setRecurringCategoryPickerOpen(false);
+        setCreateDialogOpen(true);
+    }
+
+    React.useEffect(() => {
+        if (!createDialogOpen) {
+            return undefined;
+        }
+        const id = window.requestAnimationFrame(() => {
+            recurringAmountRef.current?.focus();
+        });
+
+        return () => window.cancelAnimationFrame(id);
+    }, [createDialogOpen]);
+
+    function closeCreateDialog(): void {
+        setCreateDialogOpen(false);
+        setRecurringCategoryPickerOpen(false);
+        recurringForm.clearErrors();
+        recurringForm.setData('description', '');
+        recurringForm.setData('note', '');
+        recurringForm.setData('amount', '');
+        recurringForm.setData('end_year', '');
+        recurringForm.setData('end_month', '');
+    }
 
     function submitRecurring(e: React.FormEvent): void {
         e.preventDefault();
@@ -263,7 +297,7 @@ export default function UpcomingExpensesRecurring({
                 recurringForm.reset('description', 'note', 'amount');
                 recurringForm.setData('end_year', '');
                 recurringForm.setData('end_month', '');
-                queueMicrotask(() => recurringAmountRef.current?.focus());
+                setCreateDialogOpen(false);
             },
         });
     }
@@ -326,159 +360,238 @@ export default function UpcomingExpensesRecurring({
     }
 
     return (
-        <AppDashboardLayout title={t('upcoming_expenses.recurring.layout_title')}>
+        <AppDashboardLayout>
             <Head title={t('upcoming_expenses.recurring.head_title')} />
-            <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">{t('upcoming_expenses.recurring.section_intro')}</p>
+            <div className="space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0">
+                <div
+                    className={cn(
+                        'flex min-w-0 flex-col gap-3 rounded-xl border border-border bg-card p-3 text-card-foreground shadow-sm',
+                        'sm:flex-row sm:flex-nowrap sm:items-start sm:justify-between sm:gap-3 sm:p-4',
+                    )}
+                >
+                    <div className="min-w-0 flex-1">
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                            {t('upcoming_expenses.recurring.section_intro')}
+                        </p>
+                    </div>
+                    <Button
+                        type="button"
+                        size="sm"
+                        className="hidden h-9 shrink-0 gap-1.5 font-medium sm:inline-flex md:h-10"
+                        onClick={() => openCreateDialog()}
+                        aria-label={t('upcoming_expenses.recurring.open_new_recurring_modal_aria')}
+                    >
+                        <Plus className="size-4 shrink-0" aria-hidden />
+                        {t('upcoming_expenses.recurring.new_recurring_button')}
+                    </Button>
+                </div>
 
-                <section className="rounded-xl border bg-card p-3 text-card-foreground shadow-sm sm:p-4">
-                    <h3 className="text-sm font-medium text-foreground">{t('upcoming_expenses.recurring.add_heading')}</h3>
-                    <form onSubmit={submitRecurring} className="mt-3 flex flex-col gap-3">
-                        <div className="flex w-full min-w-0 flex-col gap-3 lg:flex-row lg:flex-nowrap lg:items-center lg:gap-2 xl:gap-3">
-                            <div className="flex w-full min-w-0 flex-col gap-0.5 lg:w-[14rem] lg:max-w-[14rem] lg:flex-shrink-0">
-                                <label htmlFor="recurring_category_trigger" className={compactLabelClass()}>
-                                    {t('expenses.category_label')}
-                                </label>
-                                <Button
-                                    type="button"
-                                    id="recurring_category_trigger"
-                                    variant="outline"
-                                    className="h-9 w-full justify-start gap-2 px-2.5 font-normal"
-                                    onClick={() => setRecurringCategoryPickerOpen(true)}
-                                    aria-expanded={recurringCategoryPickerOpen}
-                                    aria-haspopup="dialog"
-                                    aria-invalid={recurringForm.errors.expense_category_id ? true : undefined}
-                                    aria-required
-                                    aria-label={
-                                        recurringSelectedCategory
-                                            ? `${t('expenses.category_label')}: ${recurringSelectedCategory.name}. ${t(
-                                                  'expenses.open_category_picker_aria',
-                                              )}`
-                                            : t('expenses.open_category_picker_aria')
-                                    }
-                                >
-                                    <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
-                                    {recurringSelectedCategory ? (
-                                        <>
-                                            <ExpenseCategoryIcon
-                                                name={recurringSelectedCategory.icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
-                                                className="size-4 shrink-0 text-muted-foreground"
-                                            />
-                                            <span className="min-w-0 flex-1 truncate text-left text-sm">
-                                                {recurringSelectedCategory.name}
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <span className="min-w-0 flex-1 truncate text-left text-sm text-muted-foreground">
-                                            {t('expenses.category_placeholder')}
+                <section className="flex flex-col gap-3" aria-label={t('upcoming_expenses.recurring.template_list_aria')}>
+                    <h3 className="text-sm font-medium text-foreground">{t('upcoming_expenses.recurring.list_heading')}</h3>
+                    <ul className="m-0 flex min-w-0 max-w-full list-none flex-col gap-1.5 p-0">
+                        {recurringTemplates.map((rt) => (
+                            <li key={rt.id}>
+                                <RecurringTemplateListItem
+                                    row={rt}
+                                    planPeriodLabel={[
+                                        formatPlanMonth(locale, rt.start_year, rt.start_month),
+                                        rt.end_year !== null && rt.end_month !== null
+                                            ? ` · ${t('upcoming_expenses.recurring.end_label')}: ${formatPlanMonth(locale, rt.end_year, rt.end_month)}`
+                                            : '',
+                                    ].join('')}
+                                    onEdit={openRecurringTemplateEdit}
+                                    onDelete={setDeletingRecurringTemplate}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                    {recurringTemplates.length === 0 ? (
+                        <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
+                            {t('upcoming_expenses.recurring.empty')}
+                        </p>
+                    ) : null}
+                </section>
+            </div>
+
+            <Button
+                type="button"
+                variant="default"
+                size="icon"
+                className={cn(
+                    'fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] right-4 z-40 size-14 rounded-full shadow-lg sm:hidden',
+                    'touch-manipulation',
+                )}
+                onClick={() => openCreateDialog()}
+                aria-label={t('upcoming_expenses.recurring.open_new_recurring_modal_aria')}
+            >
+                <Plus className="size-7" aria-hidden />
+            </Button>
+
+            <Dialog
+                open={createDialogOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        closeCreateDialog();
+                    }
+                }}
+            >
+                <DialogContent className="max-w-lg" closeAriaLabel={t('expense_categories.close_dialog')}>
+                    <DialogHeader>
+                        <DialogTitle>{t('upcoming_expenses.recurring.add_heading')}</DialogTitle>
+                        <DialogDescription className="sr-only">
+                            {t('upcoming_expenses.recurring.open_new_recurring_modal_aria')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={submitRecurring} className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="recurring_category_trigger" className={compactLabelClass()}>
+                                {t('expenses.category_label')}
+                            </label>
+                            <Button
+                                type="button"
+                                id="recurring_category_trigger"
+                                variant="outline"
+                                className="h-9 w-full justify-start gap-2 px-2.5 font-normal"
+                                onClick={() => setRecurringCategoryPickerOpen(true)}
+                                aria-expanded={recurringCategoryPickerOpen}
+                                aria-haspopup="dialog"
+                                aria-invalid={recurringForm.errors.expense_category_id ? true : undefined}
+                                aria-required
+                                aria-label={
+                                    recurringSelectedCategory
+                                        ? `${t('expenses.category_label')}: ${recurringSelectedCategory.name}. ${t(
+                                              'expenses.open_category_picker_aria',
+                                          )}`
+                                        : t('expenses.open_category_picker_aria')
+                                }
+                            >
+                                <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                {recurringSelectedCategory ? (
+                                    <>
+                                        <ExpenseCategoryIcon
+                                            name={recurringSelectedCategory.icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                                            className="size-4 shrink-0 text-muted-foreground"
+                                        />
+                                        <span className="min-w-0 flex-1 truncate text-left text-sm">
+                                            {recurringSelectedCategory.name}
                                         </span>
-                                    )}
-                                    <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
-                                </Button>
-                                <FieldError message={recurringForm.errors.expense_category_id} />
-                                <ExpenseCategorySelectDialog
-                                    open={recurringCategoryPickerOpen}
-                                    onOpenChange={setRecurringCategoryPickerOpen}
-                                    defaultCategories={defaultCategories}
-                                    myCategories={myCategories}
-                                    selectedId={recurringForm.data.expense_category_id}
-                                    onSelect={(id) => {
-                                        recurringForm.setData('expense_category_id', String(id));
-                                        queueMicrotask(() => recurringAmountRef.current?.focus());
-                                    }}
-                                    title={t('expenses.category_picker_title')}
-                                    closeAriaLabel={t('expense_categories.close_dialog')}
-                                />
-                            </div>
-                            <div className="flex w-full min-w-0 flex-1 flex-col gap-0.5 lg:min-w-[9rem]">
-                                <label htmlFor="recurring_description" className={compactLabelClass()}>
-                                    {t('upcoming_expenses.description_label')}
-                                </label>
-                                <TextInput
-                                    id="recurring_description"
-                                    className="h-9 min-w-0 w-full py-1.5"
-                                    value={recurringForm.data.description}
-                                    onChange={(e) => recurringForm.setData('description', e.target.value)}
-                                    required
-                                    autoComplete="off"
-                                />
-                                <FieldError message={recurringForm.errors.description} />
-                            </div>
-                            <div className="flex w-full min-w-0 flex-col gap-0.5 lg:w-[11.5rem] lg:flex-shrink-0 lg:flex-grow-0">
-                                <label htmlFor="recurring_amount" className={compactLabelClass()}>
-                                    {t('upcoming_expenses.amount_label')}
-                                </label>
-                                <NumericFormat
-                                    getInputRef={recurringAmountRef}
-                                    customInput={TextInput}
-                                    id="recurring_amount"
-                                    inputMode="decimal"
-                                    allowNegative={false}
-                                    prefix="$ "
-                                    thousandSeparator={amountThousandSeparator}
-                                    decimalSeparator={amountDecimalSeparator}
-                                    decimalScale={2}
-                                    value={recurringForm.data.amount}
-                                    onValueChange={(values) => {
-                                        recurringForm.setData('amount', values.value);
-                                    }}
-                                    placeholder={t('upcoming_expenses.amount_placeholder')}
-                                    className="h-9 py-1.5"
-                                    required
-                                />
-                                <FieldError message={recurringForm.errors.amount} />
-                            </div>
-                            <div className="flex w-full min-w-0 flex-1 flex-col gap-0.5 lg:min-w-[9rem]">
-                                <label htmlFor="recurring_note" className={compactLabelClass()}>
-                                    <span>{t('upcoming_expenses.note_label')}</span>{' '}
-                                    <span className="font-normal text-muted-foreground">
-                                        {t('upcoming_expenses.optional_suffix')}
+                                    </>
+                                ) : (
+                                    <span className="min-w-0 flex-1 truncate text-left text-sm text-muted-foreground">
+                                        {t('expenses.category_placeholder')}
                                     </span>
-                                </label>
-                                <textarea
-                                    ref={recurringNoteTextareaRef}
-                                    id="recurring_note"
-                                    rows={1}
-                                    value={recurringForm.data.note}
-                                    onChange={(e) => recurringForm.setData('note', e.target.value)}
-                                    placeholder={t('upcoming_expenses.note_placeholder')}
-                                    autoComplete="off"
-                                    className={cn(
-                                        'box-border min-h-9 w-full min-w-0 resize-none rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm leading-5 outline-none transition-colors',
-                                        'placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30',
-                                    )}
-                                />
-                                <FieldError message={recurringForm.errors.note} />
-                            </div>
-                            <div className="flex w-full min-w-0 flex-col gap-0.5 lg:w-[9rem] lg:flex-shrink-0 lg:flex-grow-0 xl:w-[9.5rem]">
-                                <label htmlFor="recurring_kind" className={compactLabelClass()}>
-                                    {t('upcoming_expenses.kind_label')}
-                                </label>
-                                <Select
-                                    value={recurringForm.data.kind}
-                                    onValueChange={(value) => {
-                                        if (value === 'fixed' || value === 'variable') {
-                                            recurringForm.setData('kind', value);
-                                        }
-                                    }}
-                                >
-                                    <SelectTrigger
-                                        id="recurring_kind"
-                                        size="md"
-                                        aria-label={t('upcoming_expenses.kind_select_aria')}
-                                        className={INLINE_FORM_SELECT_TRIGGER_CLASS}
-                                    >
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="fixed">{t('upcoming_expenses.kind_fixed')}</SelectItem>
-                                        <SelectItem value="variable">{t('upcoming_expenses.kind_variable')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FieldError message={recurringForm.errors.kind} />
-                            </div>
+                                )}
+                                <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+                            </Button>
+                            <FieldError message={recurringForm.errors.expense_category_id} />
                         </div>
-                        <div className="flex flex-wrap items-center gap-3">
+
+                        <ExpenseCategorySelectDialog
+                            open={recurringCategoryPickerOpen}
+                            onOpenChange={setRecurringCategoryPickerOpen}
+                            defaultCategories={defaultCategories}
+                            myCategories={myCategories}
+                            selectedId={recurringForm.data.expense_category_id}
+                            onSelect={(id) => {
+                                recurringForm.setData('expense_category_id', String(id));
+                                focusRecurringAmount();
+                            }}
+                            title={t('expenses.category_picker_title')}
+                            closeAriaLabel={t('expense_categories.close_dialog')}
+                        />
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="recurring_description" className={compactLabelClass()}>
+                                {t('upcoming_expenses.description_label')}
+                            </label>
+                            <TextInput
+                                id="recurring_description"
+                                className="h-9 w-full py-1.5"
+                                value={recurringForm.data.description}
+                                onChange={(e) => recurringForm.setData('description', e.target.value)}
+                                required
+                                autoComplete="off"
+                            />
+                            <FieldError message={recurringForm.errors.description} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="recurring_amount" className={compactLabelClass()}>
+                                {t('upcoming_expenses.amount_label')}
+                            </label>
+                            <NumericFormat
+                                getInputRef={recurringAmountRef}
+                                customInput={TextInput}
+                                id="recurring_amount"
+                                inputMode="decimal"
+                                allowNegative={false}
+                                prefix="$ "
+                                thousandSeparator={amountThousandSeparator}
+                                decimalSeparator={amountDecimalSeparator}
+                                decimalScale={2}
+                                value={recurringForm.data.amount}
+                                onValueChange={(values) => {
+                                    recurringForm.setData('amount', values.value);
+                                }}
+                                placeholder={t('upcoming_expenses.amount_placeholder')}
+                                className="h-9 py-1.5"
+                                required
+                            />
+                            <FieldError message={recurringForm.errors.amount} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="recurring_note" className={compactLabelClass()}>
+                                <span>{t('upcoming_expenses.note_label')}</span>{' '}
+                                <span className="font-normal text-muted-foreground">
+                                    {t('upcoming_expenses.optional_suffix')}
+                                </span>
+                            </label>
+                            <textarea
+                                ref={recurringNoteTextareaRef}
+                                id="recurring_note"
+                                rows={1}
+                                value={recurringForm.data.note}
+                                onChange={(e) => recurringForm.setData('note', e.target.value)}
+                                placeholder={t('upcoming_expenses.note_placeholder')}
+                                autoComplete="off"
+                                className={cn(
+                                    'box-border min-h-9 w-full resize-none rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm leading-5 outline-none transition-colors',
+                                    'placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30',
+                                )}
+                            />
+                            <FieldError message={recurringForm.errors.note} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="recurring_kind" className={compactLabelClass()}>
+                                {t('upcoming_expenses.kind_label')}
+                            </label>
+                            <Select
+                                value={recurringForm.data.kind}
+                                onValueChange={(value) => {
+                                    if (value === 'fixed' || value === 'variable') {
+                                        recurringForm.setData('kind', value);
+                                    }
+                                }}
+                            >
+                                <SelectTrigger
+                                    id="recurring_kind"
+                                    size="md"
+                                    aria-label={t('upcoming_expenses.kind_select_aria')}
+                                    className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full')}
+                                >
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="fixed">{t('upcoming_expenses.kind_fixed')}</SelectItem>
+                                    <SelectItem value="variable">{t('upcoming_expenses.kind_variable')}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FieldError message={recurringForm.errors.kind} />
+                        </div>
+
+                        <div className="flex flex-col gap-3">
                             <RecurringPlanMonthField
                                 label={t('upcoming_expenses.recurring.start_label')}
                                 yearStr={recurringForm.data.start_year}
@@ -508,43 +621,19 @@ export default function UpcomingExpensesRecurring({
                                 errorYear={recurringForm.errors.end_year}
                                 errorMonth={recurringForm.errors.end_month}
                             />
-                            <PrimaryButton
-                                type="submit"
-                                disabled={recurringForm.processing}
-                                className="h-9 min-w-[6.5rem] font-medium"
-                            >
-                                {recurringForm.processing ? t('upcoming_expenses.submitting') : t('upcoming_expenses.submit')}
-                            </PrimaryButton>
                         </div>
-                    </form>
-                </section>
 
-                <section className="flex flex-col gap-3" aria-label={t('upcoming_expenses.recurring.template_list_aria')}>
-                    <h3 className="text-sm font-medium text-foreground">{t('upcoming_expenses.recurring.list_heading')}</h3>
-                    <ul className="m-0 flex min-w-0 max-w-full list-none flex-col gap-1.5 p-0">
-                        {recurringTemplates.map((rt) => (
-                            <li key={rt.id}>
-                                <RecurringTemplateListItem
-                                    row={rt}
-                                    planPeriodLabel={[
-                                        formatPlanMonth(locale, rt.start_year, rt.start_month),
-                                        rt.end_year !== null && rt.end_month !== null
-                                            ? ` · ${t('upcoming_expenses.recurring.end_label')}: ${formatPlanMonth(locale, rt.end_year, rt.end_month)}`
-                                            : '',
-                                    ].join('')}
-                                    onEdit={openRecurringTemplateEdit}
-                                    onDelete={setDeletingRecurringTemplate}
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                    {recurringTemplates.length === 0 ? (
-                        <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
-                            {t('upcoming_expenses.recurring.empty')}
-                        </p>
-                    ) : null}
-                </section>
-            </div>
+                        <DialogFooter className="gap-2 sm:gap-3">
+                            <Button type="button" variant="outline" onClick={() => closeCreateDialog()}>
+                                {t('expense_categories.cancel')}
+                            </Button>
+                            <Button type="submit" disabled={recurringForm.processing}>
+                                {recurringForm.processing ? t('upcoming_expenses.submitting') : t('upcoming_expenses.submit')}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
 
             <Dialog
                 open={recurringTemplateEditOpen}
