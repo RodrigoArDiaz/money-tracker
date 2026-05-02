@@ -28,17 +28,19 @@ export function HomeTodayTotalSummaryCard({
                 {t('expenses.date_heading', { date: formattedDateHeading })}
             </h2>
             <div className="flex flex-col gap-2 sm:hidden">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 flex-1 items-center gap-2">
                         <Sigma className="size-5 shrink-0 text-primary/90" aria-hidden />
-                        <p
-                            className="min-w-0 truncate text-lg font-semibold tabular-nums tracking-tight text-foreground"
-                            aria-label={totalAria}
-                        >
-                            {todayTotalDisplay}
+                        <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
+                            {caption}
                         </p>
                     </div>
-                    <p className="shrink-0 text-sm font-medium leading-snug text-muted-foreground">{caption}</p>
+                    <p
+                        className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground"
+                        aria-label={totalAria}
+                    >
+                        {todayTotalDisplay}
+                    </p>
                 </div>
                 <div className="flex items-start justify-between gap-3">
                     <p
