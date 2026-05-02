@@ -134,17 +134,17 @@ export function RecurringTemplateListItem({
                         {noteBlock}
                     </div>
                 </div>
-                <div className="flex justify-end">{expenseActions}</div>
+                <div className="flex items-center justify-end">{expenseActions}</div>
             </div>
 
-            <div className="hidden items-start gap-1.5 sm:flex sm:gap-2">
+            <div className="hidden items-center gap-1.5 sm:flex sm:gap-2">
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                     {categoryTitleRow}
                     <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
                         {formatAmountDisplay(row.amount, locale)}
                     </p>
                 </div>
-                <div className="flex min-h-0 min-w-0 flex-1 basis-0 flex-col gap-2 self-start pl-1 pt-0.5 sm:pl-1.5">
+                <div className="flex min-h-0 min-w-0 flex-1 basis-0 flex-col gap-2 pl-1 sm:pl-1.5">
                     {descriptionNoteRight}
                 </div>
                 <div className="flex shrink-0 flex-col items-stretch gap-2 self-stretch sm:flex-row sm:items-center sm:gap-2 sm:self-auto sm:pl-2">

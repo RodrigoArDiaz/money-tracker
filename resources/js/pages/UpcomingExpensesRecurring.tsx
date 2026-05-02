@@ -1,4 +1,4 @@
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import * as React from 'react';
 import { NumericFormat } from 'react-number-format';
 import { ChevronDown, Tags } from 'lucide-react';
@@ -8,7 +8,6 @@ import PrimaryButton from '@/components/atoms/PrimaryButton';
 import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
-import { HomeMonthPicker } from '@/components/molecules/HomeMonthPicker';
 import { RecurringPlanMonthField } from '@/components/molecules/RecurringPlanMonthField';
 import { RecurringTemplateListItem, type RecurringTemplateListRow } from '@/components/molecules/RecurringTemplateListItem';
 import { Button } from '@/components/ui/button';
@@ -326,35 +325,16 @@ export default function UpcomingExpensesRecurring({
         });
     }
 
-    const plannedMonthHref = `/upcoming-expenses?year=${defaultYear}&month=${defaultMonth}`;
-
     return (
-        <AppDashboardLayout
-            title={
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <HomeMonthPicker
-                        viewYear={defaultYear}
-                        viewMonth={defaultMonth}
-                        navigatePath="/upcoming-expenses/recurring"
-                        allowFutureMonths
-                        monthPickerAriaLabel={t('upcoming_expenses.recurring.default_month_picker_aria')}
-                    />
-                </div>
-            }
-        >
+        <AppDashboardLayout title={t('upcoming_expenses.recurring.layout_title')}>
             <Head title={t('upcoming_expenses.recurring.head_title')} />
             <div className="space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="text-sm text-muted-foreground">{t('upcoming_expenses.recurring.section_intro')}</p>
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href={plannedMonthHref}>{t('upcoming_expenses.recurring.back_to_planned')}</Link>
-                    </Button>
-                </div>
+                <p className="text-sm text-muted-foreground">{t('upcoming_expenses.recurring.section_intro')}</p>
 
                 <section className="rounded-xl border bg-card p-3 text-card-foreground shadow-sm sm:p-4">
                     <h3 className="text-sm font-medium text-foreground">{t('upcoming_expenses.recurring.add_heading')}</h3>
                     <form onSubmit={submitRecurring} className="mt-3 flex flex-col gap-3">
-                        <div className="flex w-full min-w-0 flex-col gap-3 lg:flex-row lg:flex-nowrap lg:items-end lg:gap-2 xl:gap-3">
+                        <div className="flex w-full min-w-0 flex-col gap-3 lg:flex-row lg:flex-nowrap lg:items-center lg:gap-2 xl:gap-3">
                             <div className="flex w-full min-w-0 flex-col gap-0.5 lg:w-[14rem] lg:max-w-[14rem] lg:flex-shrink-0">
                                 <label htmlFor="recurring_category_trigger" className={compactLabelClass()}>
                                     {t('expenses.category_label')}
@@ -498,7 +478,7 @@ export default function UpcomingExpensesRecurring({
                                 <FieldError message={recurringForm.errors.kind} />
                             </div>
                         </div>
-                        <div className="flex flex-wrap items-end gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                             <RecurringPlanMonthField
                                 label={t('upcoming_expenses.recurring.start_label')}
                                 yearStr={recurringForm.data.start_year}
@@ -741,7 +721,7 @@ export default function UpcomingExpensesRecurring({
                                 <FieldError message={templateEditForm.errors.is_active} />
                             </div>
                         </div>
-                        <div className="flex flex-wrap items-end gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                             <RecurringPlanMonthField
                                 label={t('upcoming_expenses.recurring.end_label')}
                                 yearStr={templateEditForm.data.end_year}

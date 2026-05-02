@@ -326,7 +326,7 @@ export default function UpcomingExpenses({
                 <section className="rounded-xl border bg-card p-3 text-card-foreground shadow-sm sm:p-4">
                     <h2 className="sr-only">{t('upcoming_expenses.add_heading')}</h2>
                     <form onSubmit={submitExpense} className="flex flex-col gap-3">
-                        <div className="flex flex-col gap-3 lg:flex-row lg:flex-nowrap lg:items-end lg:gap-2 xl:gap-3">
+                        <div className="flex flex-col gap-3 lg:flex-row lg:flex-nowrap lg:items-center lg:gap-2 xl:gap-3">
                             <div className="flex w-full shrink-0 flex-col gap-0.5 lg:w-[12rem] lg:max-w-[14rem]">
                                 <label htmlFor="upcoming_category_trigger" className={compactLabelClass()}>
                                     {t('expenses.category_label')}
@@ -476,7 +476,7 @@ export default function UpcomingExpenses({
                                 <FieldError message={form.errors.kind} />
                             </div>
 
-                            <div className="flex shrink-0 justify-end lg:justify-start lg:self-end lg:pb-[1px]">
+                            <div className="flex shrink-0 justify-end lg:justify-start">
                                 <PrimaryButton type="submit" disabled={form.processing} className="h-9 min-w-[6.5rem] font-medium">
                                     {form.processing ? t('upcoming_expenses.submitting') : t('upcoming_expenses.submit')}
                                 </PrimaryButton>

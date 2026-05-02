@@ -180,8 +180,7 @@ return [
 
         'recurring' => [
             'head_title' => 'Gastos recurrentes — Money Tracker',
-            'default_month_picker_aria' => 'Elegir mes para plantillas recurrentes y navegación',
-            'back_to_planned' => 'Volver al mes planificado',
+            'layout_title' => 'Gastos recurrentes',
             'nav_sublabel' => 'Recurrentes',
             'section_intro' => 'Creá una plantilla una sola vez; la agregamos en cada mes que abras. Los meses pasados no cambian cuando más adelante ajustás el monto.',
             'add_heading' => 'Nuevo gasto recurrente',

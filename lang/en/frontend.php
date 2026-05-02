@@ -180,8 +180,7 @@ return [
 
         'recurring' => [
             'head_title' => 'Recurring expenses — Money Tracker',
-            'default_month_picker_aria' => 'Choose month for recurring templates and navigation',
-            'back_to_planned' => 'Back to planned month',
+            'layout_title' => 'Recurring expenses',
             'nav_sublabel' => 'Recurring',
             'section_intro' => 'Create a template once; we add it to each month you open. Past months stay unchanged when you edit later amounts.',
             'add_heading' => 'New recurring expense',
