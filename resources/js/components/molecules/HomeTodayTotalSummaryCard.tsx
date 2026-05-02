@@ -31,16 +31,14 @@ export function HomeTodayTotalSummaryCard({
                 <div className="flex items-center justify-between gap-2">
                     <div className="flex min-w-0 flex-1 items-center gap-2">
                         <Sigma className="size-5 shrink-0 text-primary/90" aria-hidden />
-                        <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
-                            {caption}
+                        <p
+                            className="min-w-0 truncate text-lg font-semibold tabular-nums tracking-tight text-foreground"
+                            aria-label={totalAria}
+                        >
+                            {todayTotalDisplay}
                         </p>
                     </div>
-                    <p
-                        className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground"
-                        aria-label={totalAria}
-                    >
-                        {todayTotalDisplay}
-                    </p>
+                    <p className="shrink-0 text-sm font-medium leading-snug text-muted-foreground">{caption}</p>
                 </div>
                 <div className="flex items-start justify-between gap-3">
                     <p
@@ -56,15 +54,15 @@ export function HomeTodayTotalSummaryCard({
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <div className="flex items-center gap-2.5 sm:gap-3">
                         <Sigma className="size-5 shrink-0 text-primary/90" aria-hidden />
-                        <p
-                            className="min-w-0 text-left text-lg font-semibold tabular-nums tracking-tight text-foreground"
-                            aria-label={totalAria}
-                        >
-                            {todayTotalDisplay}
+                        <p className="min-w-0 max-w-[min(100%,16rem)] truncate text-left text-sm font-medium leading-snug text-muted-foreground sm:max-w-[20rem]">
+                            {caption}
                         </p>
                     </div>
-                    <p className="max-w-[min(100%,16rem)] text-sm font-medium leading-snug text-muted-foreground sm:max-w-[20rem]">
-                        {caption}
+                    <p
+                        className="text-left text-lg font-semibold tabular-nums tracking-tight text-foreground"
+                        aria-label={totalAria}
+                    >
+                        {todayTotalDisplay}
                     </p>
                 </div>
                 <p

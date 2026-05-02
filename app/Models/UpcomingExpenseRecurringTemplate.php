@@ -3,29 +3,31 @@
 namespace App\Models;
 
 use App\Enums\UpcomingExpenseKind;
-use App\Enums\UpcomingExpensePaymentStatus;
-use Database\Factories\UpcomingExpenseFactory;
+use App\Enums\UpcomingExpenseRecurrenceCadence;
+use Database\Factories\UpcomingExpenseRecurringTemplateFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'user_id',
-    'recurring_template_id',
-    'year',
-    'month',
     'expense_category_id',
     'description',
     'note',
     'amount',
     'kind',
-    'payment_status',
+    'cadence',
+    'start_year',
+    'start_month',
+    'end_year',
+    'end_month',
+    'is_active',
 ])]
-class UpcomingExpense extends Model
+class UpcomingExpenseRecurringTemplate extends Model
 {
-    /** @use HasFactory<UpcomingExpenseFactory> */
+    /** @use HasFactory<UpcomingExpenseRecurringTemplateFactory> */
     use HasFactory;
 
     /**
@@ -34,11 +36,14 @@ class UpcomingExpense extends Model
     protected function casts(): array
     {
         return [
-            'year' => 'integer',
-            'month' => 'integer',
+            'start_year' => 'integer',
+            'start_month' => 'integer',
+            'end_year' => 'integer',
+            'end_month' => 'integer',
             'amount' => 'decimal:2',
             'kind' => UpcomingExpenseKind::class,
-            'payment_status' => UpcomingExpensePaymentStatus::class,
+            'cadence' => UpcomingExpenseRecurrenceCadence::class,
+            'is_active' => 'boolean',
         ];
     }
 
@@ -59,20 +64,10 @@ class UpcomingExpense extends Model
     }
 
     /**
-     * Gasto efectivo cuando el estado es «pagado» (como máximo uno).
-     *
-     * @return HasOne<Expense, $this>
+     * @return HasMany<UpcomingExpense, $this>
      */
-    public function linkedExpense(): HasOne
+    public function upcomingExpenses(): HasMany
     {
-        return $this->hasOne(Expense::class, 'upcoming_expense_id');
-    }
-
-    /**
-     * @return BelongsTo<UpcomingExpenseRecurringTemplate, $this>
-     */
-    public function recurringTemplate(): BelongsTo
-    {
-        return $this->belongsTo(UpcomingExpenseRecurringTemplate::class, 'recurring_template_id');
+        return $this->hasMany(UpcomingExpense::class, 'recurring_template_id');
     }
 }

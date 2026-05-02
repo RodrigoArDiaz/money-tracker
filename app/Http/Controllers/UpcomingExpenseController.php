@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\RedirectsToUpcomingExpensesWithMonth;
+use App\Http\Requests\MakeUpcomingExpenseRecurringRequest;
 use App\Http\Requests\StoreUpcomingExpenseRequest;
 use App\Http\Requests\UpdateUpcomingExpenseRequest;
 use App\Models\UpcomingExpense;
@@ -45,6 +46,14 @@ class UpcomingExpenseController extends Controller
 
         return $this->redirectToUpcomingExpensesWithMonth($request)
             ->with('success', __('frontend.upcoming_expenses.flash.created'));
+    }
+
+    public function makeRecurring(MakeUpcomingExpenseRecurringRequest $request, UpcomingExpense $upcomingExpense): RedirectResponse
+    {
+        $this->upcomingExpenseService->makeRecurringFromUpcoming($upcomingExpense);
+
+        return $this->redirectToUpcomingRecurringWithMonth($request)
+            ->with('success', __('frontend.upcoming_expenses.recurring.flash.made_recurring'));
     }
 
     public function update(UpdateUpcomingExpenseRequest $request, UpcomingExpense $upcomingExpense): RedirectResponse

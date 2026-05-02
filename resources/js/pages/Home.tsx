@@ -274,7 +274,7 @@ export default function Home({
             <div className="space-y-6">
                 <section className="rounded-xl border bg-card p-3 text-card-foreground shadow-sm sm:p-4">
                     <h2 className="sr-only">{t('expenses.add_heading')}</h2>
-                    <form onSubmit={submitExpense} className="flex flex-col gap-3 lg:flex-row lg:items-end lg:gap-2">
+                    <form onSubmit={submitExpense} className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-2">
                         <div className="flex min-w-0 flex-col gap-0.5 lg:w-48 lg:shrink-0">
                             <label htmlFor="expense_category_trigger" className={compactLabelClass()}>
                                 {t('expenses.category_label')}
@@ -374,9 +374,6 @@ export default function Home({
                         </div>
 
                         <div className="flex w-full flex-col gap-0.5 lg:w-auto lg:shrink-0">
-                            <span className="mb-0.5 hidden min-h-[1.125rem] lg:block" aria-hidden>
-                                {'\u00a0'}
-                            </span>
                             <PrimaryButton
                                 type="submit"
                                 disabled={form.processing}
