@@ -1,10 +1,9 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import * as React from 'react';
 import { NumericFormat } from 'react-number-format';
-import { ChevronDown, Sigma, Tags } from 'lucide-react';
+import { ChevronDown, Plus, Sigma, Tags } from 'lucide-react';
 
 import FieldError from '@/components/atoms/FieldError';
-import PrimaryButton from '@/components/atoms/PrimaryButton';
 import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
@@ -125,6 +124,7 @@ export default function UpcomingExpenses({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [viewYear, viewMonth]);
 
+    const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
     const [categoryPickerOpen, setCategoryPickerOpen] = React.useState(false);
     const [editCategoryPickerOpen, setEditCategoryPickerOpen] = React.useState(false);
     const [editDialogOpen, setEditDialogOpen] = React.useState(false);
@@ -135,7 +135,10 @@ export default function UpcomingExpenses({
     const amountRef = React.useRef<HTMLInputElement | null>(null);
     const editAmountRef = React.useRef<HTMLInputElement | null>(null);
 
-    const noteTextareaRef = useAutosizeTextarea(form.data.note);
+    const noteTextareaRef = useAutosizeTextarea(form.data.note, {
+        maxHeightPx: 280,
+        enabled: createDialogOpen,
+    });
     const editNoteTextareaRef = useAutosizeTextarea(editForm.data.note, {
         maxHeightPx: 280,
         enabled: editDialogOpen,
@@ -187,12 +190,37 @@ export default function UpcomingExpenses({
             return;
         }
         form.setData('expense_category_id', String(id));
-        queueMicrotask(() => amountRef.current?.focus());
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function focusAmount(): void {
         queueMicrotask(() => amountRef.current?.focus());
+    }
+
+    function openCreateDialog(): void {
+        form.clearErrors();
+        setCategoryPickerOpen(false);
+        setCreateDialogOpen(true);
+    }
+
+    React.useEffect(() => {
+        if (!createDialogOpen) {
+            return undefined;
+        }
+        const id = window.requestAnimationFrame(() => {
+            amountRef.current?.focus();
+        });
+
+        return () => window.cancelAnimationFrame(id);
+    }, [createDialogOpen]);
+
+    function closeCreateDialog(): void {
+        setCreateDialogOpen(false);
+        setCategoryPickerOpen(false);
+        form.clearErrors();
+        form.setData('description', '');
+        form.setData('note', '');
+        form.setData('amount', '');
     }
 
     function focusEditAmount(): void {
@@ -209,7 +237,7 @@ export default function UpcomingExpenses({
                     localStorage.setItem(LAST_EXPENSE_CATEGORY_STORAGE_KEY, cat);
                 }
                 form.reset('description', 'note', 'amount');
-                focusAmount();
+                setCreateDialogOpen(false);
             },
         });
     }
@@ -308,182 +336,44 @@ export default function UpcomingExpenses({
     }
 
     return (
-        <AppDashboardLayout
-            title={
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <HomeMonthPicker
-                        viewYear={viewYear}
-                        viewMonth={viewMonth}
-                        navigatePath="/upcoming-expenses"
-                        allowFutureMonths
-                        monthPickerAriaLabel={t('upcoming_expenses.month_picker_aria')}
-                    />
-                </div>
-            }
-        >
+        <AppDashboardLayout>
             <Head title={t('upcoming_expenses.head_title')} />
-            <div className="space-y-6">
-                <section className="rounded-xl border bg-card p-3 text-card-foreground shadow-sm sm:p-4">
-                    <h2 className="sr-only">{t('upcoming_expenses.add_heading')}</h2>
-                    <form onSubmit={submitExpense} className="flex flex-col gap-3">
-                        <div className="flex flex-col gap-3 lg:flex-row lg:flex-nowrap lg:items-center lg:gap-2 xl:gap-3">
-                            <div className="flex w-full shrink-0 flex-col gap-0.5 lg:w-[12rem] lg:max-w-[14rem]">
-                                <label htmlFor="upcoming_category_trigger" className={compactLabelClass()}>
-                                    {t('expenses.category_label')}
-                                </label>
-                                <Button
-                                    type="button"
-                                    id="upcoming_category_trigger"
-                                    variant="outline"
-                                    className="h-9 w-full justify-start gap-2 px-2.5 font-normal"
-                                    onClick={() => setCategoryPickerOpen(true)}
-                                    aria-expanded={categoryPickerOpen}
-                                    aria-haspopup="dialog"
-                                    aria-invalid={form.errors.expense_category_id ? true : undefined}
-                                    aria-required
-                                    aria-label={
-                                        selectedCategory
-                                            ? `${t('expenses.category_label')}: ${selectedCategory.name}. ${t(
-                                                  'expenses.open_category_picker_aria',
-                                              )}`
-                                            : t('expenses.open_category_picker_aria')
-                                    }
-                                >
-                                    <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
-                                    {selectedCategory ? (
-                                        <>
-                                            <ExpenseCategoryIcon
-                                                name={selectedCategory.icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
-                                                className="size-4 shrink-0 text-muted-foreground"
-                                            />
-                                            <span className="min-w-0 flex-1 truncate text-left text-sm">
-                                                {selectedCategory.name}
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <span className="min-w-0 flex-1 truncate text-left text-sm text-muted-foreground">
-                                            {t('expenses.category_placeholder')}
-                                        </span>
-                                    )}
-                                    <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
-                                </Button>
-                                <FieldError message={form.errors.expense_category_id} />
-
-                                <ExpenseCategorySelectDialog
-                                    open={categoryPickerOpen}
-                                    onOpenChange={setCategoryPickerOpen}
-                                    defaultCategories={defaultCategories}
-                                    myCategories={myCategories}
-                                    selectedId={form.data.expense_category_id}
-                                    onSelect={(id) => {
-                                        form.setData('expense_category_id', String(id));
-                                        focusAmount();
-                                    }}
-                                    title={t('expenses.category_picker_title')}
-                                    closeAriaLabel={t('expense_categories.close_dialog')}
-                                />
-                            </div>
-
-                            <div className="flex min-w-0 flex-col gap-0.5 lg:min-w-[7rem] lg:max-w-[13rem] lg:flex-1">
-                                <label htmlFor="upcoming_description" className={compactLabelClass()}>
-                                    {t('upcoming_expenses.description_label')}
-                                </label>
-                                <TextInput
-                                    id="upcoming_description"
-                                    className="h-9 py-1.5"
-                                    value={form.data.description}
-                                    onChange={(e) => form.setData('description', e.target.value)}
-                                    required
-                                    autoComplete="off"
-                                />
-                                <FieldError message={form.errors.description} />
-                            </div>
-
-                            <div className="flex shrink-0 flex-col gap-0.5 lg:w-[11rem]">
-                                <label htmlFor="upcoming_amount" className={compactLabelClass()}>
-                                    {t('upcoming_expenses.amount_label')}
-                                </label>
-                                <NumericFormat
-                                    getInputRef={amountRef}
-                                    customInput={TextInput}
-                                    id="upcoming_amount"
-                                    inputMode="decimal"
-                                    allowNegative={false}
-                                    prefix="$ "
-                                    thousandSeparator={amountThousandSeparator}
-                                    decimalSeparator={amountDecimalSeparator}
-                                    decimalScale={2}
-                                    value={form.data.amount}
-                                    onValueChange={(values) => {
-                                        form.setData('amount', values.value);
-                                    }}
-                                    placeholder={t('upcoming_expenses.amount_placeholder')}
-                                    className="h-9 py-1.5"
-                                    required
-                                />
-                                <FieldError message={form.errors.amount} />
-                            </div>
-
-                            <div className="flex min-w-0 flex-col gap-0.5 lg:min-w-[10rem] lg:flex-1">
-                                <label htmlFor="upcoming_note" className={compactLabelClass()}>
-                                    <span>{t('upcoming_expenses.note_label')}</span>{' '}
-                                    <span className="font-normal text-muted-foreground">
-                                        {t('upcoming_expenses.optional_suffix')}
-                                    </span>
-                                </label>
-                                <textarea
-                                    ref={noteTextareaRef}
-                                    id="upcoming_note"
-                                    rows={1}
-                                    value={form.data.note}
-                                    onChange={(e) => form.setData('note', e.target.value)}
-                                    placeholder={t('upcoming_expenses.note_placeholder')}
-                                    autoComplete="off"
-                                    className={cn(
-                                        'box-border min-h-9 w-full resize-none rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm leading-5 outline-none transition-colors',
-                                        'placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30',
-                                    )}
-                                />
-                                <FieldError message={form.errors.note} />
-                            </div>
-
-                            <div className="flex shrink-0 flex-col gap-0.5 lg:w-[7.5rem] xl:w-[8rem]">
-                                <label htmlFor="upcoming_kind" className={compactLabelClass()}>
-                                    {t('upcoming_expenses.kind_label')}
-                                </label>
-                                <Select
-                                    value={form.data.kind}
-                                    onValueChange={(value) => {
-                                        if (value === 'fixed' || value === 'variable') {
-                                            form.setData('kind', value);
-                                            focusAmount();
-                                        }
-                                    }}
-                                >
-                                    <SelectTrigger
-                                        id="upcoming_kind"
-                                        size="md"
-                                        aria-label={t('upcoming_expenses.kind_select_aria')}
-                                        className={INLINE_FORM_SELECT_TRIGGER_CLASS}
-                                    >
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="fixed">{t('upcoming_expenses.kind_fixed')}</SelectItem>
-                                        <SelectItem value="variable">{t('upcoming_expenses.kind_variable')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FieldError message={form.errors.kind} />
-                            </div>
-
-                            <div className="flex shrink-0 justify-end lg:justify-start">
-                                <PrimaryButton type="submit" disabled={form.processing} className="h-9 min-w-[6.5rem] font-medium">
-                                    {form.processing ? t('upcoming_expenses.submitting') : t('upcoming_expenses.submit')}
-                                </PrimaryButton>
-                            </div>
+            <div className="space-y-6 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0">
+                <div
+                    className={cn(
+                        'flex min-w-0 flex-col gap-3 rounded-xl border border-border bg-card p-3 text-card-foreground shadow-sm',
+                        'sm:flex-row sm:flex-nowrap sm:items-center sm:justify-between sm:gap-3 sm:p-4',
+                    )}
+                >
+                    <div className="flex min-w-0 w-full flex-nowrap items-stretch gap-2 sm:w-auto sm:min-w-0 sm:shrink">
+                        <div
+                            className={cn(
+                                'min-w-0 flex-1 sm:flex-none',
+                                '[&_button]:h-11 [&_button]:w-full [&_button]:min-w-0 [&_button]:max-w-none [&_button]:justify-between [&_button]:gap-2 [&_button]:px-3 [&_button]:text-base [&_button]:font-semibold [&_button>span]:text-base',
+                                'sm:[&_button]:h-9 sm:[&_button]:w-auto sm:[&_button]:max-w-[min(100%,18rem)] sm:[&_button]:justify-start sm:[&_button]:px-2.5 sm:[&_button]:text-sm sm:[&_button]:font-normal sm:[&_button>span]:text-sm',
+                                'md:[&_button]:h-10 md:[&_button]:max-w-[20rem]',
+                            )}
+                        >
+                            <HomeMonthPicker
+                                viewYear={viewYear}
+                                viewMonth={viewMonth}
+                                navigatePath="/upcoming-expenses"
+                                allowFutureMonths
+                                monthPickerAriaLabel={t('upcoming_expenses.month_picker_aria')}
+                            />
                         </div>
-                    </form>
-                </section>
+                    </div>
+                    <Button
+                        type="button"
+                        size="sm"
+                        className="hidden h-9 shrink-0 gap-1.5 font-medium sm:inline-flex md:h-10"
+                        onClick={() => openCreateDialog()}
+                        aria-label={t('upcoming_expenses.open_new_planned_modal_aria')}
+                    >
+                        <Plus className="size-4 shrink-0" aria-hidden />
+                        {t('upcoming_expenses.new_planned_button')}
+                    </Button>
+                </div>
 
                 <section aria-label={t('upcoming_expenses.totals_section_aria')}>
                     <article
@@ -551,6 +441,197 @@ export default function UpcomingExpenses({
                     )}
                 </section>
             </div>
+
+            <Button
+                type="button"
+                variant="default"
+                size="icon"
+                className={cn(
+                    'fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] right-4 z-40 size-14 rounded-full shadow-lg sm:hidden',
+                    'touch-manipulation',
+                )}
+                onClick={() => openCreateDialog()}
+                aria-label={t('upcoming_expenses.open_new_planned_modal_aria')}
+            >
+                <Plus className="size-7" aria-hidden />
+            </Button>
+
+            <Dialog
+                open={createDialogOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        closeCreateDialog();
+                    }
+                }}
+            >
+                <DialogContent className="max-w-lg" closeAriaLabel={t('expense_categories.close_dialog')}>
+                    <DialogHeader>
+                        <DialogTitle>{t('upcoming_expenses.add_heading')}</DialogTitle>
+                        <DialogDescription className="sr-only">
+                            {t('upcoming_expenses.open_new_planned_modal_aria')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={submitExpense} className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="upcoming_category_trigger" className={compactLabelClass()}>
+                                {t('expenses.category_label')}
+                            </label>
+                            <Button
+                                type="button"
+                                id="upcoming_category_trigger"
+                                variant="outline"
+                                className="h-9 w-full justify-start gap-2 px-2.5 font-normal"
+                                onClick={() => setCategoryPickerOpen(true)}
+                                aria-expanded={categoryPickerOpen}
+                                aria-haspopup="dialog"
+                                aria-invalid={form.errors.expense_category_id ? true : undefined}
+                                aria-required
+                                aria-label={
+                                    selectedCategory
+                                        ? `${t('expenses.category_label')}: ${selectedCategory.name}. ${t(
+                                              'expenses.open_category_picker_aria',
+                                          )}`
+                                        : t('expenses.open_category_picker_aria')
+                                }
+                            >
+                                <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                {selectedCategory ? (
+                                    <>
+                                        <ExpenseCategoryIcon
+                                            name={selectedCategory.icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                                            className="size-4 shrink-0 text-muted-foreground"
+                                        />
+                                        <span className="min-w-0 flex-1 truncate text-left text-sm">
+                                            {selectedCategory.name}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="min-w-0 flex-1 truncate text-left text-sm text-muted-foreground">
+                                        {t('expenses.category_placeholder')}
+                                    </span>
+                                )}
+                                <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+                            </Button>
+                            <FieldError message={form.errors.expense_category_id} />
+                        </div>
+
+                        <ExpenseCategorySelectDialog
+                            open={categoryPickerOpen}
+                            onOpenChange={setCategoryPickerOpen}
+                            defaultCategories={defaultCategories}
+                            myCategories={myCategories}
+                            selectedId={form.data.expense_category_id}
+                            onSelect={(id) => {
+                                form.setData('expense_category_id', String(id));
+                                focusAmount();
+                            }}
+                            title={t('expenses.category_picker_title')}
+                            closeAriaLabel={t('expense_categories.close_dialog')}
+                        />
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="upcoming_description" className={compactLabelClass()}>
+                                {t('upcoming_expenses.description_label')}
+                            </label>
+                            <TextInput
+                                id="upcoming_description"
+                                className="h-9 py-1.5"
+                                value={form.data.description}
+                                onChange={(e) => form.setData('description', e.target.value)}
+                                required
+                                autoComplete="off"
+                            />
+                            <FieldError message={form.errors.description} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="upcoming_amount" className={compactLabelClass()}>
+                                {t('upcoming_expenses.amount_label')}
+                            </label>
+                            <NumericFormat
+                                getInputRef={amountRef}
+                                customInput={TextInput}
+                                id="upcoming_amount"
+                                inputMode="decimal"
+                                allowNegative={false}
+                                prefix="$ "
+                                thousandSeparator={amountThousandSeparator}
+                                decimalSeparator={amountDecimalSeparator}
+                                decimalScale={2}
+                                value={form.data.amount}
+                                onValueChange={(values) => {
+                                    form.setData('amount', values.value);
+                                }}
+                                placeholder={t('upcoming_expenses.amount_placeholder')}
+                                className="h-9 py-1.5"
+                                required
+                            />
+                            <FieldError message={form.errors.amount} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="upcoming_note" className={compactLabelClass()}>
+                                <span>{t('upcoming_expenses.note_label')}</span>{' '}
+                                <span className="font-normal text-muted-foreground">
+                                    {t('upcoming_expenses.optional_suffix')}
+                                </span>
+                            </label>
+                            <textarea
+                                ref={noteTextareaRef}
+                                id="upcoming_note"
+                                rows={1}
+                                value={form.data.note}
+                                onChange={(e) => form.setData('note', e.target.value)}
+                                placeholder={t('upcoming_expenses.note_placeholder')}
+                                autoComplete="off"
+                                className={cn(
+                                    'box-border min-h-9 w-full resize-none rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm leading-5 outline-none transition-colors',
+                                    'placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30',
+                                )}
+                            />
+                            <FieldError message={form.errors.note} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="upcoming_kind" className={compactLabelClass()}>
+                                {t('upcoming_expenses.kind_label')}
+                            </label>
+                            <Select
+                                value={form.data.kind}
+                                onValueChange={(value) => {
+                                    if (value === 'fixed' || value === 'variable') {
+                                        form.setData('kind', value);
+                                        focusAmount();
+                                    }
+                                }}
+                            >
+                                <SelectTrigger
+                                    id="upcoming_kind"
+                                    size="md"
+                                    aria-label={t('upcoming_expenses.kind_select_aria')}
+                                    className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full')}
+                                >
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="fixed">{t('upcoming_expenses.kind_fixed')}</SelectItem>
+                                    <SelectItem value="variable">{t('upcoming_expenses.kind_variable')}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FieldError message={form.errors.kind} />
+                        </div>
+
+                        <DialogFooter className="gap-2 sm:gap-3">
+                            <Button type="button" variant="outline" onClick={() => closeCreateDialog()}>
+                                {t('expense_categories.cancel')}
+                            </Button>
+                            <Button type="submit" disabled={form.processing}>
+                                {form.processing ? t('upcoming_expenses.submitting') : t('upcoming_expenses.submit')}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
 
             <Dialog
                 open={editDialogOpen}

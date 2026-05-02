@@ -144,6 +144,8 @@ return [
         'total_unpaid_caption' => 'Unpaid',
         'total_unpaid_aria' => 'Total unpaid for the month: :amount',
         'add_heading' => 'Add upcoming expense',
+        'new_planned_button' => ' New upcoming expense',
+        'open_new_planned_modal_aria' => 'Open form to add a planned upcoming expense',
         'list_heading' => 'Planned expenses',
         'list_no_category' => 'No category',
         'empty' => 'No planned expenses for this month.',

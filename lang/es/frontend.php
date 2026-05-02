@@ -144,6 +144,8 @@ return [
         'total_unpaid_caption' => 'Sin pagar',
         'total_unpaid_aria' => 'Total sin pagar del mes: :amount',
         'add_heading' => 'Agregar gasto futuro',
+        'new_planned_button' => ' Nuevo gasto futuro',
+        'open_new_planned_modal_aria' => 'Abrir formulario para agregar un gasto futuro planificado',
         'list_heading' => 'Gastos planificados',
         'list_no_category' => 'Sin categoría',
         'empty' => 'No hay gastos planificados para este mes.',
