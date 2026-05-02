@@ -110,6 +110,7 @@ return [
         'list_description' => 'Descripción',
         'list_no_description' => 'Sin nota',
         'list_category' => 'Categoría',
+        'list_no_category' => 'Sin categoría',
         'list_amount' => 'Monto',
         'edit_heading' => 'Editar gasto',
         'edit_save' => 'Guardar cambios',

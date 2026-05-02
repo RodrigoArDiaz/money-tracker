@@ -110,6 +110,7 @@ return [
         'list_description' => 'Description',
         'list_no_description' => 'No note',
         'list_category' => 'Category',
+        'list_no_category' => 'No category',
         'list_amount' => 'Amount',
         'edit_heading' => 'Edit expense',
         'edit_save' => 'Save changes',

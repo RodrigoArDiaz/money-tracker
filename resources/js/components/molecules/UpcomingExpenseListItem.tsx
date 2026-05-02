@@ -57,19 +57,13 @@ export function UpcomingExpenseListItem({
     const categoryDisplayName =
         row.category_name.trim() !== '' ? row.category_name : t('upcoming_expenses.list_no_category');
 
-    const descriptionBadge =
+    const descriptionBlock =
         row.description.trim() !== '' ? (
-            <Badge
-                variant="default"
-                className="max-w-[min(100%,18rem)] min-w-0 justify-start truncate font-normal"
-                title={row.description}
-            >
+            <p className="min-w-0 whitespace-pre-wrap break-words text-sm font-medium leading-snug text-foreground" title={row.description}>
                 {row.description}
-            </Badge>
+            </p>
         ) : (
-            <Badge variant="outline" className="max-w-[min(100%,18rem)] border-dashed font-normal italic text-muted-foreground">
-                {t('expenses.list_no_description')}
-            </Badge>
+            <p className="text-sm italic leading-snug text-muted-foreground">{t('expenses.list_no_description')}</p>
         );
 
     const kindBadge = (
@@ -90,10 +84,26 @@ export function UpcomingExpenseListItem({
             <p className="min-w-0 whitespace-pre-wrap break-words text-sm leading-snug text-muted-foreground">{row.note}</p>
         ) : null;
 
-    const extraBadgesRow = (
-        <div className="flex flex-wrap gap-2 sm:justify-end">
-            {kindBadge}
-            {recurringBadge}
+    const descriptionAndNoteRight = (
+        <div className="flex min-w-0 flex-col gap-1.5 text-right">
+            {descriptionBlock}
+            {noteBlock}
+        </div>
+    );
+
+    const categoryTitleRow = (
+        <div className="flex min-w-0 items-start gap-2 sm:gap-3">
+            <ExpenseCategoryIcon
+                name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                className="size-5 shrink-0 text-primary/90"
+            />
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
+                <p className="min-w-0 max-w-full shrink truncate text-sm font-medium leading-snug text-muted-foreground">
+                    {categoryDisplayName}
+                </p>
+                {kindBadge}
+                {recurringBadge}
+            </div>
         </div>
     );
 
@@ -145,7 +155,11 @@ export function UpcomingExpenseListItem({
             <SelectTrigger
                 size="md"
                 aria-label={t('upcoming_expenses.payment_select_aria')}
-                className={cn(INLINE_FORM_SELECT_TRIGGER_CLASS, 'w-full min-w-[10.75rem]', paymentStatusSelectTriggerTone)}
+                className={cn(
+                    INLINE_FORM_SELECT_TRIGGER_CLASS,
+                    'w-full min-w-0 sm:min-w-[10.75rem]',
+                    paymentStatusSelectTriggerTone,
+                )}
             >
                 <SelectValue />
             </SelectTrigger>
@@ -175,65 +189,38 @@ export function UpcomingExpenseListItem({
 
     return (
         <article className={cn(EXPENSE_CARD_CLASS_NAME, 'min-w-0 overflow-x-clip')}>
-            <div className="flex flex-col gap-2 sm:hidden">
-                <div className="flex items-start justify-between gap-2">
-                    <div className="flex min-w-0 flex-1 items-start gap-2">
-                        <ExpenseCategoryIcon
-                            name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
-                            className="size-5 shrink-0 text-primary/90"
-                        />
-                        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
-                            <p className="min-w-0 max-w-full shrink truncate text-sm font-medium leading-snug text-muted-foreground">
-                                {categoryDisplayName}
-                            </p>
-                            <div className="min-w-0 shrink">{descriptionBadge}</div>
-                        </div>
-                    </div>
-                    <p className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground">
+            <div className="flex flex-col gap-3 sm:hidden">
+                <div className="flex min-w-0 flex-col gap-2">
+                    {categoryTitleRow}
+                    <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
                         {formatAmountDisplay(row.amount, locale)}
                     </p>
-                </div>
-                <div className="flex flex-col gap-3">
-                    <div className="flex items-start justify-between gap-3">
-                        <div className="flex min-w-0 flex-1 flex-col gap-2 text-left">
-                            {extraBadgesRow}
-                            {noteBlock}
-                        </div>
-                        <div className="flex shrink-0 items-start gap-2">
-                            {makeRecurringControl}
-                            {expenseActions}
-                        </div>
+                    <div className="flex min-w-0 flex-col gap-1.5 text-left">
+                        {descriptionBlock}
+                        {noteBlock}
                     </div>
-                    <div className="flex flex-row flex-nowrap items-center gap-x-2 gap-y-0">
-                        <div className="flex min-w-0 flex-1 flex-row items-center gap-2">
-                            <div className="min-w-0 flex-1">{paymentSelect}</div>
-                            <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
-                        </div>
+                </div>
+                <div className="flex min-w-0 flex-row flex-nowrap items-center gap-2">
+                    <div className="flex min-w-0 min-h-0 flex-1 items-center gap-1.5">
+                        <div className="min-w-0 flex-1">{paymentSelect}</div>
+                        <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                        {makeRecurringControl}
+                        {expenseActions}
                     </div>
                 </div>
             </div>
 
             <div className="hidden items-start gap-1.5 sm:flex sm:gap-2">
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
-                    <div className="flex items-center gap-2.5 sm:gap-3">
-                        <ExpenseCategoryIcon
-                            name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
-                            className="size-5 shrink-0 text-primary/90"
-                        />
-                        <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
-                            {formatAmountDisplay(row.amount, locale)}
-                        </p>
-                    </div>
-                    <div className="flex max-w-[min(100%,16rem)] flex-wrap items-center gap-x-2 gap-y-1 sm:max-w-[min(100%,24rem)]">
-                        <p className="min-w-0 shrink truncate text-sm font-medium leading-snug text-muted-foreground">
-                            {categoryDisplayName}
-                        </p>
-                        <div className="min-w-0 shrink">{descriptionBadge}</div>
-                    </div>
+                    {categoryTitleRow}
+                    <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
+                        {formatAmountDisplay(row.amount, locale)}
+                    </p>
                 </div>
-                <div className="flex min-h-0 min-w-0 flex-1 basis-0 flex-col gap-2 self-start pl-1 pt-0.5 text-right sm:pl-1.5">
-                    {extraBadgesRow}
-                    {noteBlock !== null ? <div className="min-w-0 w-full text-right">{noteBlock}</div> : null}
+                <div className="flex min-h-0 min-w-0 flex-1 basis-0 flex-col gap-2 self-start pl-1 pt-0.5 sm:pl-1.5">
+                    {descriptionAndNoteRight}
                 </div>
                 <div className="flex shrink-0 flex-col items-stretch gap-2 self-stretch sm:flex-row sm:items-center sm:gap-2 sm:self-auto sm:pl-2">
                     <div className="w-px shrink-0 self-stretch bg-border" aria-hidden />

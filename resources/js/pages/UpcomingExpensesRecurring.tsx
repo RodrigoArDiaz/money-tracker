@@ -10,8 +10,8 @@ import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
 import { HomeMonthPicker } from '@/components/molecules/HomeMonthPicker';
 import { RecurringPlanMonthField } from '@/components/molecules/RecurringPlanMonthField';
+import { RecurringTemplateListItem, type RecurringTemplateListRow } from '@/components/molecules/RecurringTemplateListItem';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -31,7 +31,6 @@ import { useAutosizeTextarea } from '@/hooks/use-autosize-textarea';
 import { useTranslate } from '@/hooks/use-translate';
 import { DEFAULT_EXPENSE_CATEGORY_ICON } from '@/lib/expense-card-surface';
 import { ExpenseCategoryIcon } from '@/lib/expense-category-icons';
-import { formatAmountDisplay } from '@/lib/expense-format';
 import { INLINE_FORM_SELECT_TRIGGER_CLASS } from '@/lib/inline-form-select-trigger';
 import { cn } from '@/lib/utils';
 
@@ -39,23 +38,6 @@ type CategoryOption = {
     id: number;
     name: string;
     icon: string | null;
-};
-
-type RecurringTemplateRow = {
-    id: number;
-    expense_category_id: number;
-    description: string;
-    note: string | null;
-    category_name: string;
-    category_icon: string | null;
-    amount: string;
-    kind: 'fixed' | 'variable';
-    cadence: string;
-    is_active: boolean;
-    start_year: number;
-    start_month: number;
-    end_year: number | null;
-    end_month: number | null;
 };
 
 const LAST_RECURRING_CATEGORY_STORAGE_KEY = 'money-tracker-last-recurring-expense-category-id';
@@ -97,7 +79,7 @@ export default function UpcomingExpensesRecurring({
     defaultMonth: number;
     myCategories: CategoryOption[];
     defaultCategories: CategoryOption[];
-    recurringTemplates: RecurringTemplateRow[];
+    recurringTemplates: RecurringTemplateListRow[];
 }) {
     const { t, locale } = useTranslate();
 
@@ -193,8 +175,8 @@ export default function UpcomingExpensesRecurring({
     const [recurringCategoryPickerOpen, setRecurringCategoryPickerOpen] = React.useState(false);
     const [templateEditCategoryPickerOpen, setTemplateEditCategoryPickerOpen] = React.useState(false);
     const [recurringTemplateEditOpen, setRecurringTemplateEditOpen] = React.useState(false);
-    const [editingRecurringTemplate, setEditingRecurringTemplate] = React.useState<RecurringTemplateRow | null>(null);
-    const [deletingRecurringTemplate, setDeletingRecurringTemplate] = React.useState<RecurringTemplateRow | null>(null);
+    const [editingRecurringTemplate, setEditingRecurringTemplate] = React.useState<RecurringTemplateListRow | null>(null);
+    const [deletingRecurringTemplate, setDeletingRecurringTemplate] = React.useState<RecurringTemplateListRow | null>(null);
     const [deleteTemplateSubmitting, setDeleteTemplateSubmitting] = React.useState(false);
 
     const recurringAmountRef = React.useRef<HTMLInputElement | null>(null);
@@ -287,7 +269,7 @@ export default function UpcomingExpensesRecurring({
         });
     }
 
-    function openRecurringTemplateEdit(row: RecurringTemplateRow): void {
+    function openRecurringTemplateEdit(row: RecurringTemplateListRow): void {
         setEditingRecurringTemplate(row);
         templateEditForm.setData({
             expense_category_id: String(row.expense_category_id),
@@ -559,48 +541,20 @@ export default function UpcomingExpensesRecurring({
 
                 <section className="flex flex-col gap-3" aria-label={t('upcoming_expenses.recurring.template_list_aria')}>
                     <h3 className="text-sm font-medium text-foreground">{t('upcoming_expenses.recurring.list_heading')}</h3>
-                    <ul className="m-0 flex min-w-0 max-w-full list-none flex-col gap-2 p-0">
+                    <ul className="m-0 flex min-w-0 max-w-full list-none flex-col gap-1.5 p-0">
                         {recurringTemplates.map((rt) => (
-                            <li
-                                key={rt.id}
-                                className="flex flex-col gap-2 rounded-lg border border-border/80 bg-muted/5 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
-                            >
-                                <div className="min-w-0 flex-1 space-y-1">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <span className="font-medium text-foreground">{rt.description}</span>
-                                        <Badge variant="outline" className="text-xs">
-                                            {rt.is_active
-                                                ? t('upcoming_expenses.recurring.active')
-                                                : t('upcoming_expenses.recurring.paused')}
-                                        </Badge>
-                                        <Badge variant="secondary" className="text-xs">
-                                            {t('upcoming_expenses.recurring.cadence_monthly')}
-                                        </Badge>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">
-                                        {formatPlanMonth(locale, rt.start_year, rt.start_month)}
-                                        {rt.end_year !== null && rt.end_month !== null
+                            <li key={rt.id}>
+                                <RecurringTemplateListItem
+                                    row={rt}
+                                    planPeriodLabel={[
+                                        formatPlanMonth(locale, rt.start_year, rt.start_month),
+                                        rt.end_year !== null && rt.end_month !== null
                                             ? ` · ${t('upcoming_expenses.recurring.end_label')}: ${formatPlanMonth(locale, rt.end_year, rt.end_month)}`
-                                            : ''}
-                                    </p>
-                                </div>
-                                <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
-                                    <span className="text-sm font-semibold tabular-nums text-foreground">
-                                        {formatAmountDisplay(rt.amount, locale)}
-                                    </span>
-                                    <Button type="button" variant="outline" size="sm" onClick={() => openRecurringTemplateEdit(rt)}>
-                                        {t('upcoming_expenses.recurring.list_edit_tooltip')}
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                        onClick={() => setDeletingRecurringTemplate(rt)}
-                                    >
-                                        {t('upcoming_expenses.recurring.list_delete_tooltip')}
-                                    </Button>
-                                </div>
+                                            : '',
+                                    ].join('')}
+                                    onEdit={openRecurringTemplateEdit}
+                                    onDelete={setDeletingRecurringTemplate}
+                                />
                             </li>
                         ))}
                     </ul>
