@@ -95,14 +95,22 @@ export function HomeExpenseListItem({
 
     return (
         <article className={cn(EXPENSE_CARD_CLASS_NAME, 'min-w-0 overflow-x-clip')}>
-            <div className="flex flex-col gap-3 sm:hidden">
-                <div className="flex min-w-0 flex-col gap-2">
-                    {categoryTitleRow}
-                    <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
+            <div className="flex flex-col gap-0 sm:hidden">
+                <div className="flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                        <ExpenseCategoryIcon
+                            name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                            className="size-5 shrink-0 text-primary/90"
+                        />
+                        <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
+                            {categoryDisplayName}
+                        </p>
+                    </div>
+                    <p className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground">
                         {formatAmountDisplay(row.amount, locale)}
                     </p>
-                    <div className="flex min-w-0 flex-col gap-1.5 text-left">{descriptionBlock}</div>
                 </div>
+                <div className="flex min-w-0 flex-col gap-1.5 text-left">{descriptionBlock}</div>
                 <div className="flex items-center justify-end">{actionsSlot}</div>
             </div>
 

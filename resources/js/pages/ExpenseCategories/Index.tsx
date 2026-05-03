@@ -3,12 +3,10 @@ import * as React from 'react';
 
 import FieldError from '@/components/atoms/FieldError';
 import Label from '@/components/atoms/Label';
-import PrimaryButton from '@/components/atoms/PrimaryButton';
 import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import FormField from '@/components/molecules/FormField';
 import { ExpenseCategoryIconGrid } from '@/components/molecules/ExpenseCategoryIconGrid';
-import { ExpenseCategoryIconPickerDialog } from '@/components/molecules/ExpenseCategoryIconPickerDialog';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -21,7 +19,8 @@ import {
 } from '@/components/ui/dialog';
 import { useTranslate } from '@/hooks/use-translate';
 import { ExpenseCategoryIcon, EXPENSE_CATEGORY_ICON_MAP } from '@/lib/expense-category-icons';
-import { Pencil, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 type CategoryRow = {
     id: number;
@@ -54,7 +53,8 @@ export default function Index({
     const [editingCategory, setEditingCategory] = React.useState<CategoryRow | null>(null);
     const [deletingCategory, setDeletingCategory] = React.useState<CategoryRow | null>(null);
     const [deleteSubmitting, setDeleteSubmitting] = React.useState(false);
-    const [iconPickerOpen, setIconPickerOpen] = React.useState(false);
+    const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
+    const nameInputRef = React.useRef<HTMLInputElement>(null);
 
     const safeIconNames = React.useMemo(
         () => expenseCategoryIconNames.filter((n) => EXPENSE_CATEGORY_ICON_MAP[n] !== undefined),
@@ -72,6 +72,7 @@ export default function Index({
     });
 
     function openEdit(row: CategoryRow): void {
+        closeCreateDialog();
         editForm.clearErrors();
         editForm.setData('name', row.name);
         editForm.setData('icon', row.icon ?? DEFAULT_CATEGORY_ICON);
@@ -83,11 +84,37 @@ export default function Index({
         editForm.reset();
     }
 
-    function submitCreate(e: React.SubmitEvent<HTMLFormElement>): void {
+    function openCreateDialog(): void {
+        closeEdit();
+        createForm.clearErrors();
+        setCreateDialogOpen(true);
+    }
+
+    React.useEffect(() => {
+        if (!createDialogOpen) {
+            return undefined;
+        }
+        const id = window.requestAnimationFrame(() => {
+            nameInputRef.current?.focus();
+        });
+
+        return () => window.cancelAnimationFrame(id);
+    }, [createDialogOpen]);
+
+    function closeCreateDialog(): void {
+        setCreateDialogOpen(false);
+        createForm.clearErrors();
+        createForm.reset();
+    }
+
+    function submitCreate(e: React.FormEvent<HTMLFormElement>): void {
         e.preventDefault();
         createForm.post('/expense-categories', {
             preserveScroll: true,
-            onSuccess: () => createForm.reset(),
+            onSuccess: () => {
+                createForm.reset();
+                setCreateDialogOpen(false);
+            },
         });
     }
 
@@ -104,6 +131,7 @@ export default function Index({
 
     function openDeleteModal(row: CategoryRow): void {
         closeEdit();
+        closeCreateDialog();
         setDeletingCategory(row);
     }
 
@@ -127,68 +155,33 @@ export default function Index({
     }
 
     return (
-        <AppDashboardLayout title={t('expense_categories.title')}>
+        <AppDashboardLayout>
             <Head title={t('expense_categories.head_title_index')} />
-            <p className="max-w-2xl text-sm text-muted-foreground leading-relaxed">
-                {t('expense_categories.index_description')}
-            </p>
-            <section
-                className="rounded-xl border border-border bg-card p-4 text-card-foreground shadow-sm md:p-5"
-                aria-labelledby="expense-categories-add-heading"
-            >
-                <h2 id="expense-categories-add-heading" className="text-sm font-semibold tracking-tight">
-                    {t('expense_categories.create_heading')}
-                </h2>
-                <form
-                    onSubmit={submitCreate}
-                    className="mt-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end md:gap-x-3 md:gap-y-2"
+            <div className="space-y-6 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0">
+                <div
+                    className={cn(
+                        'flex min-w-0 flex-col gap-3 rounded-xl border border-border bg-card p-3 text-card-foreground shadow-sm',
+                        'sm:flex-row sm:flex-nowrap sm:items-start sm:justify-between sm:gap-3 sm:p-4',
+                    )}
                 >
-                    <div className="min-w-0 w-full md:w-64 md:shrink-0">
-                        <FormField
-                            label={t('expense_categories.name_label')}
-                            htmlFor="new-category-name"
-                            error={createForm.errors.name}
-                        >
-                            <TextInput
-                                id="new-category-name"
-                                type="text"
-                                value={createForm.data.name}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                    createForm.setData('name', e.target.value)
-                                }
-                                autoComplete="off"
-                                required
-                                maxLength={255}
-                                placeholder={t('expense_categories.name_placeholder')}
-                                className="h-9 py-1.5"
-                            />
-                        </FormField>
+                    <div className="min-w-0 flex-1">
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                            {t('expense_categories.index_description')}
+                        </p>
                     </div>
-                    <div className="flex flex-col gap-1.5 md:shrink-0">
-                        <Label>{t('expense_categories.icon_label')}</Label>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="h-9 w-11 shrink-0"
-                            onClick={() => setIconPickerOpen(true)}
-                            aria-label={t('expense_categories.pick_icon_aria')}
-                        >
-                            <ExpenseCategoryIcon name={createForm.data.icon} className="size-4" />
-                        </Button>
-                        <FieldError message={createForm.errors.icon} />
-                    </div>
-                    <PrimaryButton
-                        type="submit"
-                        disabled={createForm.processing}
-                        className="h-9 w-full shrink-0 px-4 py-1.5 text-sm md:w-auto"
+                    <Button
+                        type="button"
+                        size="sm"
+                        className="hidden h-9 shrink-0 gap-1.5 font-medium sm:inline-flex md:h-10"
+                        onClick={() => openCreateDialog()}
+                        aria-label={t('expense_categories.open_new_category_modal_aria')}
                     >
-                        {createForm.processing
-                            ? t('expense_categories.submitting_create')
-                            : t('expense_categories.submit_create')}
-                    </PrimaryButton>
-                </form>
-            </section>
-            <section className="flex flex-col gap-3" aria-labelledby="expense-categories-mine-heading">
+                        <Plus className="size-4 shrink-0" aria-hidden />
+                        {t('expense_categories.new_category_button')}
+                    </Button>
+                </div>
+
+                <section className="flex flex-col gap-3" aria-labelledby="expense-categories-mine-heading">
                 <h2 id="expense-categories-mine-heading" className="text-sm font-semibold tracking-tight">
                     {t('expense_categories.my_categories_heading')}
                 </h2>
@@ -290,17 +283,79 @@ export default function Index({
                     </section>
                 </>
             ) : null}
+            </div>
 
-            <ExpenseCategoryIconPickerDialog
-                open={iconPickerOpen}
-                onOpenChange={setIconPickerOpen}
-                names={safeIconNames}
-                selected={createForm.data.icon}
-                onPick={(name) => createForm.setData('icon', name)}
-                title={t('expense_categories.icon_picker_title')}
-                description={t('expense_categories.icon_picker_description')}
-                closeAriaLabel={t('expense_categories.close_dialog')}
-            />
+            <Button
+                type="button"
+                variant="default"
+                size="icon"
+                className={cn(
+                    'fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] right-4 z-40 size-14 rounded-full shadow-lg sm:hidden',
+                    'touch-manipulation',
+                )}
+                onClick={() => openCreateDialog()}
+                aria-label={t('expense_categories.open_new_category_modal_aria')}
+            >
+                <Plus className="size-7" aria-hidden />
+            </Button>
+
+            <Dialog
+                open={createDialogOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        closeCreateDialog();
+                    }
+                }}
+            >
+                <DialogContent closeAriaLabel={t('expense_categories.close_dialog')} className="max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>{t('expense_categories.create_heading')}</DialogTitle>
+                        <DialogDescription>{t('expense_categories.create_modal_description')}</DialogDescription>
+                    </DialogHeader>
+                    <form id="create-expense-category-form" onSubmit={submitCreate} className="grid gap-4">
+                        <FormField
+                            label={t('expense_categories.name_label')}
+                            htmlFor="new-category-name"
+                            error={createForm.errors.name}
+                        >
+                            <TextInput
+                                ref={nameInputRef}
+                                id="new-category-name"
+                                type="text"
+                                value={createForm.data.name}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    createForm.setData('name', e.target.value)
+                                }
+                                autoComplete="off"
+                                required
+                                maxLength={255}
+                            />
+                        </FormField>
+                        <div className="grid gap-2">
+                            <Label>{t('expense_categories.icon_label')}</Label>
+                            <p className="text-xs text-muted-foreground">{t('expense_categories.edit_icon_hint')}</p>
+                            <div className="max-h-48 overflow-y-auto overscroll-contain rounded-lg border border-border bg-background p-3">
+                                <ExpenseCategoryIconGrid
+                                    names={safeIconNames}
+                                    selected={createForm.data.icon}
+                                    onSelect={(name) => createForm.setData('icon', name)}
+                                />
+                            </div>
+                            <FieldError message={createForm.errors.icon} />
+                        </div>
+                    </form>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => closeCreateDialog()}>
+                            {t('expense_categories.cancel')}
+                        </Button>
+                        <Button type="submit" form="create-expense-category-form" disabled={createForm.processing}>
+                            {createForm.processing
+                                ? t('expense_categories.submitting_create')
+                                : t('expense_categories.submit_create')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <Dialog
                 open={editingCategory !== null}
@@ -350,11 +405,11 @@ export default function Index({
                         <Button type="button" variant="outline" onClick={() => closeEdit()}>
                             {t('expense_categories.cancel')}
                         </Button>
-                        <PrimaryButton type="submit" form="edit-expense-category-form" disabled={editForm.processing}>
+                        <Button type="submit" form="edit-expense-category-form" disabled={editForm.processing}>
                             {editForm.processing
                                 ? t('expense_categories.submitting_edit')
                                 : t('expense_categories.submit_edit')}
-                        </PrimaryButton>
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
