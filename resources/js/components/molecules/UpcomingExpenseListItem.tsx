@@ -18,7 +18,7 @@ import { formatAmountDisplay } from '@/lib/expense-format';
 import { ExpenseCategoryIcon } from '@/lib/expense-category-icons';
 import { INLINE_FORM_SELECT_TRIGGER_CLASS } from '@/lib/inline-form-select-trigger';
 import { cn } from '@/lib/utils';
-import { RefreshCw } from 'lucide-react';
+import { Info, RefreshCw } from 'lucide-react';
 
 export type UpcomingExpenseRow = {
     id: number;
@@ -147,6 +147,26 @@ export function UpcomingExpenseListItem({
             </Tooltip>
         ) : null;
 
+    const financingPlanInfoControl =
+        row.financing_plan_id !== null ? (
+            <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="size-8 shrink-0"
+                        aria-label={t('upcoming_expenses.financing_plan_info_aria')}
+                    >
+                        <Info className="size-4 text-primary/90" aria-hidden />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs font-normal leading-snug" side="top" sideOffset={6}>
+                    {t('upcoming_expenses.financing_plan_info_tooltip')}
+                </TooltipContent>
+            </Tooltip>
+        ) : null;
+
     const paymentStatusSelectTriggerTone =
         row.payment_status === 'paid'
             ? cn(
@@ -203,6 +223,7 @@ export function UpcomingExpenseListItem({
             deleteAriaLabel={t('upcoming_expenses.card_delete_aria')}
             editTooltip={t('upcoming_expenses.card_edit_tooltip')}
             deleteTooltip={t('upcoming_expenses.card_delete_tooltip')}
+            showEdit={row.financing_plan_id === null}
             showDelete={row.financing_plan_id === null}
         />
     );
@@ -227,6 +248,7 @@ export function UpcomingExpenseListItem({
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                         {makeRecurringControl}
+                        {financingPlanInfoControl}
                         {expenseActions}
                     </div>
                 </div>
@@ -251,6 +273,7 @@ export function UpcomingExpenseListItem({
                         </div>
                         <div className="flex shrink-0 items-center gap-2 sm:justify-end">
                             {makeRecurringControl}
+                            {financingPlanInfoControl}
                             {expenseActions}
                         </div>
                     </div>

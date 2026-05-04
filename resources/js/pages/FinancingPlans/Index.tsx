@@ -1,12 +1,13 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import * as React from 'react';
 import { NumericFormat } from 'react-number-format';
-import { Archive, ArchiveRestore, ChevronDown, Plus, Tags, Trash2, X } from 'lucide-react';
+import { ChevronDown, Plus, Tags, X } from 'lucide-react';
 
 import FieldError from '@/components/atoms/FieldError';
 import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
+import { FinancingPlanListItem } from '@/components/molecules/FinancingPlanListItem';
 import { RecurringPlanMonthField } from '@/components/molecules/RecurringPlanMonthField';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,9 +21,8 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAutosizeTextarea } from '@/hooks/use-autosize-textarea';
 import { useTranslate } from '@/hooks/use-translate';
-import { DEFAULT_EXPENSE_CATEGORY_ICON, EXPENSE_CARD_CLASS_NAME } from '@/lib/expense-card-surface';
+import { DEFAULT_EXPENSE_CATEGORY_ICON } from '@/lib/expense-card-surface';
 import { ExpenseCategoryIcon } from '@/lib/expense-category-icons';
-import { formatAmountDisplay } from '@/lib/expense-format';
 import { cn } from '@/lib/utils';
 
 type CategoryOption = {
@@ -390,91 +390,13 @@ export default function FinancingPlansIndex({
                         <ul className="m-0 flex min-w-0 max-w-full list-none flex-col gap-1.5 p-0">
                             {plans.map((plan) => (
                                 <li key={plan.id}>
-                                    <article
-                                        className={cn(
-                                            EXPENSE_CARD_CLASS_NAME,
-                                            'flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3',
-                                        )}
-                                    >
-                                        <div className="flex min-w-0 flex-1 items-start gap-2 sm:gap-3">
-                                            <ExpenseCategoryIcon
-                                                name={plan.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
-                                                className="mt-0.5 size-5 shrink-0 text-primary/90"
-                                            />
-                                            <div className="min-w-0 flex-1 space-y-1">
-                                                <p className="text-sm font-medium leading-snug text-foreground">{plan.description}</p>
-                                                <p className="text-xs text-muted-foreground">{plan.category_name}</p>
-                                                {plan.note !== null && plan.note.trim() !== '' ? (
-                                                    <p className="text-xs leading-snug text-muted-foreground">{plan.note}</p>
-                                                ) : null}
-                                            </div>
-                                        </div>
-                                        <div className="flex shrink-0 flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-3">
-                                            <div className="text-right">
-                                                <p className="text-xs text-muted-foreground">{t('financing_plans.plan_total_label')}</p>
-                                                <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
-                                                    {formatAmountDisplay(plan.total_amount, locale)}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {t('financing_plans.plan_installments_label')}: {plan.installments_count}
-                                                </p>
-                                            </div>
-                                            {listFilter === 'active' ? (
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="size-9 shrink-0"
-                                                            onClick={() => archivePlan(plan)}
-                                                            aria-label={t('financing_plans.archive_plan_aria')}
-                                                        >
-                                                            <Archive className="size-4" aria-hidden />
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent side="top" sideOffset={4}>
-                                                        {t('financing_plans.archive_plan_tooltip')}
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            ) : (
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="size-9 shrink-0"
-                                                            onClick={() => unarchivePlan(plan)}
-                                                            aria-label={t('financing_plans.unarchive_plan_aria')}
-                                                        >
-                                                            <ArchiveRestore className="size-4" aria-hidden />
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent side="top" sideOffset={4}>
-                                                        {t('financing_plans.unarchive_plan_tooltip')}
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            )}
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="size-9 shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                                        onClick={() => setDeletingPlan(plan)}
-                                                        aria-label={t('financing_plans.delete_plan_aria')}
-                                                    >
-                                                        <Trash2 className="size-4" aria-hidden />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent side="top" sideOffset={4}>
-                                                    {t('financing_plans.delete_plan_tooltip')}
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </div>
-                                    </article>
+                                    <FinancingPlanListItem
+                                        plan={plan}
+                                        listFilter={listFilter}
+                                        onArchive={archivePlan}
+                                        onUnarchive={unarchivePlan}
+                                        onDeleteRequest={setDeletingPlan}
+                                    />
                                 </li>
                             ))}
                         </ul>

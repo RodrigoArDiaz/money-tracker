@@ -178,6 +178,8 @@ return [
         'deleting' => 'Eliminando…',
         'paid_disabled_future_month_title' => 'Todavía no podés marcar como pagados los gastos de un mes futuro.',
         'payment_paid_blocked_info_aria' => 'Información: por qué no podés marcar como pagado',
+        'financing_plan_info_aria' => 'Información: cuota de un plan de financiación',
+        'financing_plan_info_tooltip' => 'Esta fila forma parte de un plan de financiación. Para quitarla, eliminá el plan completo en «Planes de financiación».',
         'validation' => [
             'cannot_mark_paid_future_month' => 'No podés marcar como pagado un gasto planificado de un mes posterior al actual.',
         ],
@@ -276,6 +278,9 @@ return [
         'submitting' => 'Creando…',
         'installment_badge' => 'Cuota :current de :total',
         'plan_total_label' => 'Total del plan',
+        'plan_installments_badge_one' => '1 cuota',
+        'plan_installments_badge_other' => ':count cuotas',
+        'plan_archived_badge' => 'Archivado',
         'plan_installments_label' => 'Cuotas',
         'archive_plan_aria' => 'Archivar plan de financiación',
         'archive_plan_tooltip' => 'Archivar (ocultar del listado de activos)',

@@ -178,6 +178,8 @@ return [
         'deleting' => 'Deleting…',
         'paid_disabled_future_month_title' => 'Planned expenses for future months can’t be marked as paid yet.',
         'payment_paid_blocked_info_aria' => 'Information: why Paid is not available for this month',
+        'financing_plan_info_aria' => 'Info: installment from an installment plan',
+        'financing_plan_info_tooltip' => 'This row is part of an installment plan. To remove it, delete the whole plan under Installment plans.',
         'validation' => [
             'cannot_mark_paid_future_month' => 'You can’t mark a planned expense as paid for a calendar month later than this one.',
         ],
@@ -276,6 +278,9 @@ return [
         'submitting' => 'Creating…',
         'installment_badge' => 'Installment :current of :total',
         'plan_total_label' => 'Plan total',
+        'plan_installments_badge_one' => '1 installment',
+        'plan_installments_badge_other' => ':count installments',
+        'plan_archived_badge' => 'Archived',
         'plan_installments_label' => 'Installments',
         'archive_plan_aria' => 'Archive installment plan',
         'archive_plan_tooltip' => 'Archive (hide from active list)',
