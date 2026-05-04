@@ -2,8 +2,8 @@ FROM php:8.4-cli-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip libzip-dev libpng-dev libonig-dev libxml2-dev \
-    libsqlite3-dev \
-    && docker-php-ext-install pdo_sqlite mbstring zip \
+    libpq-dev \
+    && docker-php-ext-install pdo_pgsql mbstring zip \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
