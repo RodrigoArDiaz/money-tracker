@@ -473,7 +473,9 @@ export default function UpcomingExpensesRecurring({
                                         : t('expenses.open_category_picker_aria')
                                 }
                             >
-                                <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                {recurringSelectedCategory === null ? (
+                                    <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                ) : null}
                                 {recurringSelectedCategory ? (
                                     <>
                                         <ExpenseCategoryIcon
@@ -681,7 +683,9 @@ export default function UpcomingExpensesRecurring({
                                 }
                                 aria-invalid={templateEditForm.errors.expense_category_id ? true : undefined}
                             >
-                                <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                {templateEditSelectedCategory === null ? (
+                                    <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                ) : null}
                                 {templateEditSelectedCategory ? (
                                     <>
                                         <ExpenseCategoryIcon

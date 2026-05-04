@@ -141,8 +141,8 @@
     @apply font-sans;
     }
 
-  /* Lista nativa de <select>: en oscuro el SO suele ignorar tokens; alineamos a popover. */
-  .dark select.home-month-picker-year option {
+  /* Lista nativa de <select> (año en popovers de calendario): en oscuro el SO suele ignorar tokens. */
+  .dark select.month-picker-year-native option {
     background-color: var(--popover);
     color: var(--popover-foreground);
   }

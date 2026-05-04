@@ -10,6 +10,7 @@ import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCateg
 import { FinancingPlanListItem } from '@/components/molecules/FinancingPlanListItem';
 import { RecurringPlanMonthField } from '@/components/molecules/RecurringPlanMonthField';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -353,7 +354,7 @@ export default function FinancingPlansIndex({
                 <section className="flex flex-col gap-3" aria-label={t('financing_plans.list_heading')}>
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                         <h3 className="text-sm font-medium text-foreground">{t('financing_plans.list_heading')}</h3>
-                        <div className="flex flex-wrap gap-2" role="group" aria-label={t('financing_plans.filter_group_aria')}>
+                        <ButtonGroup aria-label={t('financing_plans.filter_group_aria')}>
                             <Button
                                 type="button"
                                 size="sm"
@@ -388,7 +389,7 @@ export default function FinancingPlansIndex({
                             >
                                 {t('financing_plans.filter_archived')}
                             </Button>
-                        </div>
+                        </ButtonGroup>
                     </div>
                     {plans.length === 0 ? (
                         <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
@@ -440,13 +441,14 @@ export default function FinancingPlansIndex({
                         <DialogDescription className="sr-only">{t('financing_plans.section_intro')}</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={submitPlan} className="flex flex-col gap-3">
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 w-full">
                             <span className={compactLabelClass()}>{t('financing_plans.creation_mode_label')}</span>
-                            <div className="flex flex-wrap gap-2">
+                            <ButtonGroup className="w-full" aria-label={t('financing_plans.creation_mode_label')}>
                                 <Button
                                     type="button"
                                     size="sm"
                                     variant={planForm.data.creation_mode === 'total_and_count' ? 'default' : 'outline'}
+                                    className="h-9"
                                     onClick={() => {
                                         planForm.setData('creation_mode', 'total_and_count');
                                         planForm.clearErrors();
@@ -458,6 +460,7 @@ export default function FinancingPlansIndex({
                                     type="button"
                                     size="sm"
                                     variant={planForm.data.creation_mode === 'custom_schedule' ? 'default' : 'outline'}
+                                    className="h-9"
                                     onClick={() => {
                                         planForm.setData('creation_mode', 'custom_schedule');
                                         planForm.clearErrors();
@@ -465,7 +468,7 @@ export default function FinancingPlansIndex({
                                 >
                                     {t('financing_plans.creation_mode_custom')}
                                 </Button>
-                            </div>
+                            </ButtonGroup>
                         </div>
 
                         <div className="flex flex-col gap-0.5">
