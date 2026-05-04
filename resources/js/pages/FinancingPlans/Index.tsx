@@ -1,7 +1,7 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import * as React from 'react';
 import { NumericFormat } from 'react-number-format';
-import { ChevronDown, Plus, Tags, Trash2 } from 'lucide-react';
+import { ChevronDown, Plus, Tags, Trash2, X } from 'lucide-react';
 
 import FieldError from '@/components/atoms/FieldError';
 import TextInput from '@/components/atoms/TextInput';
@@ -458,7 +458,9 @@ export default function FinancingPlansIndex({
                                         : t('expenses.open_category_picker_aria')
                                 }
                             >
-                                <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                {selectedCategory === null ? (
+                                    <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                ) : null}
                                 {selectedCategory ? (
                                     <>
                                         <ExpenseCategoryIcon
@@ -621,15 +623,30 @@ export default function FinancingPlansIndex({
                                                     />
                                                     <FieldError message={planForm.errors[`installments.${index}.amount`]} />
                                                 </div>
-                                                <div className="flex shrink-0 justify-end sm:pt-6">
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => removeCustomRow(index)}
+                                                <div className="flex shrink-0 flex-col gap-0.5">
+                                                    <span
+                                                        className={cn(compactLabelClass(), 'invisible pointer-events-none select-none')}
+                                                        aria-hidden
                                                     >
-                                                        {t('financing_plans.remove_installment_row')}
-                                                    </Button>
+                                                        {'\u00a0'}
+                                                    </span>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="size-9 shrink-0"
+                                                                onClick={() => removeCustomRow(index)}
+                                                                aria-label={t('financing_plans.remove_installment_row')}
+                                                            >
+                                                                <X className="size-4" aria-hidden />
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent side="top" sideOffset={4}>
+                                                            {t('financing_plans.remove_installment_row')}
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                 </div>
                                             </div>
                                         </div>
@@ -644,7 +661,7 @@ export default function FinancingPlansIndex({
                             </>
                         )}
 
-                        <DialogFooter className="gap-2 sm:gap-0">
+                        <DialogFooter className="gap-3">
                             <Button type="button" variant="outline" onClick={() => closeCreateDialog()}>
                                 {t('financing_plans.close_dialog')}
                             </Button>
@@ -669,7 +686,7 @@ export default function FinancingPlansIndex({
                         <DialogTitle>{t('financing_plans.delete_modal_title')}</DialogTitle>
                         <DialogDescription>{t('financing_plans.delete_modal_description')}</DialogDescription>
                     </DialogHeader>
-                    <DialogFooter className="gap-2 sm:gap-0">
+                    <DialogFooter className="gap-3">
                         <Button type="button" variant="outline" onClick={() => setDeletingPlan(null)}>
                             {t('financing_plans.close_dialog')}
                         </Button>
