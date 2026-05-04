@@ -24,6 +24,7 @@ class UpcomingExpensePolicy
 
     public function delete(User $user, UpcomingExpense $upcomingExpense): bool
     {
-        return (int) $upcomingExpense->user_id === (int) $user->id;
+        return (int) $upcomingExpense->user_id === (int) $user->id
+            && $upcomingExpense->financing_plan_id === null;
     }
 }

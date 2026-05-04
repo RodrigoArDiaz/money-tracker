@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[Fillable([
     'user_id',
     'recurring_template_id',
+    'financing_plan_id',
+    'plan_installment_number',
     'year',
     'month',
     'expense_category_id',
@@ -36,6 +38,8 @@ class UpcomingExpense extends Model
         return [
             'year' => 'integer',
             'month' => 'integer',
+            'financing_plan_id' => 'integer',
+            'plan_installment_number' => 'integer',
             'amount' => 'decimal:2',
             'kind' => UpcomingExpenseKind::class,
             'payment_status' => UpcomingExpensePaymentStatus::class,
@@ -74,5 +78,13 @@ class UpcomingExpense extends Model
     public function recurringTemplate(): BelongsTo
     {
         return $this->belongsTo(UpcomingExpenseRecurringTemplate::class, 'recurring_template_id');
+    }
+
+    /**
+     * @return BelongsTo<FinancingPlan, $this>
+     */
+    public function financingPlan(): BelongsTo
+    {
+        return $this->belongsTo(FinancingPlan::class, 'financing_plan_id');
     }
 }

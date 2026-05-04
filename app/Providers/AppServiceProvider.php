@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Expense;
+use App\Models\FinancingPlan;
 use App\Models\UpcomingExpense;
 use App\Models\UpcomingExpenseRecurringTemplate;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +42,13 @@ class AppServiceProvider extends ServiceProvider
 
         Route::bind('recurring_template', function (string $value): UpcomingExpenseRecurringTemplate {
             return UpcomingExpenseRecurringTemplate::query()
+                ->whereKey($value)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+        });
+
+        Route::bind('financing_plan', function (string $value): FinancingPlan {
+            return FinancingPlan::query()
                 ->whereKey($value)
                 ->where('user_id', Auth::id())
                 ->firstOrFail();

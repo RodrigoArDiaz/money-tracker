@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FinancingPlanController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\UpcomingExpenseController;
@@ -47,6 +48,10 @@ Route::middleware('auth')->group(function () {
     Route::get('charts', ChartController::class)->name('charts');
     Route::get('upcoming-expenses/recurring', [UpcomingExpenseRecurringTemplateController::class, 'index'])
         ->name('upcoming-expenses.recurring');
+    Route::get('financing-plans', [FinancingPlanController::class, 'index'])->name('financing-plans.index');
+    Route::post('financing-plans', [FinancingPlanController::class, 'store'])->name('financing-plans.store');
+    Route::delete('financing-plans/{financing_plan}', [FinancingPlanController::class, 'destroy'])
+        ->name('financing-plans.destroy');
     Route::get('upcoming-expenses', [UpcomingExpenseController::class, 'index'])->name('upcoming-expenses.index');
     Route::post('upcoming-expenses', [UpcomingExpenseController::class, 'store'])->name('upcoming-expenses.store');
     Route::post('upcoming-expenses/{upcoming_expense}/make-recurring', [UpcomingExpenseController::class, 'makeRecurring'])

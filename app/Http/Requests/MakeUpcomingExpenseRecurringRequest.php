@@ -42,6 +42,13 @@ class MakeUpcomingExpenseRecurringRequest extends FormRequest
                     __('frontend.upcoming_expenses.recurring.validation.already_recurring'),
                 );
             }
+
+            if ($expense->financing_plan_id !== null) {
+                $v->errors()->add(
+                    'upcoming_expense',
+                    __('frontend.upcoming_expenses.recurring.validation.cannot_make_recurring_financing_plan'),
+                );
+            }
         });
     }
 }

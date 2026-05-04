@@ -23,6 +23,9 @@ import { RefreshCw } from 'lucide-react';
 export type UpcomingExpenseRow = {
     id: number;
     recurring_template_id: number | null;
+    financing_plan_id: number | null;
+    plan_installment_number: number | null;
+    plan_installment_total: number | null;
     expense_category_id: number | null;
     category_name: string;
     category_icon: string | null;
@@ -79,6 +82,19 @@ export function UpcomingExpenseListItem({
             </Badge>
         ) : null;
 
+    const financingPlanBadge =
+        row.financing_plan_id !== null &&
+        row.plan_installment_number !== null &&
+        row.plan_installment_total !== null &&
+        row.plan_installment_total > 0 ? (
+            <Badge variant="outline" className="shrink-0 font-normal">
+                {t('financing_plans.installment_badge', {
+                    current: row.plan_installment_number,
+                    total: row.plan_installment_total,
+                })}
+            </Badge>
+        ) : null;
+
     const noteBlock =
         row.note !== null && row.note.trim() !== '' ? (
             <p className="min-w-0 whitespace-pre-wrap break-words text-sm leading-snug text-muted-foreground">{row.note}</p>
@@ -103,12 +119,15 @@ export function UpcomingExpenseListItem({
                 </p>
                 {kindBadge}
                 {recurringBadge}
+                {financingPlanBadge}
             </div>
         </div>
     );
 
     const makeRecurringControl =
-        onMakeRecurring !== undefined && row.recurring_template_id === null ? (
+        onMakeRecurring !== undefined &&
+        row.recurring_template_id === null &&
+        row.financing_plan_id === null ? (
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button
@@ -184,6 +203,7 @@ export function UpcomingExpenseListItem({
             deleteAriaLabel={t('upcoming_expenses.card_delete_aria')}
             editTooltip={t('upcoming_expenses.card_edit_tooltip')}
             deleteTooltip={t('upcoming_expenses.card_delete_tooltip')}
+            showDelete={row.financing_plan_id === null}
         />
     );
 

@@ -7,6 +7,7 @@ use App\Enums\UpcomingExpensePaymentStatus;
 use App\Enums\UpcomingExpenseRecurrenceCadence;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
+use App\Models\FinancingPlan;
 use App\Models\UpcomingExpense;
 use App\Models\UpcomingExpenseRecurringTemplate;
 use App\Models\User;
@@ -18,6 +19,7 @@ use App\Repositories\UpcomingExpenseRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class UpcomingExpenseService
 {
@@ -45,6 +47,8 @@ class UpcomingExpenseService
         return $this->upcomingExpenseRepository->create([
             'user_id' => $user->id,
             'recurring_template_id' => null,
+            'financing_plan_id' => null,
+            'plan_installment_number' => null,
             'year' => $validated['year'],
             'month' => $validated['month'],
             'expense_category_id' => $validated['expense_category_id'],
@@ -95,6 +99,12 @@ class UpcomingExpenseService
 
     public function delete(UpcomingExpense $upcomingExpense): void
     {
+        if ($upcomingExpense->financing_plan_id !== null) {
+            throw ValidationException::withMessages([
+                'upcoming_expense' => [__('frontend.upcoming_expenses.flash.cannot_delete_financing_installment')],
+            ]);
+        }
+
         DB::transaction(function () use ($upcomingExpense): void {
             $templateId = $upcomingExpense->recurring_template_id;
             if ($templateId !== null) {
@@ -113,6 +123,10 @@ class UpcomingExpenseService
     public function makeRecurringFromUpcoming(UpcomingExpense $upcomingExpense): void
     {
         if ($upcomingExpense->recurring_template_id !== null) {
+            return;
+        }
+
+        if ($upcomingExpense->financing_plan_id !== null) {
             return;
         }
 
@@ -286,18 +300,35 @@ class UpcomingExpenseService
             ])
             ->all();
 
+        $planIds = $collection->pluck('financing_plan_id')->filter()->unique()->values()->all();
+        $planInstallmentTotals = [];
+        if ($planIds !== []) {
+            $planInstallmentTotals = FinancingPlan::query()
+                ->whereIn('id', $planIds)
+                ->withCount('upcomingInstallments')
+                ->get()
+                ->mapWithKeys(fn (FinancingPlan $p): array => [(int) $p->id => (int) $p->upcoming_installments_count])
+                ->all();
+        }
+
         return [
             'viewYear' => $year,
             'viewMonth' => $month,
             'myCategories' => $myCategories,
             'defaultCategories' => $defaultCategories,
             'expenses' => $collection
-                ->map(function (UpcomingExpense $e) use ($locale): array {
+                ->map(function (UpcomingExpense $e) use ($locale, $planInstallmentTotals): array {
                     $category = $e->category;
+                    $planId = $e->financing_plan_id;
 
                     return [
                         'id' => $e->id,
                         'recurring_template_id' => $e->recurring_template_id,
+                        'financing_plan_id' => $planId,
+                        'plan_installment_number' => $e->plan_installment_number,
+                        'plan_installment_total' => $planId !== null
+                            ? ($planInstallmentTotals[(int) $planId] ?? null)
+                            : null,
                         'expense_category_id' => $e->expense_category_id,
                         'category_name' => $category instanceof ExpenseCategory
                             ? $category->localizedName($locale)
@@ -440,6 +471,8 @@ class UpcomingExpenseService
         $this->upcomingExpenseRepository->create([
             'user_id' => $template->user_id,
             'recurring_template_id' => $template->id,
+            'financing_plan_id' => null,
+            'plan_installment_number' => null,
             'year' => $year,
             'month' => $month,
             'expense_category_id' => $template->expense_category_id,
