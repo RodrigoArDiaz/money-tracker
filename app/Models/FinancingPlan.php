@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'description',
     'note',
     'total_amount',
+    'archived_at',
 ])]
 class FinancingPlan extends Model
 {
@@ -28,6 +29,7 @@ class FinancingPlan extends Model
     {
         return [
             'total_amount' => 'decimal:2',
+            'archived_at' => 'datetime',
         ];
     }
 

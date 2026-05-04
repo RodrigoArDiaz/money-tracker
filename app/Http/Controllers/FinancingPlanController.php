@@ -34,10 +34,20 @@ class FinancingPlanController extends Controller
 
         [$defaultYear, $defaultMonth] = $this->resolveUpcomingMonthQuery($request);
 
-        $plans = FinancingPlan::query()
+        $listFilter = $this->resolveFinancingPlansListFilter($request);
+
+        $plansQuery = FinancingPlan::query()
             ->where('user_id', $user->id)
             ->with(['category'])
-            ->withCount('upcomingInstallments')
+            ->withCount('upcomingInstallments');
+
+        if ($listFilter === 'active') {
+            $plansQuery->whereNull('archived_at');
+        } else {
+            $plansQuery->whereNotNull('archived_at');
+        }
+
+        $plans = $plansQuery
             ->orderByDesc('id')
             ->get()
             ->map(function (FinancingPlan $plan) use ($locale): array {
@@ -80,10 +90,31 @@ class FinancingPlanController extends Controller
         return Inertia::render('FinancingPlans/Index', [
             'defaultYear' => $defaultYear,
             'defaultMonth' => $defaultMonth,
+            'listFilter' => $listFilter,
             'myCategories' => $myCategories,
             'defaultCategories' => $defaultCategories,
             'plans' => $plans,
         ]);
+    }
+
+    public function archive(Request $request, FinancingPlan $financingPlan): RedirectResponse
+    {
+        $this->authorize('archive', $financingPlan);
+
+        $this->financingPlanService->archiveOwnedPlan($financingPlan);
+
+        return $this->redirectToFinancingPlansWithMonth($request)
+            ->with('success', __('frontend.financing_plans.flash.archived'));
+    }
+
+    public function unarchive(Request $request, FinancingPlan $financingPlan): RedirectResponse
+    {
+        $this->authorize('unarchive', $financingPlan);
+
+        $this->financingPlanService->unarchiveOwnedPlan($financingPlan);
+
+        return $this->redirectToFinancingPlansWithMonth($request)
+            ->with('success', __('frontend.financing_plans.flash.restored'));
     }
 
     public function store(StoreFinancingPlanRequest $request): RedirectResponse
@@ -138,5 +169,15 @@ class FinancingPlanController extends Controller
         }
 
         return [$year, $month];
+    }
+
+    /**
+     * @return 'active'|'archived'
+     */
+    private function resolveFinancingPlansListFilter(Request $request): string
+    {
+        $filter = (string) $request->query('filter', 'active');
+
+        return $filter === 'archived' ? 'archived' : 'active';
     }
 }

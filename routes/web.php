@@ -52,6 +52,10 @@ Route::middleware('auth')->group(function () {
     Route::post('financing-plans', [FinancingPlanController::class, 'store'])->name('financing-plans.store');
     Route::delete('financing-plans/{financing_plan}', [FinancingPlanController::class, 'destroy'])
         ->name('financing-plans.destroy');
+    Route::post('financing-plans/{financing_plan}/archive', [FinancingPlanController::class, 'archive'])
+        ->name('financing-plans.archive');
+    Route::post('financing-plans/{financing_plan}/unarchive', [FinancingPlanController::class, 'unarchive'])
+        ->name('financing-plans.unarchive');
     Route::get('upcoming-expenses', [UpcomingExpenseController::class, 'index'])->name('upcoming-expenses.index');
     Route::post('upcoming-expenses', [UpcomingExpenseController::class, 'store'])->name('upcoming-expenses.store');
     Route::post('upcoming-expenses/{upcoming_expense}/make-recurring', [UpcomingExpenseController::class, 'makeRecurring'])

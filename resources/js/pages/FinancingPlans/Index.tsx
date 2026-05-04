@@ -1,7 +1,7 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import * as React from 'react';
 import { NumericFormat } from 'react-number-format';
-import { ChevronDown, Plus, Tags, Trash2, X } from 'lucide-react';
+import { Archive, ArchiveRestore, ChevronDown, Plus, Tags, Trash2, X } from 'lucide-react';
 
 import FieldError from '@/components/atoms/FieldError';
 import TextInput from '@/components/atoms/TextInput';
@@ -79,15 +79,19 @@ function compactLabelClass(): string {
     return 'mb-0.5 block text-xs font-medium text-muted-foreground';
 }
 
+type ListFilter = 'active' | 'archived';
+
 export default function FinancingPlansIndex({
     defaultYear,
     defaultMonth,
+    listFilter,
     myCategories,
     defaultCategories,
     plans,
 }: {
     defaultYear: number;
     defaultMonth: number;
+    listFilter: ListFilter;
     myCategories: CategoryOption[];
     defaultCategories: CategoryOption[];
     plans: PlanRow[];
@@ -274,6 +278,18 @@ export default function FinancingPlansIndex({
         });
     }
 
+    function financingPlansRedirectPayload(): {
+        redirect_year: number;
+        redirect_month: number;
+        filter?: 'archived';
+    } {
+        return {
+            redirect_year: defaultYear,
+            redirect_month: defaultMonth,
+            ...(listFilter === 'archived' ? { filter: 'archived' as const } : {}),
+        };
+    }
+
     function performDeletePlan(): void {
         if (deletingPlan === null) {
             return;
@@ -281,14 +297,23 @@ export default function FinancingPlansIndex({
         setDeleteSubmitting(true);
         router.delete(`/financing-plans/${deletingPlan.id}`, {
             preserveScroll: true,
-            data: {
-                redirect_year: defaultYear,
-                redirect_month: defaultMonth,
-            },
+            data: financingPlansRedirectPayload(),
             onFinish: () => {
                 setDeleteSubmitting(false);
                 setDeletingPlan(null);
             },
+        });
+    }
+
+    function archivePlan(plan: PlanRow): void {
+        router.post(`/financing-plans/${plan.id}/archive`, financingPlansRedirectPayload(), {
+            preserveScroll: true,
+        });
+    }
+
+    function unarchivePlan(plan: PlanRow): void {
+        router.post(`/financing-plans/${plan.id}/unarchive`, financingPlansRedirectPayload(), {
+            preserveScroll: true,
         });
     }
 
@@ -318,10 +343,48 @@ export default function FinancingPlansIndex({
                 </div>
 
                 <section className="flex flex-col gap-3" aria-label={t('financing_plans.list_heading')}>
-                    <h3 className="text-sm font-medium text-foreground">{t('financing_plans.list_heading')}</h3>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                        <h3 className="text-sm font-medium text-foreground">{t('financing_plans.list_heading')}</h3>
+                        <div className="flex flex-wrap gap-2" role="group" aria-label={t('financing_plans.filter_group_aria')}>
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant={listFilter === 'active' ? 'default' : 'outline'}
+                                className="h-9"
+                                onClick={() =>
+                                    router.get(
+                                        '/financing-plans',
+                                        { year: defaultYear, month: defaultMonth },
+                                        { preserveScroll: true },
+                                    )
+                                }
+                            >
+                                {t('financing_plans.filter_active')}
+                            </Button>
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant={listFilter === 'archived' ? 'default' : 'outline'}
+                                className="h-9"
+                                onClick={() =>
+                                    router.get(
+                                        '/financing-plans',
+                                        {
+                                            year: defaultYear,
+                                            month: defaultMonth,
+                                            filter: 'archived',
+                                        },
+                                        { preserveScroll: true },
+                                    )
+                                }
+                            >
+                                {t('financing_plans.filter_archived')}
+                            </Button>
+                        </div>
+                    </div>
                     {plans.length === 0 ? (
                         <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
-                            {t('financing_plans.empty')}
+                            {listFilter === 'archived' ? t('financing_plans.empty_archived') : t('financing_plans.empty')}
                         </p>
                     ) : (
                         <ul className="m-0 flex min-w-0 max-w-full list-none flex-col gap-1.5 p-0">
@@ -356,6 +419,43 @@ export default function FinancingPlansIndex({
                                                     {t('financing_plans.plan_installments_label')}: {plan.installments_count}
                                                 </p>
                                             </div>
+                                            {listFilter === 'active' ? (
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="size-9 shrink-0"
+                                                            onClick={() => archivePlan(plan)}
+                                                            aria-label={t('financing_plans.archive_plan_aria')}
+                                                        >
+                                                            <Archive className="size-4" aria-hidden />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent side="top" sideOffset={4}>
+                                                        {t('financing_plans.archive_plan_tooltip')}
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            ) : (
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="size-9 shrink-0"
+                                                            onClick={() => unarchivePlan(plan)}
+                                                            aria-label={t('financing_plans.unarchive_plan_aria')}
+                                                        >
+                                                            <ArchiveRestore className="size-4" aria-hidden />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent side="top" sideOffset={4}>
+                                                        {t('financing_plans.unarchive_plan_tooltip')}
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            )}
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Button

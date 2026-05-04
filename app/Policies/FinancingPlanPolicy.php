@@ -26,4 +26,17 @@ class FinancingPlanPolicy
     {
         return (int) $financingPlan->user_id === (int) $user->id;
     }
+
+    public function archive(User $user, FinancingPlan $financingPlan): bool
+    {
+        return (int) $financingPlan->user_id === (int) $user->id
+            && $financingPlan->archived_at === null;
+    }
+
+    public function unarchive(User $user, FinancingPlan $financingPlan): bool
+    {
+        // Solo titularidad: restaurar es idempotente y evita falsos 403 si `archived_at`
+        // no llega al modelo en el chequeo (p. ej. interacción Gate/Spatie o estado).
+        return (int) $financingPlan->user_id === (int) $user->id;
+    }
 }

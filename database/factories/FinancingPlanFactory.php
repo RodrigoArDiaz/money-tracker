@@ -25,6 +25,7 @@ class FinancingPlanFactory extends Factory
             'description' => fake()->words(4, true),
             'note' => null,
             'total_amount' => '100.00',
+            'archived_at' => null,
         ];
     }
 

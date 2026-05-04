@@ -130,6 +130,117 @@ class FinancingPlanTest extends TestCase
     }
 
     #[Test]
+    public function archiving_plan_hides_it_from_active_list_and_shows_under_archived_filter(): void
+    {
+        $this->artisan('default-expense-categories:sync');
+
+        $this->travelTo(Carbon::parse('2026-05-10 12:00:00', 'UTC'));
+
+        $user = User::factory()->create();
+        $category = ExpenseCategory::query()->system()->firstOrFail();
+
+        $this->actingAs($user)->post(route('financing-plans.store'), [
+            'creation_mode' => 'total_and_count',
+            'description' => 'Archive me',
+            'expense_category_id' => $category->id,
+            'total_amount' => '40.00',
+            'installment_count' => 2,
+            'start_year' => 2026,
+            'start_month' => 6,
+            'redirect_year' => 2026,
+            'redirect_month' => 6,
+        ]);
+
+        $plan = FinancingPlan::query()->where('user_id', $user->id)->firstOrFail();
+        $this->assertNull($plan->archived_at);
+
+        $this->actingAs($user)
+            ->post(route('financing-plans.archive', $plan), [
+                'redirect_year' => 2026,
+                'redirect_month' => 6,
+            ])
+            ->assertRedirect(route('financing-plans.index', ['year' => 2026, 'month' => 6]))
+            ->assertSessionHas('success', __('frontend.financing_plans.flash.archived'));
+
+        $plan->refresh();
+        $this->assertNotNull($plan->archived_at);
+
+        $this->actingAs($user)
+            ->get(route('financing-plans.index', ['year' => 2026, 'month' => 6]))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('FinancingPlans/Index')
+                ->has('plans', 0));
+
+        $this->actingAs($user)
+            ->get(route('financing-plans.index', [
+                'year' => 2026,
+                'month' => 6,
+                'filter' => 'archived',
+            ]))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('FinancingPlans/Index')
+                ->where('listFilter', 'archived')
+                ->has('plans', 1)
+                ->where('plans.0.description', 'Archive me'));
+
+        $this->travelBack();
+    }
+
+    #[Test]
+    public function user_can_unarchive_plan(): void
+    {
+        $this->artisan('default-expense-categories:sync');
+
+        $this->travelTo(Carbon::parse('2026-05-10 12:00:00', 'UTC'));
+
+        $user = User::factory()->create();
+        $category = ExpenseCategory::query()->system()->firstOrFail();
+
+        $this->actingAs($user)->post(route('financing-plans.store'), [
+            'creation_mode' => 'total_and_count',
+            'description' => 'Restore me',
+            'expense_category_id' => $category->id,
+            'total_amount' => '25.00',
+            'installment_count' => 2,
+            'start_year' => 2026,
+            'start_month' => 6,
+            'redirect_year' => 2026,
+            'redirect_month' => 6,
+        ]);
+
+        $plan = FinancingPlan::query()->where('user_id', $user->id)->firstOrFail();
+        $plan->update(['archived_at' => now()]);
+
+        $this->actingAs($user)
+            ->post(route('financing-plans.unarchive', $plan), [
+                'redirect_year' => 2026,
+                'redirect_month' => 6,
+                'filter' => 'archived',
+            ])
+            ->assertRedirect(route('financing-plans.index', [
+                'year' => 2026,
+                'month' => 6,
+                'filter' => 'archived',
+            ]))
+            ->assertSessionHas('success', __('frontend.financing_plans.flash.restored'));
+
+        $plan->refresh();
+        $this->assertNull($plan->archived_at);
+
+        $this->actingAs($user)
+            ->get(route('financing-plans.index', ['year' => 2026, 'month' => 6]))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('FinancingPlans/Index')
+                ->has('plans', 1)
+                ->where('plans.0.description', 'Restore me'));
+
+        $this->travelBack();
+    }
+
+    #[Test]
     public function user_cannot_delete_single_financing_installment_row(): void
     {
         $this->artisan('default-expense-categories:sync');

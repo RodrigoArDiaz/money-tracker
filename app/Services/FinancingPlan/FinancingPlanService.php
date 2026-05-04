@@ -97,6 +97,16 @@ class FinancingPlanService
         });
     }
 
+    public function archiveOwnedPlan(FinancingPlan $plan): void
+    {
+        $plan->update(['archived_at' => now()]);
+    }
+
+    public function unarchiveOwnedPlan(FinancingPlan $plan): void
+    {
+        $plan->update(['archived_at' => null]);
+    }
+
     public function deleteOwnedPlan(FinancingPlan $plan): void
     {
         $plan->delete();

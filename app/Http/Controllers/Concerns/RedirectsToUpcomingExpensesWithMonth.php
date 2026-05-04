@@ -58,9 +58,15 @@ trait RedirectsToUpcomingExpensesWithMonth
             $year = (int) now()->year;
         }
 
-        return redirect()->route('financing-plans.index', [
+        $query = [
             'year' => $year,
             'month' => $month,
-        ]);
+        ];
+        $filter = $request->input('filter') ?? $request->query('filter');
+        if ($filter === 'archived') {
+            $query['filter'] = 'archived';
+        }
+
+        return redirect()->route('financing-plans.index', $query);
     }
 }
