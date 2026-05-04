@@ -60,7 +60,9 @@ function AppSidebar() {
     const { t } = useTranslate();
     const pathOnly = url.split('?')[0] ?? '';
     const isUpcomingRecurring = pathOnly === '/upcoming-expenses/recurring';
+    const isFinancingPlans = pathOnly === '/financing-plans';
     const isUpcomingPlanned = pathOnly === '/upcoming-expenses';
+    const isUpcomingSectionActive = isUpcomingPlanned || isUpcomingRecurring || isFinancingPlans;
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -101,7 +103,7 @@ function AppSidebar() {
                             <SidebarMenuItem>
                                 <SidebarMenuButton
                                     asChild
-                                    isActive={isUpcomingPlanned}
+                                    isActive={isUpcomingSectionActive}
                                     tooltip={t('upcoming_expenses.nav_label')}
                                 >
                                     <Link href="/upcoming-expenses">
@@ -114,6 +116,13 @@ function AppSidebar() {
                                         <SidebarMenuSubButton asChild isActive={isUpcomingRecurring} size="sm">
                                             <Link href="/upcoming-expenses/recurring">
                                                 <span>{t('upcoming_expenses.recurring.nav_sublabel')}</span>
+                                            </Link>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton asChild isActive={isFinancingPlans} size="sm">
+                                            <Link href="/financing-plans">
+                                                <span>{t('financing_plans.nav_sublabel')}</span>
                                             </Link>
                                         </SidebarMenuSubButton>
                                     </SidebarMenuSubItem>

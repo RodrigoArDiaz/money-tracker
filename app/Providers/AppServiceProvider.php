@@ -3,9 +3,12 @@
 namespace App\Providers;
 
 use App\Models\Expense;
+use App\Models\FinancingPlan;
 use App\Models\UpcomingExpense;
 use App\Models\UpcomingExpenseRecurringTemplate;
+use App\Policies\FinancingPlanPolicy;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -25,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(FinancingPlan::class, FinancingPlanPolicy::class);
+
         Route::bind('expense', function (string $value): Expense {
             return Expense::query()
                 ->whereKey($value)
@@ -41,6 +46,13 @@ class AppServiceProvider extends ServiceProvider
 
         Route::bind('recurring_template', function (string $value): UpcomingExpenseRecurringTemplate {
             return UpcomingExpenseRecurringTemplate::query()
+                ->whereKey($value)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+        });
+
+        Route::bind('financing_plan', function (string $value): FinancingPlan {
+            return FinancingPlan::query()
                 ->whereKey($value)
                 ->where('user_id', Auth::id())
                 ->firstOrFail();

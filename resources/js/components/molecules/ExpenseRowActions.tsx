@@ -11,6 +11,8 @@ export function ExpenseRowActions({
     deleteAriaLabel,
     editTooltip,
     deleteTooltip,
+    showEdit = true,
+    showDelete = true,
 }: {
     onEdit: () => void;
     onDelete: () => void;
@@ -18,43 +20,55 @@ export function ExpenseRowActions({
     deleteAriaLabel: string;
     editTooltip: string;
     deleteTooltip: string;
-}): React.ReactElement {
+    /** Si es false, no se muestra editar (p. ej. cuotas de un plan de financiación). */
+    showEdit?: boolean;
+    /** Si es false, solo se muestra editar (p. ej. cuotas de un plan de financiación). */
+    showDelete?: boolean;
+}): React.ReactElement | null {
+    if (!showEdit && !showDelete) {
+        return null;
+    }
+
     return (
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="shrink-0"
-                        onClick={onEdit}
-                        aria-label={editAriaLabel}
-                    >
-                        <Pencil className="size-4" aria-hidden />
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={4}>
-                    {editTooltip}
-                </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onClick={onDelete}
-                        aria-label={deleteAriaLabel}
-                    >
-                        <Trash2 className="size-4" aria-hidden />
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={4}>
-                    {deleteTooltip}
-                </TooltipContent>
-            </Tooltip>
+            {showEdit ? (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="shrink-0"
+                            onClick={onEdit}
+                            aria-label={editAriaLabel}
+                        >
+                            <Pencil className="size-4" aria-hidden />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" sideOffset={4}>
+                        {editTooltip}
+                    </TooltipContent>
+                </Tooltip>
+            ) : null}
+            {showDelete ? (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            onClick={onDelete}
+                            aria-label={deleteAriaLabel}
+                        >
+                            <Trash2 className="size-4" aria-hidden />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" sideOffset={4}>
+                        {deleteTooltip}
+                    </TooltipContent>
+                </Tooltip>
+            ) : null}
         </div>
     );
 }

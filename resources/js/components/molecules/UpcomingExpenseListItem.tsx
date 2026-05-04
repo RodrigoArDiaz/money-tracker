@@ -18,11 +18,14 @@ import { formatAmountDisplay } from '@/lib/expense-format';
 import { ExpenseCategoryIcon } from '@/lib/expense-category-icons';
 import { INLINE_FORM_SELECT_TRIGGER_CLASS } from '@/lib/inline-form-select-trigger';
 import { cn } from '@/lib/utils';
-import { RefreshCw } from 'lucide-react';
+import { Info, RefreshCw } from 'lucide-react';
 
 export type UpcomingExpenseRow = {
     id: number;
     recurring_template_id: number | null;
+    financing_plan_id: number | null;
+    plan_installment_number: number | null;
+    plan_installment_total: number | null;
     expense_category_id: number | null;
     category_name: string;
     category_icon: string | null;
@@ -79,6 +82,19 @@ export function UpcomingExpenseListItem({
             </Badge>
         ) : null;
 
+    const financingPlanBadge =
+        row.financing_plan_id !== null &&
+        row.plan_installment_number !== null &&
+        row.plan_installment_total !== null &&
+        row.plan_installment_total > 0 ? (
+            <Badge variant="outline" className="shrink-0 font-normal">
+                {t('financing_plans.installment_badge', {
+                    current: row.plan_installment_number,
+                    total: row.plan_installment_total,
+                })}
+            </Badge>
+        ) : null;
+
     const noteBlock =
         row.note !== null && row.note.trim() !== '' ? (
             <p className="min-w-0 whitespace-pre-wrap break-words text-sm leading-snug text-muted-foreground">{row.note}</p>
@@ -103,12 +119,15 @@ export function UpcomingExpenseListItem({
                 </p>
                 {kindBadge}
                 {recurringBadge}
+                {financingPlanBadge}
             </div>
         </div>
     );
 
     const makeRecurringControl =
-        onMakeRecurring !== undefined && row.recurring_template_id === null ? (
+        onMakeRecurring !== undefined &&
+        row.recurring_template_id === null &&
+        row.financing_plan_id === null ? (
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button
@@ -124,6 +143,26 @@ export function UpcomingExpenseListItem({
                 </TooltipTrigger>
                 <TooltipContent side="top" sideOffset={4}>
                     {t('upcoming_expenses.recurring.make_recurring_tooltip')}
+                </TooltipContent>
+            </Tooltip>
+        ) : null;
+
+    const financingPlanInfoControl =
+        row.financing_plan_id !== null ? (
+            <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="size-8 shrink-0"
+                        aria-label={t('upcoming_expenses.financing_plan_info_aria')}
+                    >
+                        <Info className="size-4 text-primary/90" aria-hidden />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs font-normal leading-snug" side="top" sideOffset={6}>
+                    {t('upcoming_expenses.financing_plan_info_tooltip')}
                 </TooltipContent>
             </Tooltip>
         ) : null;
@@ -184,6 +223,8 @@ export function UpcomingExpenseListItem({
             deleteAriaLabel={t('upcoming_expenses.card_delete_aria')}
             editTooltip={t('upcoming_expenses.card_edit_tooltip')}
             deleteTooltip={t('upcoming_expenses.card_delete_tooltip')}
+            showEdit={row.financing_plan_id === null}
+            showDelete={row.financing_plan_id === null}
         />
     );
 
@@ -207,6 +248,7 @@ export function UpcomingExpenseListItem({
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                         {makeRecurringControl}
+                        {financingPlanInfoControl}
                         {expenseActions}
                     </div>
                 </div>
@@ -231,6 +273,7 @@ export function UpcomingExpenseListItem({
                         </div>
                         <div className="flex shrink-0 items-center gap-2 sm:justify-end">
                             {makeRecurringControl}
+                            {financingPlanInfoControl}
                             {expenseActions}
                         </div>
                     </div>

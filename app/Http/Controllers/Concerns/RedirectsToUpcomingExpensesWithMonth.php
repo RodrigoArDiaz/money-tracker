@@ -44,4 +44,29 @@ trait RedirectsToUpcomingExpensesWithMonth
             'month' => $month,
         ]);
     }
+
+    protected function redirectToFinancingPlansWithMonth(Request $request): RedirectResponse
+    {
+        $year = (int) ($request->input('redirect_year') ?? $request->query('redirect_year') ?? now()->year);
+        $month = (int) ($request->input('redirect_month') ?? $request->query('redirect_month') ?? now()->month);
+
+        if ($month < 1 || $month > 12) {
+            $month = (int) now()->month;
+        }
+
+        if ($year < 2000 || $year > 2100) {
+            $year = (int) now()->year;
+        }
+
+        $query = [
+            'year' => $year,
+            'month' => $month,
+        ];
+        $filter = $request->input('filter') ?? $request->query('filter');
+        if ($filter === 'archived') {
+            $query['filter'] = 'archived';
+        }
+
+        return redirect()->route('financing-plans.index', $query);
+    }
 }
