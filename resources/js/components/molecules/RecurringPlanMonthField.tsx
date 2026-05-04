@@ -175,6 +175,7 @@ export function RecurringPlanMonthField({
                             <select
                                 id={yearSelectId}
                                 className={cn(
+                                    'month-picker-year-native',
                                     'h-9 w-full min-w-0 cursor-pointer rounded-lg border border-input bg-background px-2.5 py-1',
                                     'text-sm text-foreground outline-none transition-colors',
                                     'focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50',
