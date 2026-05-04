@@ -174,7 +174,7 @@ function UserMenu({ user }: { user: AuthUser }) {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 gap-2 rounded-lg px-2">
-                    <Avatar className="size-8">
+                    <Avatar className="size-6">
                         <AvatarFallback className="text-xs">{initialsFromName(user.name)}</AvatarFallback>
                     </Avatar>
                     <span className="hidden max-w-[10rem] truncate text-sm font-medium md:inline">{user.name}</span>
