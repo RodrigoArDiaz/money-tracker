@@ -494,7 +494,9 @@ export default function UpcomingExpenses({
                                         : t('expenses.open_category_picker_aria')
                                 }
                             >
-                                <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                {selectedCategory === null ? (
+                                    <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                ) : null}
                                 {selectedCategory ? (
                                     <>
                                         <ExpenseCategoryIcon
@@ -669,7 +671,9 @@ export default function UpcomingExpenses({
                                 }
                                 aria-invalid={editForm.errors.expense_category_id ? true : undefined}
                             >
-                                <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                {editSelectedCategory === null ? (
+                                    <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                ) : null}
                                 {editSelectedCategory ? (
                                     <>
                                         <ExpenseCategoryIcon
