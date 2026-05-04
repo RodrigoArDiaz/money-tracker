@@ -79,6 +79,42 @@ class InsertDefaultExpenseCategoriesCommand extends Command
                 'sort_order' => 5,
                 'names' => ['es' => 'Regalo', 'en' => 'Gift'],
             ],
+            [
+                'slug' => 'entertainment',
+                'icon' => 'Film',
+                'sort_order' => 6,
+                'names' => ['es' => 'Entretenimiento', 'en' => 'Entertainment'],
+            ],
+            [
+                'slug' => 'education',
+                'icon' => 'GraduationCap',
+                'sort_order' => 7,
+                'names' => ['es' => 'Educación', 'en' => 'Education'],
+            ],
+            [
+                'slug' => 'repairs',
+                'icon' => 'Wrench',
+                'sort_order' => 8,
+                'names' => ['es' => 'Reparaciones', 'en' => 'Repairs'],
+            ],
+            [
+                'slug' => 'pets',
+                'icon' => 'PawPrint',
+                'sort_order' => 9,
+                'names' => ['es' => 'Mascotas', 'en' => 'Pets'],
+            ],
+            [
+                'slug' => 'donations',
+                'icon' => 'Heart',
+                'sort_order' => 10,
+                'names' => ['es' => 'Donaciones', 'en' => 'Donations'],
+            ],
+            [
+                'slug' => 'snacks',
+                'icon' => 'Cookie',
+                'sort_order' => 11,
+                'names' => ['es' => 'Snacks', 'en' => 'Snacks'],
+            ],
         ];
     }
 }

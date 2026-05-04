@@ -13,16 +13,20 @@ class DefaultExpenseCategorySyncCommandTest extends TestCase
     use LazilyRefreshDatabase;
 
     #[Test]
-    public function sync_command_inserts_five_system_categories_with_json_names(): void
+    public function sync_command_inserts_system_categories_with_json_names(): void
     {
         $exit = Artisan::call('default-expense-categories:sync');
 
         $this->assertSame(0, $exit);
-        $this->assertSame(5, ExpenseCategory::query()->system()->count());
+        $this->assertSame(11, ExpenseCategory::query()->system()->count());
 
         $food = ExpenseCategory::query()->system()->where('slug', 'food')->firstOrFail();
         $this->assertSame('Pizza', $food->icon);
         $this->assertSame(['es' => 'Comida', 'en' => 'Food'], $food->names);
+
+        $education = ExpenseCategory::query()->system()->where('slug', 'education')->firstOrFail();
+        $this->assertSame('GraduationCap', $education->icon);
+        $this->assertSame(['es' => 'Educación', 'en' => 'Education'], $education->names);
     }
 
     #[Test]
@@ -31,6 +35,6 @@ class DefaultExpenseCategorySyncCommandTest extends TestCase
         Artisan::call('default-expense-categories:sync');
         Artisan::call('default-expense-categories:sync');
 
-        $this->assertSame(5, ExpenseCategory::query()->system()->count());
+        $this->assertSame(11, ExpenseCategory::query()->system()->count());
     }
 }
