@@ -9,6 +9,7 @@ import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
 import { RecurringPlanMonthField } from '@/components/molecules/RecurringPlanMonthField';
 import { RecurringTemplateListItem, type RecurringTemplateListRow } from '@/components/molecules/RecurringTemplateListItem';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -370,9 +371,16 @@ export default function UpcomingExpensesRecurring({
                     )}
                 >
                     <div className="min-w-0 flex-1">
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                            {t('upcoming_expenses.recurring.section_intro')}
-                        </p>
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="intro">
+                                <AccordionTrigger>{t('upcoming_expenses.recurring.section_intro_accordion_label')}</AccordionTrigger>
+                                <AccordionContent>
+                                    <p className="text-sm leading-relaxed text-muted-foreground">
+                                        {t('upcoming_expenses.recurring.section_intro')}
+                                    </p>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                     </div>
                     <Button
                         type="button"

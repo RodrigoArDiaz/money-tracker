@@ -9,6 +9,7 @@ import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
 import { FinancingPlanListItem } from '@/components/molecules/FinancingPlanListItem';
 import { RecurringPlanMonthField } from '@/components/molecules/RecurringPlanMonthField';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -328,7 +329,14 @@ export default function FinancingPlansIndex({
                     )}
                 >
                     <div className="min-w-0 flex-1">
-                        <p className="text-sm leading-relaxed text-muted-foreground">{t('financing_plans.section_intro')}</p>
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="intro">
+                                <AccordionTrigger>{t('financing_plans.section_intro_accordion_label')}</AccordionTrigger>
+                                <AccordionContent>
+                                    <p className="text-sm leading-relaxed text-muted-foreground">{t('financing_plans.section_intro')}</p>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                     </div>
                     <Button
                         type="button"

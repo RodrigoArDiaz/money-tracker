@@ -7,6 +7,7 @@ import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import FormField from '@/components/molecules/FormField';
 import { ExpenseCategoryIconGrid } from '@/components/molecules/ExpenseCategoryIconGrid';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -165,9 +166,16 @@ export default function Index({
                     )}
                 >
                     <div className="min-w-0 flex-1">
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                            {t('expense_categories.index_description')}
-                        </p>
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="intro">
+                                <AccordionTrigger>{t('expense_categories.index_description_accordion_label')}</AccordionTrigger>
+                                <AccordionContent>
+                                    <p className="text-sm leading-relaxed text-muted-foreground">
+                                        {t('expense_categories.index_description')}
+                                    </p>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                     </div>
                     <Button
                         type="button"
