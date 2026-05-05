@@ -106,7 +106,7 @@ export function HomeExpenseListItem({
                             {categoryDisplayName}
                         </p>
                     </div>
-                    <p className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground">
+                    <p className="shrink-0 text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
                         {formatAmountDisplay(row.amount, locale)}
                     </p>
                 </div>
@@ -117,7 +117,7 @@ export function HomeExpenseListItem({
             <div className="hidden items-center gap-1.5 sm:flex sm:gap-2">
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                     {categoryTitleRow}
-                    <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
+                    <p className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
                         {formatAmountDisplay(row.amount, locale)}
                     </p>
                 </div>

@@ -388,7 +388,7 @@ export default function UpcomingExpenses({
                                             {t('upcoming_expenses.total_all_caption')}
                                         </p>
                                         <p
-                                            className="text-xl font-semibold tabular-nums tracking-tight text-foreground"
+                                            className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm"
                                             aria-label={t('upcoming_expenses.total_all_aria', { amount: totalDisplay })}
                                         >
                                             {totalDisplay}
@@ -404,7 +404,7 @@ export default function UpcomingExpenses({
                                             {t('upcoming_expenses.total_unpaid_caption')}
                                         </p>
                                         <p
-                                            className="text-xl font-semibold tabular-nums tracking-tight text-foreground"
+                                            className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm"
                                             aria-label={t('upcoming_expenses.total_unpaid_aria', {
                                                 amount: unpaidDisplay,
                                             })}
