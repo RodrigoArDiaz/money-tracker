@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
+import FullscreenToggle from '@/components/molecules/FullscreenToggle';
 import LocaleSwitcher from '@/components/molecules/LocaleSwitcher';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
 import AuthPanelDivider from '@/components/atoms/AuthPanelDivider';
@@ -33,6 +34,7 @@ export default function Register({ canRegisterWithGoogle }: RegisterProps) {
         <div className="relative flex min-h-screen items-center justify-center bg-background px-4 py-10 text-foreground">
             <div className="fixed right-4 top-4 z-50 flex items-center gap-1">
                 <LocaleSwitcher align="end" />
+                <FullscreenToggle />
                 <ThemeMenu align="end" />
             </div>
             <Head title={t('register.head_title')} />
