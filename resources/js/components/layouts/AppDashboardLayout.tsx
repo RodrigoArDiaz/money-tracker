@@ -76,7 +76,7 @@ function AppSidebar() {
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">Money Tracker</span>
-                                    <span className="truncate text-xs text-sidebar-foreground/70">{t('layout.panel')}</span>
+                                    {/* <span className="truncate text-xs text-sidebar-foreground/70">{t('layout.panel')}</span> */}
                                 </div>
                             </Link>
                         </SidebarMenuButton>
@@ -158,9 +158,9 @@ function AppSidebar() {
             </SidebarContent>
             <SidebarSeparator />
             <SidebarFooter className="p-2">
-                <p className="px-2 text-xs text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
+                {/* <p className="px-2 text-xs text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
                     {t('layout.footer_hint')}
-                </p>
+                </p> */}
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>
@@ -174,7 +174,7 @@ function UserMenu({ user }: { user: AuthUser }) {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 gap-2 rounded-lg px-2">
-                    <Avatar className="size-8">
+                    <Avatar className="size-6">
                         <AvatarFallback className="text-xs">{initialsFromName(user.name)}</AvatarFallback>
                     </Avatar>
                     <span className="hidden max-w-[10rem] truncate text-sm font-medium md:inline">{user.name}</span>
