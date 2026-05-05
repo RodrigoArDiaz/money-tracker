@@ -5,21 +5,7 @@ import ReactApexChart from 'react-apexcharts';
 import { useTheme } from '@/components/theme-provider';
 import { useTranslate } from '@/hooks/use-translate';
 import { formatAmountDisplay } from '@/lib/expense-format';
-
-const SERIES_COLORS = [
-    '#6366f1',
-    '#8b5cf6',
-    '#ec4899',
-    '#14b8a6',
-    '#f59e0b',
-    '#ef4444',
-    '#22c55e',
-    '#3b82f6',
-    '#a855f7',
-    '#f97316',
-    '#84cc16',
-    '#06b6d4',
-];
+import { DONUT_CATEGORY_COLORS, sliceDataLabelTextColors } from '@/lib/theme-chart-colors';
 
 type Row = { id: number; name: string; total: string };
 
@@ -37,7 +23,8 @@ export function CategorySpendingDonutChart({
     const { resolvedTheme } = useTheme();
     const { locale } = useTranslate();
     const isDark = resolvedTheme === 'dark';
-    const labelColor = isDark ? '#e5e7eb' : '#1f2937';
+    /** Texto del centro del donut: mismo tono que foreground del tema (olive base). */
+    const centerLabelColor = isDark ? 'oklch(0.988 0.003 106.5)' : 'oklch(0.153 0.006 107.1)';
 
     const totalNumeric = React.useMemo(
         () => rows.reduce((acc, r) => acc + Number.parseFloat(r.total), 0),
@@ -54,6 +41,13 @@ export function CategorySpendingDonutChart({
         };
     }, [rows]);
 
+    const sliceColors = React.useMemo(
+        () => DONUT_CATEGORY_COLORS.slice(0, Math.max(rows.length, 1)),
+        [rows.length],
+    );
+
+    const arcPercentColors = React.useMemo(() => sliceDataLabelTextColors(sliceColors), [sliceColors]);
+
     const options = React.useMemo<ApexOptions>(
         () => ({
             chart: {
@@ -66,11 +60,24 @@ export function CategorySpendingDonutChart({
             },
             labels,
             theme: { mode: isDark ? 'dark' : 'light' },
-            colors: SERIES_COLORS.slice(0, Math.max(rows.length, 1)),
+            colors: sliceColors,
             dataLabels: {
                 enabled: true,
                 formatter: (val: string | number | undefined) =>
                     val !== undefined && val !== null ? `${Number(val).toFixed(1)}%` : '',
+                style: {
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    colors: arcPercentColors,
+                },
+                dropShadow: {
+                    enabled: true,
+                    top: 0,
+                    left: 0,
+                    blur: 2,
+                    opacity: 0.28,
+                    color: '#000000',
+                },
             },
             legend: {
                 show: false,
@@ -81,10 +88,10 @@ export function CategorySpendingDonutChart({
                         size: '70%',
                         labels: {
                             show: rows.length > 0,
-                            name: { color: labelColor },
+                            name: { color: centerLabelColor },
                             // Al pasar el cursor por un arco, el centro muestra categoría + monto (Apex pasa el valor de la serie).
                             value: {
-                                color: labelColor,
+                                color: centerLabelColor,
                                 formatter: (val: string) => {
                                     const n = Number.parseFloat(String(val).replaceAll(',', ''));
                                     if (Number.isNaN(n)) {
@@ -97,7 +104,7 @@ export function CategorySpendingDonutChart({
                             total: {
                                 show: rows.length > 0,
                                 label: valueLabel,
-                                color: labelColor,
+                                color: centerLabelColor,
                                 formatter: () => totalFormatted,
                             },
                         },
@@ -106,12 +113,16 @@ export function CategorySpendingDonutChart({
             },
             stroke: { width: 0 },
             tooltip: {
+                fillSeriesColor: false,
+                style: {
+                    fontSize: '13px',
+                },
                 y: {
                     formatter: (val: number) => formatAmountDisplay(val.toFixed(2), locale),
                 },
             },
         }),
-        [isDark, labels, labelColor, locale, rows.length, totalFormatted, valueLabel],
+        [arcPercentColors, centerLabelColor, isDark, labels, locale, rows.length, sliceColors, totalFormatted, valueLabel],
     );
 
     if (rows.length === 0) {
@@ -119,7 +130,11 @@ export function CategorySpendingDonutChart({
     }
 
     return (
-        <div className="w-full overflow-visible" role="img" aria-label={chartAriaLabel}>
+        <div
+            className="category-spending-donut-chart w-full overflow-visible"
+            role="img"
+            aria-label={chartAriaLabel}
+        >
             <ReactApexChart options={options} series={series} type="donut" height={320} />
         </div>
     );

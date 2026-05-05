@@ -194,7 +194,7 @@ export function HomeMonthPicker({
                                         'h-9 px-1 text-xs font-normal transition-colors',
                                         !disabled &&
                                             isCalendarCurrentMonth &&
-                                            'border-2 border-emerald-600/65 bg-emerald-500/[0.15] font-medium text-emerald-950 hover:bg-emerald-500/[0.24] hover:text-emerald-950 dark:border-emerald-500/55 dark:bg-emerald-950/45 dark:text-emerald-50 dark:hover:bg-emerald-950/65 dark:hover:text-emerald-50',
+                                            'border-2 border-theme-green-4/65 bg-theme-green-3/[0.15] font-medium text-theme-green-5 hover:bg-theme-green-3/[0.24] hover:text-theme-green-5 dark:border-theme-green-3/55 dark:bg-theme-green-5/45 dark:text-theme-green-1 dark:hover:bg-theme-green-5/65 dark:hover:text-theme-green-1',
                                         !disabled &&
                                             !isCalendarCurrentMonth &&
                                             isCalendarNextMonth &&
@@ -217,7 +217,7 @@ export function HomeMonthPicker({
                     >
                         <span className="inline-flex items-center gap-2">
                             <span
-                                className="inline-block size-3 shrink-0 rounded-[3px] border-2 border-emerald-600/75 bg-emerald-500/20 dark:border-emerald-500/65 dark:bg-emerald-950/50"
+                                className="inline-block size-3 shrink-0 rounded-[3px] border-2 border-theme-green-4/75 bg-theme-green-3/20 dark:border-theme-green-3/65 dark:bg-theme-green-5/50"
                                 aria-hidden
                             />
                             {t('expenses.month_picker_legend_current')}

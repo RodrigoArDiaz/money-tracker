@@ -59,6 +59,21 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+    /* Gamas theme green / theme red (generator ui.shadcn.com, base olive) */
+    --color-theme-green-1: var(--theme-green-1);
+    --color-theme-green-2: var(--theme-green-2);
+    --color-theme-green-3: var(--theme-green-3);
+    --color-theme-green-4: var(--theme-green-4);
+    --color-theme-green-5: var(--theme-green-5);
+    --color-theme-green: var(--theme-green);
+    --color-theme-green-foreground: var(--theme-green-foreground);
+    --color-theme-red-1: var(--theme-red-1);
+    --color-theme-red-2: var(--theme-red-2);
+    --color-theme-red-3: var(--theme-red-3);
+    --color-theme-red-4: var(--theme-red-4);
+    --color-theme-red-5: var(--theme-red-5);
+    --color-theme-red: var(--theme-red);
+    --color-theme-red-foreground: var(--theme-red-foreground);
 }
 
 :root {
@@ -94,6 +109,22 @@
     --sidebar-accent-foreground: oklch(0.228 0.013 107.4);
     --sidebar-border: oklch(0.93 0.007 106.5);
     --sidebar-ring: oklch(0.737 0.021 106.9);
+    /* Theme “green” (shadcn generator): escala chart + primary */
+    --theme-green-1: oklch(0.871 0.15 154.449);
+    --theme-green-2: oklch(0.723 0.219 149.579);
+    --theme-green-3: oklch(0.627 0.194 149.214);
+    --theme-green-4: oklch(0.527 0.154 150.069);
+    --theme-green-5: oklch(0.448 0.119 151.328);
+    --theme-green: oklch(0.527 0.154 150.069);
+    --theme-green-foreground: oklch(0.982 0.018 155.826);
+    /* Theme “red” (shadcn generator): escala chart + primary */
+    --theme-red-1: oklch(0.808 0.114 19.571);
+    --theme-red-2: oklch(0.637 0.237 25.331);
+    --theme-red-3: oklch(0.577 0.245 27.325);
+    --theme-red-4: oklch(0.505 0.213 27.518);
+    --theme-red-5: oklch(0.444 0.177 26.899);
+    --theme-red: oklch(0.505 0.213 27.518);
+    --theme-red-foreground: oklch(0.971 0.013 17.38);
 }
 
 .dark {
@@ -128,6 +159,10 @@
     --sidebar-accent-foreground: oklch(0.988 0.003 106.5);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.58 0.031 107.3);
+    --theme-green: oklch(0.448 0.119 151.328);
+    --theme-green-foreground: oklch(0.982 0.018 155.826);
+    --theme-red: oklch(0.444 0.177 26.899);
+    --theme-red-foreground: oklch(0.971 0.013 17.38);
 }
 
 @layer base {
@@ -145,5 +180,29 @@
   .dark select.month-picker-year-native option {
     background-color: var(--popover);
     color: var(--popover-foreground);
+  }
+
+  /* ApexCharts donut (CategorySpendingDonutChart): tooltip legible en claro y oscuro */
+  .category-spending-donut-chart .apexcharts-tooltip {
+    background: var(--popover) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--popover-foreground) !important;
+    box-shadow:
+      0 10px 15px -3px oklch(0 0 0 / 0.12),
+      0 4px 6px -4px oklch(0 0 0 / 0.08);
+  }
+
+  .category-spending-donut-chart .apexcharts-tooltip-title {
+    color: var(--popover-foreground) !important;
+  }
+
+  .category-spending-donut-chart .apexcharts-tooltip-text,
+  .category-spending-donut-chart .apexcharts-tooltip-text-y-label,
+  .category-spending-donut-chart .apexcharts-tooltip-text-y-value {
+    color: var(--popover-foreground) !important;
+  }
+
+  .category-spending-donut-chart .apexcharts-tooltip-series-group {
+    color: var(--popover-foreground) !important;
   }
 }
