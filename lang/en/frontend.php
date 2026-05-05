@@ -387,6 +387,8 @@ return [
         'charts_nav_tooltip' => 'Spending by category',
         'footer_hint' => 'More sections coming soon.',
         'sign_out' => 'Sign out',
+        'fullscreen_enter_aria' => 'Enter full screen',
+        'fullscreen_exit_aria' => 'Exit full screen',
     ],
 
     'flash' => [

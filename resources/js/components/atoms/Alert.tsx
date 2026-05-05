@@ -10,7 +10,8 @@ type AlertProps = {
 
 const variantClasses: Record<AlertVariant, string> = {
     danger: 'border-destructive/30 bg-destructive/10 text-destructive',
-    success: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+    success:
+        'border-theme-green-3/30 bg-theme-green-2/12 text-theme-green-5 dark:border-theme-green-3/35 dark:bg-theme-green-5/20 dark:text-theme-green-2',
 };
 
 export default function Alert({ variant = 'danger', children, className = '' }: AlertProps) {

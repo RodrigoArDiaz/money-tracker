@@ -170,16 +170,16 @@ export function UpcomingExpenseListItem({
     const paymentStatusSelectTriggerTone =
         row.payment_status === 'paid'
             ? cn(
-                  'border-emerald-600/55 bg-emerald-500/[0.14] text-emerald-950',
-                  'hover:bg-emerald-500/22 dark:border-emerald-400/40 dark:bg-emerald-950/45 dark:text-emerald-50 dark:hover:bg-emerald-950/55',
-                  'focus-visible:border-emerald-600 focus-visible:ring-emerald-500/35 dark:focus-visible:border-emerald-400',
-                  '[&_[data-slot=select-value]]:text-inherit [&>svg:last-of-type]:text-emerald-800 dark:[&>svg:last-of-type]:text-emerald-200',
+                  'border-theme-green-4/55 bg-theme-green-3/[0.14] text-theme-green-5',
+                  'hover:bg-theme-green-3/[0.22] dark:border-theme-green-3/40 dark:bg-theme-green-5/45 dark:text-theme-green-1 dark:hover:bg-theme-green-5/55',
+                  'focus-visible:border-theme-green-4 focus-visible:ring-theme-green-3/35 dark:focus-visible:border-theme-green-3',
+                  '[&_[data-slot=select-value]]:text-inherit [&>svg:last-of-type]:text-theme-green-5 dark:[&>svg:last-of-type]:text-theme-green-2',
               )
             : cn(
-                  'border-red-600/50 bg-red-500/[0.11] text-red-950',
-                  'hover:bg-red-500/[0.17] dark:border-red-400/40 dark:bg-red-950/40 dark:text-red-50 dark:hover:bg-red-950/52',
-                  'focus-visible:border-red-600 focus-visible:ring-red-500/30 dark:focus-visible:border-red-500',
-                  '[&_[data-slot=select-value]]:text-inherit [&>svg:last-of-type]:text-red-800 dark:[&>svg:last-of-type]:text-red-200',
+                  'border-theme-red-4/50 bg-theme-red-3/[0.11] text-theme-red-5',
+                  'hover:bg-theme-red-3/[0.17] dark:border-theme-red-3/40 dark:bg-theme-red-5/40 dark:text-theme-red-1 dark:hover:bg-theme-red-5/52',
+                  'focus-visible:border-theme-red-4 focus-visible:ring-theme-red-3/30 dark:focus-visible:border-theme-red-4',
+                  '[&_[data-slot=select-value]]:text-inherit [&>svg:last-of-type]:text-theme-red-5 dark:[&>svg:last-of-type]:text-theme-red-2',
               );
 
     const paymentSelect = (

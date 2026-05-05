@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import FullscreenToggle from '@/components/molecules/FullscreenToggle';
 import LocaleSwitcher from '@/components/molecules/LocaleSwitcher';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
 import AuthLoginPanel from '@/components/organisms/AuthLoginPanel';
@@ -15,6 +16,7 @@ export default function Welcome({ canLoginWithGoogle }: WelcomeProps) {
         <div className="relative flex min-h-screen flex-col bg-background text-foreground lg:flex-row">
             <div className="fixed right-4 top-4 z-50 flex items-center gap-1">
                 <LocaleSwitcher align="end" />
+                <FullscreenToggle />
                 <ThemeMenu align="end" />
             </div>
             <Head title={t('welcome.head_title')} />

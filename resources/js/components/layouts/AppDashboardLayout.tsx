@@ -32,6 +32,7 @@ import {
     SidebarSeparator,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
+import FullscreenToggle from '@/components/molecules/FullscreenToggle';
 import LocaleSwitcher from '@/components/molecules/LocaleSwitcher';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -232,6 +233,7 @@ export default function AppDashboardLayout({
                         </div>
                         <div className="flex items-center gap-1">
                             <LocaleSwitcher align="end" />
+                            <FullscreenToggle />
                             <ThemeMenu align="end" />
                             {user ? <UserMenu user={user} /> : null}
                         </div>

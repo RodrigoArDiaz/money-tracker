@@ -222,7 +222,7 @@ export default function Index({
                                                 type="button"
                                                 variant="outline"
                                                 size="icon-sm"
-                                                className="shrink-0 border-emerald-600/35 text-emerald-600 hover:border-emerald-600/55 hover:bg-emerald-500/10 hover:text-emerald-700 dark:border-emerald-500/40 dark:text-emerald-400 dark:hover:border-emerald-400/60 dark:hover:bg-emerald-500/15 dark:hover:text-emerald-300"
+                                                className="shrink-0 border-theme-green-4/35 text-theme-green-4 hover:border-theme-green-4/55 hover:bg-theme-green-3/10 hover:text-theme-green-5 dark:border-theme-green-3/40 dark:text-theme-green-2 dark:hover:border-theme-green-3/60 dark:hover:bg-theme-green-5/15 dark:hover:text-theme-green-1"
                                                 onClick={() => openEdit(row)}
                                                 aria-label={t('expense_categories.card_edit_aria')}
                                             >

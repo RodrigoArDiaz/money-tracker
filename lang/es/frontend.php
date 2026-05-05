@@ -387,6 +387,8 @@ return [
         'charts_nav_tooltip' => 'Gastos por categoría',
         'footer_hint' => 'Más secciones próximamente.',
         'sign_out' => 'Cerrar sesión',
+        'fullscreen_enter_aria' => 'Pantalla completa',
+        'fullscreen_exit_aria' => 'Salir de pantalla completa',
     ],
 
     'flash' => [
