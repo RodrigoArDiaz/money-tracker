@@ -126,7 +126,7 @@ export function RecurringTemplateListItem({
             <div className="flex flex-col gap-3 sm:hidden">
                 <div className="flex min-w-0 flex-col gap-2">
                     {categoryTitleRow}
-                    <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
+                    <p className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
                         {formatAmountDisplay(row.amount, locale)}
                     </p>
                     <div className="flex min-w-0 flex-col gap-1.5 text-left">
@@ -140,7 +140,7 @@ export function RecurringTemplateListItem({
             <div className="hidden items-center gap-1.5 sm:flex sm:gap-2">
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                     {categoryTitleRow}
-                    <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">
+                    <p className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
                         {formatAmountDisplay(row.amount, locale)}
                     </p>
                 </div>

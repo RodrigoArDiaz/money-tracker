@@ -36,7 +36,7 @@ export function HomeTodayTotalSummaryCard({
                         </p>
                     </div>
                     <p
-                        className="shrink-0 text-lg font-semibold tabular-nums tracking-tight text-foreground"
+                        className="shrink-0 text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm"
                         aria-label={totalAria}
                     >
                         {todayTotalDisplay}
@@ -44,7 +44,7 @@ export function HomeTodayTotalSummaryCard({
                 </div>
                 <div className="flex items-start justify-between gap-3">
                     <p
-                        className="min-w-0 flex-1 text-left text-sm font-medium leading-snug text-foreground"
+                        className="min-w-0 flex-1 text-left text-xs font-medium leading-snug text-foreground sm:text-sm"
                         aria-hidden
                     >
                         {t('expenses.date_heading', { date: formattedDateHeading })}
@@ -61,14 +61,14 @@ export function HomeTodayTotalSummaryCard({
                         </p>
                     </div>
                     <p
-                        className="text-left text-lg font-semibold tabular-nums tracking-tight text-foreground"
+                        className="text-left text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm"
                         aria-label={totalAria}
                     >
                         {todayTotalDisplay}
                     </p>
                 </div>
                 <p
-                    className="shrink-0 text-right text-sm font-semibold tracking-tight text-foreground sm:text-base"
+                    className="shrink-0 text-right text-xs font-medium tracking-tight text-foreground sm:text-sm"
                     aria-hidden
                 >
                     {t('expenses.date_heading', { date: formattedDateHeading })}

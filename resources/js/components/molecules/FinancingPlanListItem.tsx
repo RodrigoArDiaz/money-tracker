@@ -98,7 +98,7 @@ export function FinancingPlanListItem({
 
     const totalAmountEl = (
         <p
-            className="text-lg font-semibold tabular-nums tracking-tight text-foreground"
+            className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm"
             aria-label={`${t('financing_plans.plan_total_label')}: ${formatAmountDisplay(plan.total_amount, locale)}`}
         >
             {formatAmountDisplay(plan.total_amount, locale)}
