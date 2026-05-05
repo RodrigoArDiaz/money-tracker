@@ -1,7 +1,7 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import * as React from 'react';
 import { NumericFormat } from 'react-number-format';
-import { ChevronDown, Plus, Tags } from 'lucide-react';
+import { AlertTriangle, ChevronDown, Plus, Tags } from 'lucide-react';
 
 import FieldError from '@/components/atoms/FieldError';
 import TextInput from '@/components/atoms/TextInput';
@@ -661,6 +661,18 @@ export default function UpcomingExpensesRecurring({
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={submitTemplateEdit} className="flex flex-col gap-3">
+                        <div
+                            className="flex gap-2.5 rounded-md border border-amber-500/35 bg-amber-500/10 px-3 py-2.5 dark:border-amber-400/30 dark:bg-amber-400/10"
+                            role="note"
+                        >
+                            <AlertTriangle
+                                className="size-5 shrink-0 text-amber-600 dark:text-amber-400"
+                                aria-hidden
+                            />
+                            <p className="text-sm leading-relaxed text-foreground">
+                                {t('upcoming_expenses.recurring.edit_template_notice')}
+                            </p>
+                        </div>
                         <div className="flex flex-col gap-0.5">
                             <label htmlFor="edit_template_category_trigger" className={compactLabelClass()}>
                                 {t('expenses.category_label')}
