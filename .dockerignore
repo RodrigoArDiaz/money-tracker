@@ -11,3 +11,4 @@ bootstrap/cache/*
 .env
 .env.backup
 .env.production
+docker-compose.prod.yml
