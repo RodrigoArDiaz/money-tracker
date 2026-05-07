@@ -14,6 +14,10 @@ services:
     env_file:
       - .env
 
+    # env_file inyecta variables pero no crea el fichero; Laravel (p. ej. key:generate) lee /var/www/.env
+    volumes:
+      - ./.env:/var/www/.env
+
     depends_on:
       - postgres
 
