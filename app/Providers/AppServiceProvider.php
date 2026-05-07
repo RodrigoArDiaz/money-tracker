@@ -7,12 +7,13 @@ use App\Models\FinancingPlan;
 use App\Models\UpcomingExpense;
 use App\Models\UpcomingExpenseRecurringTemplate;
 use App\Policies\FinancingPlanPolicy;
+use App\Providers\Telescope\TelescopeServiceProvider as AppTelescopeServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use Laravel\Telescope\TelescopeServiceProvider;
+use Laravel\Telescope\TelescopeServiceProvider as LaravelTelescopeServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,9 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if ($this->app->isLocal() && class_exists(TelescopeServiceProvider::class)) {
-            $this->app->register(TelescopeServiceProvider::class);
-            $this->app->register(\App\Providers\TelescopeServiceProvider::class);
+        if ($this->app->isLocal() && class_exists(LaravelTelescopeServiceProvider::class)) {
+            $this->app->register(LaravelTelescopeServiceProvider::class);
+            $this->app->register(AppTelescopeServiceProvider::class);
         }
     }
 

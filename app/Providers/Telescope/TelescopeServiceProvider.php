@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers;
+namespace App\Providers\Telescope;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
