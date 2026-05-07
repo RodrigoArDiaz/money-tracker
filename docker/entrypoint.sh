@@ -1,6 +1,17 @@
 #!/bin/sh
 set -e
-cd /var/www/html
+
+# Imagen CLI (Dockerfile raíz): /var/www/html · imagen FPM (docker/php/Dockerfile): /var/www
+if [ -d /var/www/html ]; then
+    APP_ROOT=/var/www/html
+elif [ -d /var/www ]; then
+    APP_ROOT=/var/www
+else
+    echo "entrypoint: no se encontró el directorio de la app (/var/www/html ni /var/www)" >&2
+    exit 1
+fi
+
+cd "$APP_ROOT"
 
 if [ ! -f .env ]; then
   cp .env.example .env
