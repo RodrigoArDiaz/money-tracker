@@ -21,6 +21,9 @@ WORKDIR /var/www
 
 COPY . .
 
+# Evita caché de paquetes/local que referencie proveedores solo en require-dev (p. ej. Telescope).
+RUN rm -f bootstrap/cache/*.php 2>/dev/null || true
+
 RUN composer install --no-dev --optimize-autoloader
 
 RUN npm install
