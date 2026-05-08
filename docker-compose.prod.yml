@@ -41,6 +41,13 @@ services:
 
     ports:
       - "80:80"
+      - "443:443"
+
+    volumes:
+      # Certificados emitidos en el host (certbot). Primera vez: ver comentario al final de este archivo.
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Webroot para renovación: certbot --webroot -w ./docker/certbot/www
+      - ./docker/certbot/www:/var/www/certbot:ro
 
     depends_on:
       - app
@@ -69,3 +76,13 @@ volumes:
   postgres-data:
   app-storage:
   app-bootstrap-cache:
+
+# --- HTTPS (Let's Encrypt en la VPS) ---
+# 1) En el host: sudo apt install certbot
+# 2) Primera emisión con Nginx detenido (libera el 80): docker compose -f docker-compose.prod.yml stop nginx
+#    sudo certbot certonly --standalone -d tu-dominio.com
+# 3) Ajusta server_name y rutas live/tu-dominio en docker/nginx/default.conf; rebuild nginx:
+#    docker compose -f docker-compose.prod.yml build nginx && docker compose -f docker-compose.prod.yml up -d
+# 4) En .env: APP_URL=https://tu-dominio.com
+# Renovación con stack en marcha: sudo certbot renew --webroot -w /ruta/al/proyecto/docker/certbot/www
+#    (los challenges deben escribirse en docker/certbot/www; luego docker compose exec nginx nginx -s reload)
