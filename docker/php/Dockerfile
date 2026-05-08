@@ -1,3 +1,4 @@
+# Imagen FPM para desarrollo / compose local con volumen montado. Producción sin volumen: docker/prod/Dockerfile.
 FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache \
