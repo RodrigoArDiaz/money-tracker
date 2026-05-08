@@ -1,9 +1,16 @@
+# Producción sin montar el código: el artefacto es la imagen. Requiere `.env` en el host (misma carpeta
+# que este archivo) para `env_file` y para las variables ${DB_*} de Postgres.
+#
+# Despliegue típico: git pull → docker compose -f docker-compose.prod.yml build --no-cache → up -d
+# → exec app php artisan migrate --force (y passport:keys / storage:link si aplica).
+
 services:
 
   app:
     build:
       context: .
-      dockerfile: docker/php/Dockerfile
+      dockerfile: docker/prod/Dockerfile
+      target: app
 
     container_name: money-tracker-app
 
@@ -11,15 +18,21 @@ services:
 
     working_dir: /var/www
 
-    # env_file inyecta variables pero no crea el fichero; Laravel (p. ej. key:generate) lee /var/www/.env
+    env_file:
+      - .env
+
     volumes:
-      - .:/var/www
+      - app-storage:/var/www/storage
+      - app-bootstrap-cache:/var/www/bootstrap/cache
 
     depends_on:
       - postgres
 
   nginx:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: docker/prod/Dockerfile
+      target: nginx
 
     container_name: money-tracker-nginx
 
@@ -27,16 +40,13 @@ services:
 
     ports:
       - "80:80"
-      - "443:443"
-
-    volumes:
-      - .:/var/www
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
 
     depends_on:
       - app
 
+  # Las credenciales deben coincidir con DB_* en .env (Compose inyecta .env de la raíz al interpretar ${...}).
+  # Nota: POSTGRES_* solo aplica en el primer arranque del volumen; si ya existe postgres-data, cambiar la
+  # contraseña requiere ALTER USER en Postgres o recrear el volumen (pérdida de datos).
   postgres:
     image: postgres:16-alpine
 
@@ -45,9 +55,9 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_DB: money_tracker
-      POSTGRES_USER: money_tracker
-      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: ${DB_DATABASE:-money_tracker}
+      POSTGRES_USER: ${DB_USERNAME:-money_tracker}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD in .env}
 
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -56,3 +66,5 @@ services:
 
 volumes:
   postgres-data:
+  app-storage:
+  app-bootstrap-cache:
