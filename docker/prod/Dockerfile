@@ -18,6 +18,9 @@ RUN docker-php-ext-install \
     pdo_pgsql \
     mbstring
 
+# Por defecto php-fpm limpia el entorno de los workers: Laravel no ve APP_KEY ni DB_* inyectadas por Docker (env_file).
+RUN printf '\nclear_env = no\n' >> /usr/local/etc/php-fpm.d/www.conf
+
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www

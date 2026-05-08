@@ -18,6 +18,7 @@ services:
 
     working_dir: /var/www
 
+    # Variables (APP_KEY, DB_*, etc.): requieren clear_env=no en php-fpm — ver docker/prod/Dockerfile.
     env_file:
       - .env
 
