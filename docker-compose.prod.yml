@@ -37,6 +37,9 @@ services:
     depends_on:
       - app
 
+  # Las credenciales deben coincidir con DB_* en .env (Compose inyecta .env de la raíz al interpretar ${...}).
+  # Nota: POSTGRES_* solo aplica en el primer arranque del volumen; si ya existe postgres-data, cambiar la
+  # contraseña requiere ALTER USER en Postgres o recrear el volumen (pérdida de datos).
   postgres:
     image: postgres:16-alpine
 
@@ -45,9 +48,9 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_DB: money_tracker
-      POSTGRES_USER: money_tracker
-      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: ${DB_DATABASE:-money_tracker}
+      POSTGRES_USER: ${DB_USERNAME:-money_tracker}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD in .env}
 
     volumes:
       - postgres-data:/var/lib/postgresql/data
