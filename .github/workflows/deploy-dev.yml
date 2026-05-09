@@ -1,0 +1,53 @@
+# Despliegue a la VPS cuando hay push en la rama `dev` (incluye merges a `dev`).
+#
+# Configuración en GitHub: Repositorio → Settings → Secrets and variables → Actions → New repository secret
+#
+# Obligatorios:
+#   VPS_HOST     — IP o hostname SSH de la VPS
+#   VPS_USER     — Usuario SSH (debe poder ejecutar `docker compose` en VPS_APP_PATH; ideal: grupo `docker` o sin sudo)
+#   VPS_SSH_KEY  — Clave privada OpenSSH completa (desde -----BEGIN hasta -----END)
+#   VPS_APP_PATH — Ruta ABSOLUTA del repo en la VPS (ej. /root/apps/money-tracker). No uses ~ en el secreto.
+#
+# Opcional:
+#   VPS_SSH_PORT — Puerto SSH si no es 22
+#
+# Requisitos en la VPS:
+#   - `git clone` del repo, `origin` = este GitHub, despliegue desde la rama `dev`
+#   - Docker y Docker Compose plugin instalados; `.env` presente junto a `docker-compose.prod.yml`
+#   - El servidor SSH debe ser alcanzable desde internet (los runners de GitHub tienen IPs dinámicas)
+#
+# Probar a mano: pestaña Actions → workflow "Deploy dev to VPS" → Run workflow
+
+name: Deploy dev to VPS
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vps-dev
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH — pull, build, up, migrate
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd '${{ secrets.VPS_APP_PATH }}'
+            git fetch origin dev
+            git checkout dev
+            git pull --ff-only origin dev
+            docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
