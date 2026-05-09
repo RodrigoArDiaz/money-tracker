@@ -34,6 +34,10 @@ type CategoryOption = {
 
 const LAST_EXPENSE_CATEGORY_STORAGE_KEY = 'money-tracker-last-expense-category-id';
 
+/** Pantalla completa en viewport móvil; diálogo centrado desde sm (twMerge con DialogContent base). */
+const homeDialogSheetMobileClassName =
+    'inset-0 h-[100dvh] max-h-[100dvh] w-full max-w-full translate-x-0 translate-y-0 rounded-none border-0 overflow-y-auto overscroll-contain content-start items-start p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[90vh] sm:w-[calc(100%-2rem)] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:content-normal sm:items-stretch sm:rounded-xl sm:border sm:border-border sm:p-6';
+
 function compactLabelClass(): string {
     return 'mb-0.5 block text-xs font-medium text-muted-foreground';
 }
@@ -402,12 +406,15 @@ export default function Home({
                     }
                 }}
             >
-                <DialogContent className="max-w-lg" closeAriaLabel={t('expense_categories.close_dialog')}>
+                <DialogContent
+                    className={cn(homeDialogSheetMobileClassName, 'sm:max-w-lg')}
+                    closeAriaLabel={t('expense_categories.close_dialog')}
+                >
                     <DialogHeader>
                         <DialogTitle>{t('expenses.add_heading')}</DialogTitle>
                         <DialogDescription className="sr-only">{t('expenses.open_new_expense_modal_aria')}</DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={submitExpense} className="flex flex-col gap-3">
+                    <form onSubmit={submitExpense} className="flex w-full min-w-0 flex-col gap-3">
                         <div className="flex flex-col gap-0.5">
                             <label htmlFor="expense_category_trigger" className={compactLabelClass()}>
                                 {t('expenses.category_label')}
@@ -528,12 +535,15 @@ export default function Home({
                     }
                 }}
             >
-                <DialogContent className="max-w-lg" closeAriaLabel={t('expense_categories.close_dialog')}>
+                <DialogContent
+                    className={cn(homeDialogSheetMobileClassName, 'sm:max-w-lg')}
+                    closeAriaLabel={t('expense_categories.close_dialog')}
+                >
                     <DialogHeader>
                         <DialogTitle>{t('expenses.edit_heading')}</DialogTitle>
                         <DialogDescription className="sr-only">{t('expenses.edit_heading')}</DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={submitEdit} className="flex flex-col gap-3">
+                    <form onSubmit={submitEdit} className="flex w-full min-w-0 flex-col gap-3">
                         <div className="flex flex-col gap-0.5">
                             <label htmlFor="edit_expense_category_trigger" className={compactLabelClass()}>
                                 {t('expenses.category_label')}
@@ -649,7 +659,10 @@ export default function Home({
                     }
                 }}
             >
-                <DialogContent closeAriaLabel={t('expense_categories.close_dialog')}>
+                <DialogContent
+                    className={cn(homeDialogSheetMobileClassName, 'sm:max-w-md')}
+                    closeAriaLabel={t('expense_categories.close_dialog')}
+                >
                     <DialogHeader>
                         <DialogTitle>{t('expenses.delete_modal_title')}</DialogTitle>
                         <DialogDescription>{t('expenses.delete_modal_description')}</DialogDescription>
