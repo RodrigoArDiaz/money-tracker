@@ -23,7 +23,7 @@ class ExpenseCategoryDefaultListInertiaTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('ExpenseCategories/Index')
-                ->has('defaultExpenseCategories', 5)
+                ->has('defaultExpenseCategories', 11)
                 ->where('defaultExpenseCategories.4.name', 'Regalo')
                 ->where('defaultExpenseCategories.4.icon', 'Gift'));
 
