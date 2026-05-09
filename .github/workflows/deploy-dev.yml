@@ -1,6 +1,11 @@
 # Despliegue a la VPS cuando hay push en la rama `dev` (incluye merges a `dev`).
 #
-# Configuración en GitHub: Repositorio → Settings → Secrets and variables → Actions → New repository secret
+# Secretos (elige una opción):
+#
+# A) Environment (recomendado para prod): Settings → Environments → crea p. ej. "vps" → Environment secrets
+#    El job usa `environment: vps` abajo; los mismos nombres (VPS_HOST, …) funcionan igual que en repo secrets.
+#
+# B) Repository secrets: Settings → Secrets and variables → Actions → Repository secrets
 #
 # Obligatorios:
 #   VPS_HOST     — IP o hostname SSH de la VPS
@@ -33,6 +38,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: development
     steps:
       - name: SSH — pull, build, up, migrate
         uses: appleboy/ssh-action@v1.2.2
