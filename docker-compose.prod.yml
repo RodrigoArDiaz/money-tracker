@@ -1,7 +1,11 @@
 # Producción sin montar el código: el artefacto es la imagen. Requiere `.env` en el host (misma carpeta
 # que este archivo) para `env_file` y para las variables ${DB_*} de Postgres.
 #
-# Despliegue típico: git pull → docker compose -f docker-compose.prod.yml build --no-cache → up -d
+# Importante: la imagen `nginx` copia `public/` (incl. `public/build` de Vite) al construirse. Tras cambios de
+# frontend o `npm run build`, hay que reconstruir `app` Y `nginx` (o `docker compose ... build` sin filtrar).
+# Si solo haces `build app`, el HTML apuntará a hashes nuevos y Nginx seguirá sirviendo assets viejos → 404.
+#
+# Despliegue típico: git pull → docker compose -f docker-compose.prod.yml build → up -d
 # → exec app php artisan migrate --force (y passport:keys / storage:link si aplica).
 
 services:
