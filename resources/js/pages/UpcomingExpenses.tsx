@@ -464,7 +464,11 @@ export default function UpcomingExpenses({
                     }
                 }}
             >
-                <DialogContent className="max-w-lg" closeAriaLabel={t('expense_categories.close_dialog')}>
+                <DialogContent
+                    presentation="form"
+                    className="sm:max-w-lg"
+                    closeAriaLabel={t('expense_categories.close_dialog')}
+                >
                     <DialogHeader>
                         <DialogTitle>{t('upcoming_expenses.add_heading')}</DialogTitle>
                         <DialogDescription className="sr-only">
@@ -643,7 +647,11 @@ export default function UpcomingExpenses({
                     }
                 }}
             >
-                <DialogContent className="max-w-lg" closeAriaLabel={t('expense_categories.close_dialog')}>
+                <DialogContent
+                    presentation="form"
+                    className="sm:max-w-lg"
+                    closeAriaLabel={t('expense_categories.close_dialog')}
+                >
                     <DialogHeader>
                         <DialogTitle>{t('upcoming_expenses.edit_heading')}</DialogTitle>
                         <DialogDescription className="sr-only">{t('upcoming_expenses.edit_heading')}</DialogDescription>

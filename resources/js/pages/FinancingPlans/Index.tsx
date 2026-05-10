@@ -435,7 +435,11 @@ export default function FinancingPlansIndex({
                     }
                 }}
             >
-                <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" closeAriaLabel={t('financing_plans.close_dialog')}>
+                <DialogContent
+                    presentation="form"
+                    className="sm:max-w-lg"
+                    closeAriaLabel={t('financing_plans.close_dialog')}
+                >
                     <DialogHeader>
                         <DialogTitle>{t('financing_plans.create_modal_title')}</DialogTitle>
                         <DialogDescription className="sr-only">{t('financing_plans.section_intro')}</DialogDescription>
