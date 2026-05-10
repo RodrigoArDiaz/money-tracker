@@ -473,6 +473,31 @@ export default function UpcomingExpenses({
                     </DialogHeader>
                     <form onSubmit={submitExpense} className="flex flex-col gap-3">
                         <div className="flex flex-col gap-0.5">
+                            <label htmlFor="upcoming_amount" className={compactLabelClass()}>
+                                {t('upcoming_expenses.amount_label')}
+                            </label>
+                            <NumericFormat
+                                getInputRef={amountRef}
+                                customInput={TextInput}
+                                id="upcoming_amount"
+                                inputMode="decimal"
+                                allowNegative={false}
+                                prefix="$ "
+                                thousandSeparator={amountThousandSeparator}
+                                decimalSeparator={amountDecimalSeparator}
+                                decimalScale={2}
+                                value={form.data.amount}
+                                onValueChange={(values) => {
+                                    form.setData('amount', values.value);
+                                }}
+                                placeholder={t('upcoming_expenses.amount_placeholder')}
+                                className="h-9 py-1.5"
+                                required
+                            />
+                            <FieldError message={form.errors.amount} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
                             <label htmlFor="upcoming_category_trigger" className={compactLabelClass()}>
                                 {t('expenses.category_label')}
                             </label>
@@ -544,31 +569,6 @@ export default function UpcomingExpenses({
                                 autoComplete="off"
                             />
                             <FieldError message={form.errors.description} />
-                        </div>
-
-                        <div className="flex flex-col gap-0.5">
-                            <label htmlFor="upcoming_amount" className={compactLabelClass()}>
-                                {t('upcoming_expenses.amount_label')}
-                            </label>
-                            <NumericFormat
-                                getInputRef={amountRef}
-                                customInput={TextInput}
-                                id="upcoming_amount"
-                                inputMode="decimal"
-                                allowNegative={false}
-                                prefix="$ "
-                                thousandSeparator={amountThousandSeparator}
-                                decimalSeparator={amountDecimalSeparator}
-                                decimalScale={2}
-                                value={form.data.amount}
-                                onValueChange={(values) => {
-                                    form.setData('amount', values.value);
-                                }}
-                                placeholder={t('upcoming_expenses.amount_placeholder')}
-                                className="h-9 py-1.5"
-                                required
-                            />
-                            <FieldError message={form.errors.amount} />
                         </div>
 
                         <div className="flex flex-col gap-0.5">
@@ -650,6 +650,31 @@ export default function UpcomingExpenses({
                     </DialogHeader>
                     <form onSubmit={submitEdit} className="flex flex-col gap-3">
                         <div className="flex flex-col gap-0.5">
+                            <label htmlFor="edit_upcoming_amount" className={compactLabelClass()}>
+                                {t('upcoming_expenses.amount_label')}
+                            </label>
+                            <NumericFormat
+                                getInputRef={editAmountRef}
+                                customInput={TextInput}
+                                id="edit_upcoming_amount"
+                                inputMode="decimal"
+                                allowNegative={false}
+                                prefix="$ "
+                                thousandSeparator={amountThousandSeparator}
+                                decimalSeparator={amountDecimalSeparator}
+                                decimalScale={2}
+                                value={editForm.data.amount}
+                                onValueChange={(values) => {
+                                    editForm.setData('amount', values.value);
+                                }}
+                                placeholder={t('upcoming_expenses.amount_placeholder')}
+                                className="h-9 py-1.5"
+                                required
+                            />
+                            <FieldError message={editForm.errors.amount} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
                             <label htmlFor="edit_upcoming_category_trigger" className={compactLabelClass()}>
                                 {t('expenses.category_label')}
                             </label>
@@ -720,31 +745,6 @@ export default function UpcomingExpenses({
                                 autoComplete="off"
                             />
                             <FieldError message={editForm.errors.description} />
-                        </div>
-
-                        <div className="flex flex-col gap-0.5">
-                            <label htmlFor="edit_upcoming_amount" className={compactLabelClass()}>
-                                {t('upcoming_expenses.amount_label')}
-                            </label>
-                            <NumericFormat
-                                getInputRef={editAmountRef}
-                                customInput={TextInput}
-                                id="edit_upcoming_amount"
-                                inputMode="decimal"
-                                allowNegative={false}
-                                prefix="$ "
-                                thousandSeparator={amountThousandSeparator}
-                                decimalSeparator={amountDecimalSeparator}
-                                decimalScale={2}
-                                value={editForm.data.amount}
-                                onValueChange={(values) => {
-                                    editForm.setData('amount', values.value);
-                                }}
-                                placeholder={t('upcoming_expenses.amount_placeholder')}
-                                className="h-9 py-1.5"
-                                required
-                            />
-                            <FieldError message={editForm.errors.amount} />
                         </div>
 
                         <div className="flex flex-col gap-0.5">

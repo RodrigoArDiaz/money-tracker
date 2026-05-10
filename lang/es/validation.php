@@ -195,6 +195,8 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'spent_on' => 'fecha del gasto',
+    ],
 
 ];

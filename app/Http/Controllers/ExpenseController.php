@@ -22,7 +22,7 @@ class ExpenseController extends Controller
 
     public function store(StoreExpenseRequest $request): RedirectResponse
     {
-        $this->expenseService->createForToday($request->user(), $request->validated());
+        $this->expenseService->create($request->user(), $request->validated());
 
         return $this->redirectToHomeWithMonth($request)
             ->with('success', __('frontend.expenses.flash.created'));

@@ -471,91 +471,6 @@ export default function FinancingPlansIndex({
                             </ButtonGroup>
                         </div>
 
-                        <div className="flex flex-col gap-0.5">
-                            <label htmlFor="financing_category_trigger" className={compactLabelClass()}>
-                                {t('expenses.category_label')}
-                            </label>
-                            <Button
-                                type="button"
-                                id="financing_category_trigger"
-                                variant="outline"
-                                className="h-9 w-full justify-start gap-2 px-2.5 font-normal"
-                                onClick={() => setCategoryPickerOpen(true)}
-                                aria-expanded={categoryPickerOpen}
-                                aria-haspopup="dialog"
-                                aria-invalid={planForm.errors.expense_category_id ? true : undefined}
-                                aria-required={true}
-                                aria-label={
-                                    selectedCategory
-                                        ? `${t('expenses.category_label')}: ${selectedCategory.name}. ${t('expenses.open_category_picker_aria')}`
-                                        : t('expenses.open_category_picker_aria')
-                                }
-                            >
-                                {selectedCategory === null ? (
-                                    <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
-                                ) : null}
-                                {selectedCategory ? (
-                                    <>
-                                        <ExpenseCategoryIcon
-                                            name={selectedCategory.icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
-                                            className="size-4 shrink-0 text-muted-foreground"
-                                        />
-                                        <span className="min-w-0 flex-1 truncate text-left text-sm">{selectedCategory.name}</span>
-                                    </>
-                                ) : (
-                                    <span className="min-w-0 flex-1 truncate text-left text-sm text-muted-foreground">
-                                        {t('expenses.category_placeholder')}
-                                    </span>
-                                )}
-                                <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
-                            </Button>
-                            <FieldError message={planForm.errors.expense_category_id} />
-                        </div>
-
-                        <ExpenseCategorySelectDialog
-                            open={categoryPickerOpen}
-                            onOpenChange={setCategoryPickerOpen}
-                            myCategories={myCategories}
-                            defaultCategories={defaultCategories}
-                            selectedId={planForm.data.expense_category_id}
-                            onSelect={(id) => {
-                                planForm.setData('expense_category_id', String(id));
-                            }}
-                            title={t('expenses.category_picker_title')}
-                            closeAriaLabel={t('expense_categories.close_dialog')}
-                        />
-
-                        <div className="flex flex-col gap-0.5">
-                            <label htmlFor="financing_description" className={compactLabelClass()}>
-                                {t('financing_plans.description_label')}
-                            </label>
-                            <TextInput
-                                id="financing_description"
-                                value={planForm.data.description}
-                                onChange={(e) => planForm.setData('description', e.target.value)}
-                                aria-invalid={planForm.errors.description ? true : undefined}
-                                aria-required={true}
-                                autoComplete="off"
-                            />
-                            <FieldError message={planForm.errors.description} />
-                        </div>
-
-                        <div className="flex flex-col gap-0.5">
-                            <label htmlFor="financing_note" className={compactLabelClass()}>
-                                {t('financing_plans.note_label')} <span className="font-normal text-muted-foreground">{t('upcoming_expenses.optional_suffix')}</span>
-                            </label>
-                            <textarea
-                                id="financing_note"
-                                ref={planNoteTextareaRef}
-                                value={planForm.data.note}
-                                onChange={(e) => planForm.setData('note', e.target.value)}
-                                rows={2}
-                                className="flex min-h-[2.5rem] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
-                                aria-invalid={planForm.errors.note ? true : undefined}
-                            />
-                            <FieldError message={planForm.errors.note} />
-                        </div>
-
                         {planForm.data.creation_mode === 'total_and_count' ? (
                             <>
                                 <div className="flex flex-col gap-0.5">
@@ -589,20 +504,6 @@ export default function FinancingPlansIndex({
                                     />
                                     <FieldError message={planForm.errors.installment_count} />
                                 </div>
-                                <RecurringPlanMonthField
-                                    label={t('financing_plans.start_month_label')}
-                                    yearStr={planForm.data.start_year}
-                                    monthStr={planForm.data.start_month}
-                                    onYearMonthChange={(y, m) => {
-                                        planForm.setData('start_year', y);
-                                        planForm.setData('start_month', m);
-                                    }}
-                                    fallbackDisplayMonth={planMonthFallback}
-                                    buttonAriaLabel={t('financing_plans.start_month_aria')}
-                                    errorYear={planForm.errors.start_year}
-                                    errorMonth={planForm.errors.start_month}
-                                    inclusiveMinYearMonth={recurringStartInclusiveMin}
-                                />
                             </>
                         ) : (
                             <>
@@ -693,6 +594,108 @@ export default function FinancingPlansIndex({
                                 </Button>
                             </>
                         )}
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="financing_category_trigger" className={compactLabelClass()}>
+                                {t('expenses.category_label')}
+                            </label>
+                            <Button
+                                type="button"
+                                id="financing_category_trigger"
+                                variant="outline"
+                                className="h-9 w-full justify-start gap-2 px-2.5 font-normal"
+                                onClick={() => setCategoryPickerOpen(true)}
+                                aria-expanded={categoryPickerOpen}
+                                aria-haspopup="dialog"
+                                aria-invalid={planForm.errors.expense_category_id ? true : undefined}
+                                aria-required={true}
+                                aria-label={
+                                    selectedCategory
+                                        ? `${t('expenses.category_label')}: ${selectedCategory.name}. ${t('expenses.open_category_picker_aria')}`
+                                        : t('expenses.open_category_picker_aria')
+                                }
+                            >
+                                {selectedCategory === null ? (
+                                    <Tags className="size-4 shrink-0 opacity-70" aria-hidden />
+                                ) : null}
+                                {selectedCategory ? (
+                                    <>
+                                        <ExpenseCategoryIcon
+                                            name={selectedCategory.icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                                            className="size-4 shrink-0 text-muted-foreground"
+                                        />
+                                        <span className="min-w-0 flex-1 truncate text-left text-sm">{selectedCategory.name}</span>
+                                    </>
+                                ) : (
+                                    <span className="min-w-0 flex-1 truncate text-left text-sm text-muted-foreground">
+                                        {t('expenses.category_placeholder')}
+                                    </span>
+                                )}
+                                <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+                            </Button>
+                            <FieldError message={planForm.errors.expense_category_id} />
+                        </div>
+
+                        <ExpenseCategorySelectDialog
+                            open={categoryPickerOpen}
+                            onOpenChange={setCategoryPickerOpen}
+                            myCategories={myCategories}
+                            defaultCategories={defaultCategories}
+                            selectedId={planForm.data.expense_category_id}
+                            onSelect={(id) => {
+                                planForm.setData('expense_category_id', String(id));
+                            }}
+                            title={t('expenses.category_picker_title')}
+                            closeAriaLabel={t('expense_categories.close_dialog')}
+                        />
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="financing_description" className={compactLabelClass()}>
+                                {t('financing_plans.description_label')}
+                            </label>
+                            <TextInput
+                                id="financing_description"
+                                value={planForm.data.description}
+                                onChange={(e) => planForm.setData('description', e.target.value)}
+                                aria-invalid={planForm.errors.description ? true : undefined}
+                                aria-required={true}
+                                autoComplete="off"
+                            />
+                            <FieldError message={planForm.errors.description} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="financing_note" className={compactLabelClass()}>
+                                {t('financing_plans.note_label')} <span className="font-normal text-muted-foreground">{t('upcoming_expenses.optional_suffix')}</span>
+                            </label>
+                            <textarea
+                                id="financing_note"
+                                ref={planNoteTextareaRef}
+                                value={planForm.data.note}
+                                onChange={(e) => planForm.setData('note', e.target.value)}
+                                rows={2}
+                                className="flex min-h-[2.5rem] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+                                aria-invalid={planForm.errors.note ? true : undefined}
+                            />
+                            <FieldError message={planForm.errors.note} />
+                        </div>
+
+                        {planForm.data.creation_mode === 'total_and_count' ? (
+                            <RecurringPlanMonthField
+                                label={t('financing_plans.start_month_label')}
+                                yearStr={planForm.data.start_year}
+                                monthStr={planForm.data.start_month}
+                                onYearMonthChange={(y, m) => {
+                                    planForm.setData('start_year', y);
+                                    planForm.setData('start_month', m);
+                                }}
+                                fallbackDisplayMonth={planMonthFallback}
+                                buttonAriaLabel={t('financing_plans.start_month_aria')}
+                                errorYear={planForm.errors.start_year}
+                                errorMonth={planForm.errors.start_month}
+                                inclusiveMinYearMonth={recurringStartInclusiveMin}
+                            />
+                        ) : null}
 
                         <DialogFooter className="gap-3">
                             <Button type="button" variant="outline" onClick={() => closeCreateDialog()}>

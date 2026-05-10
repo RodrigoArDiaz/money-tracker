@@ -101,6 +101,8 @@ return [
         'category_placeholder' => 'Elegí una categoría',
         'category_picker_title' => 'Elegir categoría',
         'open_category_picker_aria' => 'Abrir selector de categoría',
+        'spent_on_label' => 'Día (por defecto hoy)',
+        'spent_on_open_calendar_aria' => 'Abrir calendario para elegir el día del gasto',
         'description_label' => 'Descripción',
         'optional_suffix' => '(opcional)',
         'description_placeholder' => 'Ej.: almuerzo, colectivo…',
@@ -127,6 +129,9 @@ return [
         'deleting' => 'Eliminando…',
         'from_upcoming_tooltip' => 'Este gasto se registró cuando marcaste un gasto futuro como pagado. Para editarlo o borrarlo, usá la sección Gastos futuros.',
         'from_upcoming_info_aria' => 'Información: gasto creado desde gastos futuros',
+        'validation' => [
+            'spent_on_must_match_view_month' => 'La fecha del gasto debe estar en el mes que estás viendo.',
+        ],
         'flash' => [
             'created' => 'Gasto guardado.',
             'updated' => 'Gasto actualizado.',

@@ -6,6 +6,10 @@ import FieldError from '@/components/atoms/FieldError';
 import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
+import {
+    defaultSpentOnForViewedMonth,
+    HomeExpenseDayPicker,
+} from '@/components/molecules/HomeExpenseDayPicker';
 import { HomeExpenseListItem, type HomeExpenseListRow } from '@/components/molecules/HomeExpenseListItem';
 import { HomeMonthPicker } from '@/components/molecules/HomeMonthPicker';
 import { HomeTodayTotalSummaryCard } from '@/components/molecules/HomeTodayTotalSummaryCard';
@@ -94,6 +98,7 @@ export default function Home({
 
     const form = useForm({
         expense_category_id: '',
+        spent_on: defaultSpentOnForViewedMonth(today, viewYear, viewMonth),
         description: '',
         amount: '',
         redirect_year: String(viewYear),
@@ -109,11 +114,6 @@ export default function Home({
     });
 
     React.useEffect(() => {
-        form.setData('redirect_year', String(viewYear));
-        form.setData('redirect_month', String(viewMonth));
-    }, [viewYear, viewMonth]);
-
-    React.useEffect(() => {
         editForm.setData('redirect_year', String(viewYear));
         editForm.setData('redirect_month', String(viewMonth));
     }, [viewYear, viewMonth]);
@@ -126,7 +126,15 @@ export default function Home({
     const [deletingExpense, setDeletingExpense] = React.useState<HomeExpenseListRow | null>(null);
     const [deleteSubmitting, setDeleteSubmitting] = React.useState(false);
 
+    React.useEffect(() => {
+        if (!createDialogOpen) {
+            return;
+        }
+        form.setData('spent_on', defaultSpentOnForViewedMonth(today, viewYear, viewMonth));
+    }, [viewYear, viewMonth, createDialogOpen]);
+
     const amountRef = React.useRef<HTMLInputElement | null>(null);
+    const descriptionRef = React.useRef<HTMLInputElement | null>(null);
     const editAmountRef = React.useRef<HTMLInputElement | null>(null);
 
     const allCategoryOptions = React.useMemo(
@@ -152,12 +160,13 @@ export default function Home({
         return allCategoryOptions.find((c) => c.id === id) ?? null;
     }, [editForm.data.expense_category_id, allCategoryOptions]);
 
-    function focusAmount(): void {
-        queueMicrotask(() => amountRef.current?.focus());
+    function focusDescription(): void {
+        queueMicrotask(() => descriptionRef.current?.focus());
     }
 
     function openCreateDialog(): void {
         form.clearErrors();
+        form.setData('spent_on', defaultSpentOnForViewedMonth(today, viewYear, viewMonth));
         setCategoryPickerOpen(false);
         setCreateDialogOpen(true);
     }
@@ -177,6 +186,7 @@ export default function Home({
         setCreateDialogOpen(false);
         setCategoryPickerOpen(false);
         form.clearErrors();
+        form.setData('spent_on', defaultSpentOnForViewedMonth(today, viewYear, viewMonth));
         form.setData('description', '');
         form.setData('amount', '');
     }
@@ -208,6 +218,17 @@ export default function Home({
 
     function submitExpense(e: React.FormEvent): void {
         e.preventDefault();
+        form.transform((data) => {
+            const parts = data.spent_on.split('-');
+            const year = parts[0] ?? String(viewYear);
+            const monthNum = Number.parseInt(parts[1] ?? String(viewMonth), 10);
+
+            return {
+                ...data,
+                redirect_year: year,
+                redirect_month: String(Number.isFinite(monthNum) ? monthNum : viewMonth),
+            };
+        });
         form.post('/expenses', {
             preserveScroll: true,
             onSuccess: () => {
@@ -216,6 +237,7 @@ export default function Home({
                     localStorage.setItem(LAST_EXPENSE_CATEGORY_STORAGE_KEY, cat);
                 }
                 form.reset('description', 'amount');
+                form.setData('spent_on', defaultSpentOnForViewedMonth(today, viewYear, viewMonth));
                 setCreateDialogOpen(false);
             },
         });
@@ -416,6 +438,31 @@ export default function Home({
                     </DialogHeader>
                     <form onSubmit={submitExpense} className="flex w-full min-w-0 flex-col gap-3">
                         <div className="flex flex-col gap-0.5">
+                            <label htmlFor="expense_amount" className={compactLabelClass()}>
+                                {t('expenses.amount_label')}
+                            </label>
+                            <NumericFormat
+                                getInputRef={amountRef}
+                                customInput={TextInput}
+                                id="expense_amount"
+                                inputMode="decimal"
+                                allowNegative={false}
+                                prefix="$ "
+                                thousandSeparator={amountThousandSeparator}
+                                decimalSeparator={amountDecimalSeparator}
+                                decimalScale={2}
+                                value={form.data.amount}
+                                onValueChange={(values) => {
+                                    form.setData('amount', values.value);
+                                }}
+                                placeholder={t('expenses.amount_placeholder')}
+                                className="h-9 py-1.5"
+                                required
+                            />
+                            <FieldError message={form.errors.amount} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
                             <label htmlFor="expense_category_trigger" className={compactLabelClass()}>
                                 {t('expenses.category_label')}
                             </label>
@@ -466,36 +513,11 @@ export default function Home({
                             selectedId={form.data.expense_category_id}
                             onSelect={(id) => {
                                 form.setData('expense_category_id', String(id));
-                                focusAmount();
+                                focusDescription();
                             }}
                             title={t('expenses.category_picker_title')}
                             closeAriaLabel={t('expense_categories.close_dialog')}
                         />
-
-                        <div className="flex flex-col gap-0.5">
-                            <label htmlFor="expense_amount" className={compactLabelClass()}>
-                                {t('expenses.amount_label')}
-                            </label>
-                            <NumericFormat
-                                getInputRef={amountRef}
-                                customInput={TextInput}
-                                id="expense_amount"
-                                inputMode="decimal"
-                                allowNegative={false}
-                                prefix="$ "
-                                thousandSeparator={amountThousandSeparator}
-                                decimalSeparator={amountDecimalSeparator}
-                                decimalScale={2}
-                                value={form.data.amount}
-                                onValueChange={(values) => {
-                                    form.setData('amount', values.value);
-                                }}
-                                placeholder={t('expenses.amount_placeholder')}
-                                className="h-9 py-1.5"
-                                required
-                            />
-                            <FieldError message={form.errors.amount} />
-                        </div>
 
                         <div className="flex flex-col gap-0.5">
                             <label htmlFor="expense_description" className={compactLabelClass()}>
@@ -505,6 +527,7 @@ export default function Home({
                                 </span>
                             </label>
                             <TextInput
+                                ref={descriptionRef}
                                 id="expense_description"
                                 className="h-9 py-1.5"
                                 value={form.data.description}
@@ -513,6 +536,20 @@ export default function Home({
                                 autoComplete="off"
                             />
                             <FieldError message={form.errors.description} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="expense_spent_on" className={compactLabelClass()}>
+                                {t('expenses.spent_on_label')}
+                            </label>
+                            <HomeExpenseDayPicker
+                                id="expense_spent_on"
+                                viewYear={viewYear}
+                                viewMonth={viewMonth}
+                                value={form.data.spent_on}
+                                onChange={(iso) => form.setData('spent_on', iso)}
+                            />
+                            <FieldError message={form.errors.spent_on} />
                         </div>
 
                         <DialogFooter className="gap-2 sm:gap-3">
