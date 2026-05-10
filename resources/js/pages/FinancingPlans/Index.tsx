@@ -452,7 +452,7 @@ export default function FinancingPlansIndex({
                                     type="button"
                                     size="sm"
                                     variant={planForm.data.creation_mode === 'total_and_count' ? 'default' : 'outline'}
-                                    className="h-9"
+                                    className="h-9 max-sm:min-w-0 max-sm:shrink max-sm:basis-0 max-sm:flex-1"
                                     onClick={() => {
                                         planForm.setData('creation_mode', 'total_and_count');
                                         planForm.clearErrors();
@@ -464,7 +464,7 @@ export default function FinancingPlansIndex({
                                     type="button"
                                     size="sm"
                                     variant={planForm.data.creation_mode === 'custom_schedule' ? 'default' : 'outline'}
-                                    className="h-9"
+                                    className="h-9 max-sm:min-w-0 max-sm:shrink max-sm:basis-0 max-sm:flex-1"
                                     onClick={() => {
                                         planForm.setData('creation_mode', 'custom_schedule');
                                         planForm.clearErrors();
@@ -477,6 +477,9 @@ export default function FinancingPlansIndex({
 
                         {planForm.data.creation_mode === 'total_and_count' ? (
                             <>
+                                <div className="flex flex-col gap-3">
+                                    <p className="text-xs text-muted-foreground">{t('financing_plans.total_and_count_help')}</p>
+                                </div>
                                 <div className="flex flex-col gap-0.5">
                                     <label htmlFor="financing_total" className={compactLabelClass()}>
                                         {t('financing_plans.total_amount_label')}
@@ -546,45 +549,40 @@ export default function FinancingPlansIndex({
                                                 </div>
                                                 <div className="flex w-full min-w-0 flex-col gap-0.5 sm:max-w-[12rem]">
                                                     <span className={compactLabelClass()}>{t('financing_plans.row_amount_label')}</span>
-                                                    <NumericFormat
-                                                        customInput={TextInput}
-                                                        value={row.amount}
-                                                        onValueChange={(vals) => {
-                                                            const next = [...planForm.data.installments];
-                                                            next[index] = { ...next[index], amount: vals.value };
-                                                            planForm.setData('installments', next);
-                                                        }}
-                                                        thousandSeparator={amountThousandSeparator}
-                                                        decimalSeparator={amountDecimalSeparator}
-                                                        decimalScale={2}
-                                                        allowNegative={false}
-                                                    />
+                                                    <div className="flex min-w-0 items-center gap-2">
+                                                        <NumericFormat
+                                                            customInput={TextInput}
+                                                            className="h-9 min-w-0 flex-1"
+                                                            value={row.amount}
+                                                            onValueChange={(vals) => {
+                                                                const next = [...planForm.data.installments];
+                                                                next[index] = { ...next[index], amount: vals.value };
+                                                                planForm.setData('installments', next);
+                                                            }}
+                                                            thousandSeparator={amountThousandSeparator}
+                                                            decimalSeparator={amountDecimalSeparator}
+                                                            decimalScale={2}
+                                                            allowNegative={false}
+                                                        />
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="outline"
+                                                                    size="icon"
+                                                                    className="size-9 shrink-0"
+                                                                    onClick={() => removeCustomRow(index)}
+                                                                    aria-label={t('financing_plans.remove_installment_row')}
+                                                                >
+                                                                    <X className="size-4" aria-hidden />
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent side="top" sideOffset={4}>
+                                                                {t('financing_plans.remove_installment_row')}
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </div>
                                                     <FieldError message={planForm.errors[`installments.${index}.amount`]} />
-                                                </div>
-                                                <div className="flex shrink-0 flex-col gap-0.5">
-                                                    <span
-                                                        className={cn(compactLabelClass(), 'invisible pointer-events-none select-none')}
-                                                        aria-hidden
-                                                    >
-                                                        {'\u00a0'}
-                                                    </span>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="icon"
-                                                                className="size-9 shrink-0"
-                                                                onClick={() => removeCustomRow(index)}
-                                                                aria-label={t('financing_plans.remove_installment_row')}
-                                                            >
-                                                                <X className="size-4" aria-hidden />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent side="top" sideOffset={4}>
-                                                            {t('financing_plans.remove_installment_row')}
-                                                        </TooltipContent>
-                                                    </Tooltip>
                                                 </div>
                                             </div>
                                         </div>
@@ -593,7 +591,14 @@ export default function FinancingPlansIndex({
                                 {typeof planForm.errors.installments === 'string' ? (
                                     <FieldError message={planForm.errors.installments} />
                                 ) : null}
-                                <Button type="button" variant="secondary" size="sm" className="self-start" onClick={() => addCustomRow()}>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    className="self-start gap-2"
+                                    onClick={() => addCustomRow()}
+                                >
+                                    <Plus className="size-4 shrink-0" aria-hidden />
                                     {t('financing_plans.add_installment_row')}
                                 </Button>
                             </>
