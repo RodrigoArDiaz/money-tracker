@@ -101,6 +101,8 @@ return [
         'category_placeholder' => 'Choose a category',
         'category_picker_title' => 'Choose category',
         'open_category_picker_aria' => 'Open category picker',
+        'spent_on_label' => 'Day (default today)',
+        'spent_on_open_calendar_aria' => 'Open calendar to choose the expense date',
         'description_label' => 'Description',
         'optional_suffix' => '(optional)',
         'description_placeholder' => 'e.g. Lunch, bus fare…',
@@ -127,6 +129,9 @@ return [
         'deleting' => 'Deleting…',
         'from_upcoming_tooltip' => 'This expense was created when you marked a planned expense as paid. Edit it or delete it from Upcoming expenses.',
         'from_upcoming_info_aria' => 'Information: expense comes from upcoming planned expenses',
+        'validation' => [
+            'spent_on_must_match_view_month' => 'The expense date must be in the month you are viewing.',
+        ],
         'flash' => [
             'created' => 'Expense saved.',
             'updated' => 'Expense updated.',

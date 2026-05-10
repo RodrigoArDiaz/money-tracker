@@ -13,16 +13,16 @@ class ExpenseService
     ) {}
 
     /**
-     * @param  array{expense_category_id: int, description?: string|null, amount: float|int|string}  $validated
+     * @param  array{expense_category_id: int, description?: string|null, amount: float|int|string, spent_on: string}  $validated
      */
-    public function createForToday(User $user, array $validated): Expense
+    public function create(User $user, array $validated): Expense
     {
         return $this->expenseRepository->create([
             'user_id' => $user->id,
             'expense_category_id' => $validated['expense_category_id'],
             'description' => trim((string) ($validated['description'] ?? '')),
             'amount' => $validated['amount'],
-            'spent_on' => now()->toDateString(),
+            'spent_on' => $validated['spent_on'],
         ]);
     }
 

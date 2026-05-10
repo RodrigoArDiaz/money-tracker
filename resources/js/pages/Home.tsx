@@ -6,6 +6,10 @@ import FieldError from '@/components/atoms/FieldError';
 import TextInput from '@/components/atoms/TextInput';
 import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import { ExpenseCategorySelectDialog } from '@/components/molecules/ExpenseCategorySelectDialog';
+import {
+    defaultSpentOnForViewedMonth,
+    HomeExpenseDayPicker,
+} from '@/components/molecules/HomeExpenseDayPicker';
 import { HomeExpenseListItem, type HomeExpenseListRow } from '@/components/molecules/HomeExpenseListItem';
 import { HomeMonthPicker } from '@/components/molecules/HomeMonthPicker';
 import { HomeTodayTotalSummaryCard } from '@/components/molecules/HomeTodayTotalSummaryCard';
@@ -94,6 +98,7 @@ export default function Home({
 
     const form = useForm({
         expense_category_id: '',
+        spent_on: defaultSpentOnForViewedMonth(today, viewYear, viewMonth),
         description: '',
         amount: '',
         redirect_year: String(viewYear),
@@ -109,11 +114,6 @@ export default function Home({
     });
 
     React.useEffect(() => {
-        form.setData('redirect_year', String(viewYear));
-        form.setData('redirect_month', String(viewMonth));
-    }, [viewYear, viewMonth]);
-
-    React.useEffect(() => {
         editForm.setData('redirect_year', String(viewYear));
         editForm.setData('redirect_month', String(viewMonth));
     }, [viewYear, viewMonth]);
@@ -125,6 +125,13 @@ export default function Home({
     const [editingExpense, setEditingExpense] = React.useState<HomeExpenseListRow | null>(null);
     const [deletingExpense, setDeletingExpense] = React.useState<HomeExpenseListRow | null>(null);
     const [deleteSubmitting, setDeleteSubmitting] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!createDialogOpen) {
+            return;
+        }
+        form.setData('spent_on', defaultSpentOnForViewedMonth(today, viewYear, viewMonth));
+    }, [viewYear, viewMonth, createDialogOpen]);
 
     const amountRef = React.useRef<HTMLInputElement | null>(null);
     const editAmountRef = React.useRef<HTMLInputElement | null>(null);
@@ -158,6 +165,7 @@ export default function Home({
 
     function openCreateDialog(): void {
         form.clearErrors();
+        form.setData('spent_on', defaultSpentOnForViewedMonth(today, viewYear, viewMonth));
         setCategoryPickerOpen(false);
         setCreateDialogOpen(true);
     }
@@ -177,6 +185,7 @@ export default function Home({
         setCreateDialogOpen(false);
         setCategoryPickerOpen(false);
         form.clearErrors();
+        form.setData('spent_on', defaultSpentOnForViewedMonth(today, viewYear, viewMonth));
         form.setData('description', '');
         form.setData('amount', '');
     }
@@ -208,6 +217,17 @@ export default function Home({
 
     function submitExpense(e: React.FormEvent): void {
         e.preventDefault();
+        form.transform((data) => {
+            const parts = data.spent_on.split('-');
+            const year = parts[0] ?? String(viewYear);
+            const monthNum = Number.parseInt(parts[1] ?? String(viewMonth), 10);
+
+            return {
+                ...data,
+                redirect_year: year,
+                redirect_month: String(Number.isFinite(monthNum) ? monthNum : viewMonth),
+            };
+        });
         form.post('/expenses', {
             preserveScroll: true,
             onSuccess: () => {
@@ -216,6 +236,7 @@ export default function Home({
                     localStorage.setItem(LAST_EXPENSE_CATEGORY_STORAGE_KEY, cat);
                 }
                 form.reset('description', 'amount');
+                form.setData('spent_on', defaultSpentOnForViewedMonth(today, viewYear, viewMonth));
                 setCreateDialogOpen(false);
             },
         });
@@ -471,6 +492,20 @@ export default function Home({
                             title={t('expenses.category_picker_title')}
                             closeAriaLabel={t('expense_categories.close_dialog')}
                         />
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="expense_spent_on" className={compactLabelClass()}>
+                                {t('expenses.spent_on_label')}
+                            </label>
+                            <HomeExpenseDayPicker
+                                id="expense_spent_on"
+                                viewYear={viewYear}
+                                viewMonth={viewMonth}
+                                value={form.data.spent_on}
+                                onChange={(iso) => form.setData('spent_on', iso)}
+                            />
+                            <FieldError message={form.errors.spent_on} />
+                        </div>
 
                         <div className="flex flex-col gap-0.5">
                             <label htmlFor="expense_amount" className={compactLabelClass()}>
