@@ -127,8 +127,10 @@ return [
         'delete_modal_description' => 'The amount and details will be removed. This cannot be undone.',
         'delete_confirm' => 'Delete',
         'deleting' => 'Deleting…',
+        'from_upcoming_more_info' => 'More information',
         'from_upcoming_tooltip' => 'This expense was created when you marked a planned expense as paid. Edit it or delete it from Upcoming expenses.',
-        'from_upcoming_info_aria' => 'Information: expense comes from upcoming planned expenses',
+        'from_upcoming_info_aria' => 'More information: expense created from upcoming planned expenses',
+        'from_upcoming_info_modal_close' => 'Close',
         'validation' => [
             'spent_on_must_match_view_month' => 'The expense date must be in the month you are viewing.',
         ],

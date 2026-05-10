@@ -127,8 +127,10 @@ return [
         'delete_modal_description' => 'Se quitará el monto y los datos. No se puede deshacer.',
         'delete_confirm' => 'Eliminar',
         'deleting' => 'Eliminando…',
+        'from_upcoming_more_info' => 'Más información',
         'from_upcoming_tooltip' => 'Este gasto se registró cuando marcaste un gasto futuro como pagado. Para editarlo o borrarlo, usá la sección Gastos futuros.',
-        'from_upcoming_info_aria' => 'Información: gasto creado desde gastos futuros',
+        'from_upcoming_info_aria' => 'Más información: gasto creado desde gastos futuros',
+        'from_upcoming_info_modal_close' => 'Cerrar',
         'validation' => [
             'spent_on_must_match_view_month' => 'La fecha del gasto debe estar en el mes que estás viendo.',
         ],

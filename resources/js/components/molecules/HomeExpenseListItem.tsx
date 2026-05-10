@@ -3,6 +3,14 @@ import { Info } from 'lucide-react';
 
 import { ExpenseRowActions } from '@/components/molecules/ExpenseRowActions';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslate } from '@/hooks/use-translate';
 import { EXPENSE_CARD_CLASS_NAME, DEFAULT_EXPENSE_CATEGORY_ICON } from '@/lib/expense-card-surface';
@@ -32,6 +40,7 @@ export function HomeExpenseListItem({
 }): React.ReactElement {
     const { t, locale } = useTranslate();
     const isFromUpcoming = row.from_upcoming === true;
+    const [fromUpcomingInfoOpen, setFromUpcomingInfoOpen] = React.useState(false);
 
     const categoryDisplayName =
         row.category_name.trim() !== '' ? row.category_name : t('expenses.list_no_category');
@@ -66,22 +75,42 @@ export function HomeExpenseListItem({
     );
 
     const actionsSlot = isFromUpcoming ? (
-        <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="size-8 shrink-0"
-                    aria-label={t('expenses.from_upcoming_info_aria')}
-                >
-                    <Info className="size-4 text-primary/90" aria-hidden />
-                </Button>
-            </TooltipTrigger>
-            <TooltipContent className="max-w-xs font-normal leading-snug" side="top" sideOffset={6}>
-                {t('expenses.from_upcoming_tooltip')}
-            </TooltipContent>
-        </Tooltip>
+        <>
+            <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="size-8 shrink-0"
+                        aria-label={t('expenses.from_upcoming_info_aria')}
+                        aria-expanded={fromUpcomingInfoOpen}
+                        aria-haspopup="dialog"
+                        onClick={() => setFromUpcomingInfoOpen(true)}
+                    >
+                        <Info className="size-4 text-primary/90" aria-hidden />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs font-normal leading-snug" side="top" sideOffset={6}>
+                    {t('expenses.from_upcoming_more_info')}
+                </TooltipContent>
+            </Tooltip>
+            <Dialog open={fromUpcomingInfoOpen} onOpenChange={setFromUpcomingInfoOpen}>
+                <DialogContent className="max-w-sm" closeAriaLabel={t('expenses.from_upcoming_info_modal_close')}>
+                    <DialogHeader>
+                        <DialogTitle>{t('expenses.from_upcoming_more_info')}</DialogTitle>
+                        <DialogDescription className="text-left leading-snug">
+                            {t('expenses.from_upcoming_tooltip')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button type="button" onClick={() => setFromUpcomingInfoOpen(false)}>
+                            {t('expenses.from_upcoming_info_modal_close')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
     ) : (
         <ExpenseRowActions
             onEdit={() => onEdit(row)}
