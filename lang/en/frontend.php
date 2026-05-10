@@ -398,6 +398,7 @@ return [
         'sign_out' => 'Sign out',
         'fullscreen_enter_aria' => 'Enter full screen',
         'fullscreen_exit_aria' => 'Exit full screen',
+        'mobile_bottom_nav_aria' => 'Main navigation',
     ],
 
     'flash' => [

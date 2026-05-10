@@ -11,6 +11,7 @@ import { FinancingPlanListItem } from '@/components/molecules/FinancingPlanListI
 import { RecurringPlanMonthField } from '@/components/molecules/RecurringPlanMonthField';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ButtonGroup } from '@/components/ui/button-group';
+import { MobileFab, mobileFabPlusIconClassName } from '@/components/molecules/MobileFab';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -413,19 +414,12 @@ export default function FinancingPlansIndex({
                 </section>
             </div>
 
-            <Button
-                type="button"
-                variant="default"
-                size="icon"
-                className={cn(
-                    'fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] right-4 z-40 size-14 rounded-full shadow-lg sm:hidden',
-                    'touch-manipulation',
-                )}
+            <MobileFab
                 onClick={() => openCreateDialog()}
                 aria-label={t('financing_plans.open_create_modal_aria')}
             >
-                <Plus className="size-7" aria-hidden />
-            </Button>
+                <Plus className={mobileFabPlusIconClassName} aria-hidden />
+            </MobileFab>
 
             <Dialog
                 open={createDialogOpen}

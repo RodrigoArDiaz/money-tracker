@@ -13,6 +13,10 @@
 @source '../**/*.ts';
 @source '../**/*.tsx';
 
+/* Dynamic class strings in TS are not always scanned; keep FAB / layout padding utilities emitted. */
+@source inline('bottom-[calc(1rem+3.75rem+env(safe-area-inset-bottom,0px))]');
+@source inline('max-sm:pb-[calc(3.75rem+env(safe-area-inset-bottom,0px)+0.75rem)]');
+
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
