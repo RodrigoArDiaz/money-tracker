@@ -398,6 +398,7 @@ return [
         'sign_out' => 'Cerrar sesión',
         'fullscreen_enter_aria' => 'Pantalla completa',
         'fullscreen_exit_aria' => 'Salir de pantalla completa',
+        'mobile_bottom_nav_aria' => 'Navegación principal',
     ],
 
     'flash' => [

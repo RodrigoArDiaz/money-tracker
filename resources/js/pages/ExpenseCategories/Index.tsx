@@ -8,6 +8,7 @@ import AppDashboardLayout from '@/components/layouts/AppDashboardLayout';
 import FormField from '@/components/molecules/FormField';
 import { ExpenseCategoryIconGrid } from '@/components/molecules/ExpenseCategoryIconGrid';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { MobileFab, mobileFabPlusIconClassName } from '@/components/molecules/MobileFab';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -293,19 +294,12 @@ export default function Index({
             ) : null}
             </div>
 
-            <Button
-                type="button"
-                variant="default"
-                size="icon"
-                className={cn(
-                    'fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] right-4 z-40 size-14 rounded-full shadow-lg sm:hidden',
-                    'touch-manipulation',
-                )}
+            <MobileFab
                 onClick={() => openCreateDialog()}
                 aria-label={t('expense_categories.open_new_category_modal_aria')}
             >
-                <Plus className="size-7" aria-hidden />
-            </Button>
+                <Plus className={mobileFabPlusIconClassName} aria-hidden />
+            </MobileFab>
 
             <Dialog
                 open={createDialogOpen}

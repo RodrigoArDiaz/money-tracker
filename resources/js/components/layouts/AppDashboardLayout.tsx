@@ -34,9 +34,11 @@ import {
 } from '@/components/ui/sidebar';
 import FullscreenToggle from '@/components/molecules/FullscreenToggle';
 import LocaleSwitcher from '@/components/molecules/LocaleSwitcher';
+import MobileBottomNav from '@/components/molecules/MobileBottomNav';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useTranslate } from '@/hooks/use-translate';
+import { mobileMainContentBottomPaddingClass } from '@/lib/mobile-dashboard-ui';
 import { cn } from '@/lib/utils';
 
 type AuthUser = {
@@ -238,7 +240,15 @@ export default function AppDashboardLayout({
                             {user ? <UserMenu user={user} /> : null}
                         </div>
                     </header>
-                    <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">{children}</div>
+                    <div
+                        className={cn(
+                            'flex flex-1 flex-col gap-4 p-4 md:p-6',
+                            mobileMainContentBottomPaddingClass,
+                        )}
+                    >
+                        {children}
+                    </div>
+                    <MobileBottomNav />
                 </SidebarInset>
             </TooltipProvider>
         </SidebarProvider>
