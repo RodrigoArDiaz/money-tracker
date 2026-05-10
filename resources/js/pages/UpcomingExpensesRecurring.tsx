@@ -180,6 +180,7 @@ export default function UpcomingExpensesRecurring({
     const [deleteTemplateSubmitting, setDeleteTemplateSubmitting] = React.useState(false);
 
     const recurringAmountRef = React.useRef<HTMLInputElement | null>(null);
+    const recurringDescriptionRef = React.useRef<HTMLInputElement | null>(null);
     const templateEditAmountRef = React.useRef<HTMLInputElement | null>(null);
 
     const recurringNoteTextareaRef = useAutosizeTextarea(recurringForm.data.note, {
@@ -254,8 +255,8 @@ export default function UpcomingExpensesRecurring({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    function focusRecurringAmount(): void {
-        queueMicrotask(() => recurringAmountRef.current?.focus());
+    function focusRecurringDescription(): void {
+        queueMicrotask(() => recurringDescriptionRef.current?.focus());
     }
 
     function openCreateDialog(): void {
@@ -452,6 +453,31 @@ export default function UpcomingExpensesRecurring({
                     </DialogHeader>
                     <form onSubmit={submitRecurring} className="flex flex-col gap-3">
                         <div className="flex flex-col gap-0.5">
+                            <label htmlFor="recurring_amount" className={compactLabelClass()}>
+                                {t('upcoming_expenses.amount_label')}
+                            </label>
+                            <NumericFormat
+                                getInputRef={recurringAmountRef}
+                                customInput={TextInput}
+                                id="recurring_amount"
+                                inputMode="decimal"
+                                allowNegative={false}
+                                prefix="$ "
+                                thousandSeparator={amountThousandSeparator}
+                                decimalSeparator={amountDecimalSeparator}
+                                decimalScale={2}
+                                value={recurringForm.data.amount}
+                                onValueChange={(values) => {
+                                    recurringForm.setData('amount', values.value);
+                                }}
+                                placeholder={t('upcoming_expenses.amount_placeholder')}
+                                className="h-9 py-1.5"
+                                required
+                            />
+                            <FieldError message={recurringForm.errors.amount} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
                             <label htmlFor="recurring_category_trigger" className={compactLabelClass()}>
                                 {t('expenses.category_label')}
                             </label>
@@ -504,7 +530,7 @@ export default function UpcomingExpensesRecurring({
                             selectedId={recurringForm.data.expense_category_id}
                             onSelect={(id) => {
                                 recurringForm.setData('expense_category_id', String(id));
-                                focusRecurringAmount();
+                                focusRecurringDescription();
                             }}
                             title={t('expenses.category_picker_title')}
                             closeAriaLabel={t('expense_categories.close_dialog')}
@@ -515,6 +541,7 @@ export default function UpcomingExpensesRecurring({
                                 {t('upcoming_expenses.description_label')}
                             </label>
                             <TextInput
+                                ref={recurringDescriptionRef}
                                 id="recurring_description"
                                 className="h-9 w-full py-1.5"
                                 value={recurringForm.data.description}
@@ -523,31 +550,6 @@ export default function UpcomingExpensesRecurring({
                                 autoComplete="off"
                             />
                             <FieldError message={recurringForm.errors.description} />
-                        </div>
-
-                        <div className="flex flex-col gap-0.5">
-                            <label htmlFor="recurring_amount" className={compactLabelClass()}>
-                                {t('upcoming_expenses.amount_label')}
-                            </label>
-                            <NumericFormat
-                                getInputRef={recurringAmountRef}
-                                customInput={TextInput}
-                                id="recurring_amount"
-                                inputMode="decimal"
-                                allowNegative={false}
-                                prefix="$ "
-                                thousandSeparator={amountThousandSeparator}
-                                decimalSeparator={amountDecimalSeparator}
-                                decimalScale={2}
-                                value={recurringForm.data.amount}
-                                onValueChange={(values) => {
-                                    recurringForm.setData('amount', values.value);
-                                }}
-                                placeholder={t('upcoming_expenses.amount_placeholder')}
-                                className="h-9 py-1.5"
-                                required
-                            />
-                            <FieldError message={recurringForm.errors.amount} />
                         </div>
 
                         <div className="flex flex-col gap-0.5">

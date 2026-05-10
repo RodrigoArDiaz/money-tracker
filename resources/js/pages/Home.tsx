@@ -134,6 +134,7 @@ export default function Home({
     }, [viewYear, viewMonth, createDialogOpen]);
 
     const amountRef = React.useRef<HTMLInputElement | null>(null);
+    const descriptionRef = React.useRef<HTMLInputElement | null>(null);
     const editAmountRef = React.useRef<HTMLInputElement | null>(null);
 
     const allCategoryOptions = React.useMemo(
@@ -159,8 +160,8 @@ export default function Home({
         return allCategoryOptions.find((c) => c.id === id) ?? null;
     }, [editForm.data.expense_category_id, allCategoryOptions]);
 
-    function focusAmount(): void {
-        queueMicrotask(() => amountRef.current?.focus());
+    function focusDescription(): void {
+        queueMicrotask(() => descriptionRef.current?.focus());
     }
 
     function openCreateDialog(): void {
@@ -437,6 +438,31 @@ export default function Home({
                     </DialogHeader>
                     <form onSubmit={submitExpense} className="flex w-full min-w-0 flex-col gap-3">
                         <div className="flex flex-col gap-0.5">
+                            <label htmlFor="expense_amount" className={compactLabelClass()}>
+                                {t('expenses.amount_label')}
+                            </label>
+                            <NumericFormat
+                                getInputRef={amountRef}
+                                customInput={TextInput}
+                                id="expense_amount"
+                                inputMode="decimal"
+                                allowNegative={false}
+                                prefix="$ "
+                                thousandSeparator={amountThousandSeparator}
+                                decimalSeparator={amountDecimalSeparator}
+                                decimalScale={2}
+                                value={form.data.amount}
+                                onValueChange={(values) => {
+                                    form.setData('amount', values.value);
+                                }}
+                                placeholder={t('expenses.amount_placeholder')}
+                                className="h-9 py-1.5"
+                                required
+                            />
+                            <FieldError message={form.errors.amount} />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
                             <label htmlFor="expense_category_trigger" className={compactLabelClass()}>
                                 {t('expenses.category_label')}
                             </label>
@@ -487,11 +513,30 @@ export default function Home({
                             selectedId={form.data.expense_category_id}
                             onSelect={(id) => {
                                 form.setData('expense_category_id', String(id));
-                                focusAmount();
+                                focusDescription();
                             }}
                             title={t('expenses.category_picker_title')}
                             closeAriaLabel={t('expense_categories.close_dialog')}
                         />
+
+                        <div className="flex flex-col gap-0.5">
+                            <label htmlFor="expense_description" className={compactLabelClass()}>
+                                <span>{t('expenses.description_label')}</span>{' '}
+                                <span className="font-normal text-muted-foreground">
+                                    {t('expenses.optional_suffix')}
+                                </span>
+                            </label>
+                            <TextInput
+                                ref={descriptionRef}
+                                id="expense_description"
+                                className="h-9 py-1.5"
+                                value={form.data.description}
+                                onChange={(e) => form.setData('description', e.target.value)}
+                                placeholder={t('expenses.description_placeholder')}
+                                autoComplete="off"
+                            />
+                            <FieldError message={form.errors.description} />
+                        </div>
 
                         <div className="flex flex-col gap-0.5">
                             <label htmlFor="expense_spent_on" className={compactLabelClass()}>
@@ -505,49 +550,6 @@ export default function Home({
                                 onChange={(iso) => form.setData('spent_on', iso)}
                             />
                             <FieldError message={form.errors.spent_on} />
-                        </div>
-
-                        <div className="flex flex-col gap-0.5">
-                            <label htmlFor="expense_amount" className={compactLabelClass()}>
-                                {t('expenses.amount_label')}
-                            </label>
-                            <NumericFormat
-                                getInputRef={amountRef}
-                                customInput={TextInput}
-                                id="expense_amount"
-                                inputMode="decimal"
-                                allowNegative={false}
-                                prefix="$ "
-                                thousandSeparator={amountThousandSeparator}
-                                decimalSeparator={amountDecimalSeparator}
-                                decimalScale={2}
-                                value={form.data.amount}
-                                onValueChange={(values) => {
-                                    form.setData('amount', values.value);
-                                }}
-                                placeholder={t('expenses.amount_placeholder')}
-                                className="h-9 py-1.5"
-                                required
-                            />
-                            <FieldError message={form.errors.amount} />
-                        </div>
-
-                        <div className="flex flex-col gap-0.5">
-                            <label htmlFor="expense_description" className={compactLabelClass()}>
-                                <span>{t('expenses.description_label')}</span>{' '}
-                                <span className="font-normal text-muted-foreground">
-                                    {t('expenses.optional_suffix')}
-                                </span>
-                            </label>
-                            <TextInput
-                                id="expense_description"
-                                className="h-9 py-1.5"
-                                value={form.data.description}
-                                onChange={(e) => form.setData('description', e.target.value)}
-                                placeholder={t('expenses.description_placeholder')}
-                                autoComplete="off"
-                            />
-                            <FieldError message={form.errors.description} />
                         </div>
 
                         <DialogFooter className="gap-2 sm:gap-3">
