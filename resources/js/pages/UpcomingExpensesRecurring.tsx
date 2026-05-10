@@ -444,7 +444,11 @@ export default function UpcomingExpensesRecurring({
                     }
                 }}
             >
-                <DialogContent className="max-w-lg" closeAriaLabel={t('expense_categories.close_dialog')}>
+                <DialogContent
+                    presentation="form"
+                    className="sm:max-w-lg"
+                    closeAriaLabel={t('expense_categories.close_dialog')}
+                >
                     <DialogHeader>
                         <DialogTitle>{t('upcoming_expenses.recurring.add_heading')}</DialogTitle>
                         <DialogDescription className="sr-only">
@@ -655,7 +659,11 @@ export default function UpcomingExpensesRecurring({
                     }
                 }}
             >
-                <DialogContent className="max-w-lg" closeAriaLabel={t('expense_categories.close_dialog')}>
+                <DialogContent
+                    presentation="form"
+                    className="sm:max-w-lg"
+                    closeAriaLabel={t('expense_categories.close_dialog')}
+                >
                     <DialogHeader>
                         <DialogTitle>{t('upcoming_expenses.recurring.edit_template_heading')}</DialogTitle>
                         <DialogDescription className="sr-only">

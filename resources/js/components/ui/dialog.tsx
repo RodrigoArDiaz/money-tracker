@@ -5,6 +5,13 @@ import { XIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
+/**
+ * Mobile: pantalla completa (100dvh), contenido al inicio; desde `sm`: mismo patrón centrado que el diálogo por defecto.
+ * Usar con `presentation="form"` en modales de creación/edición.
+ */
+const dialogContentFormMobileSheetClassName =
+    'inset-0 h-[100dvh] max-h-[100dvh] w-full max-w-full translate-x-0 translate-y-0 rounded-none border-0 overflow-y-auto overscroll-contain content-start items-start p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[90vh] sm:w-[calc(100%-2rem)] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:overflow-y-auto sm:content-normal sm:items-stretch sm:rounded-xl sm:border sm:border-border sm:p-6';
+
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
     return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
@@ -39,18 +46,22 @@ function DialogContent({
     children,
     showCloseButton = true,
     closeAriaLabel = 'Close',
+    presentation = 'default',
     ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
     showCloseButton?: boolean;
     closeAriaLabel?: string;
+    presentation?: 'default' | 'form';
 }) {
     return (
         <DialogPortal>
             <DialogOverlay />
             <DialogPrimitive.Content
                 data-slot="dialog-content"
+                data-dialog-presentation={presentation}
                 className={cn(
                     'fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 rounded-xl border border-border bg-popover p-6 text-popover-foreground shadow-lg duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+                    presentation === 'form' ? dialogContentFormMobileSheetClassName : null,
                     className,
                 )}
                 {...props}

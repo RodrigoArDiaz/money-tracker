@@ -315,7 +315,11 @@ export default function Index({
                     }
                 }}
             >
-                <DialogContent closeAriaLabel={t('expense_categories.close_dialog')} className="max-w-lg">
+                <DialogContent
+                    presentation="form"
+                    closeAriaLabel={t('expense_categories.close_dialog')}
+                    className="sm:max-w-lg"
+                >
                     <DialogHeader>
                         <DialogTitle>{t('expense_categories.create_heading')}</DialogTitle>
                         <DialogDescription>{t('expense_categories.create_modal_description')}</DialogDescription>
@@ -373,7 +377,11 @@ export default function Index({
                     }
                 }}
             >
-                <DialogContent closeAriaLabel={t('expense_categories.close_dialog')} className="max-w-lg">
+                <DialogContent
+                    presentation="form"
+                    closeAriaLabel={t('expense_categories.close_dialog')}
+                    className="sm:max-w-lg"
+                >
                     <DialogHeader>
                         <DialogTitle>{t('expense_categories.edit_heading')}</DialogTitle>
                         <DialogDescription>{t('expense_categories.edit_modal_description')}</DialogDescription>
