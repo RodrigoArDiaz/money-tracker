@@ -13,9 +13,36 @@
 @source '../**/*.ts';
 @source '../**/*.tsx';
 
-/* Dynamic class strings in TS are not always scanned; keep FAB / layout padding utilities emitted. */
-@source inline('bottom-[calc(1rem+4.25rem+env(safe-area-inset-bottom,0px))]');
-@source inline('max-sm:pb-[calc(4.25rem+env(safe-area-inset-bottom,0px)+0.75rem)]');
+/*
+ * Shell móvil (barra inferior + FAB): ajustá solo estas variables.
+ * Debe coincidir con el padding visual de MobileBottomNav (pt + fila + pb).
+ */
+:root {
+    --mobile-bottom-nav-height: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+    --mobile-fab-size: 4.375rem;
+    --mobile-fab-gap-above-nav: 1rem;
+    --mobile-main-scroll-tail: 0.75rem;
+}
+
+@layer utilities {
+    @media (max-width: 639px) {
+        .pb-mobile-dashboard-main {
+            padding-bottom: calc(
+                var(--mobile-bottom-nav-height) + var(--mobile-fab-gap-above-nav) + var(--mobile-fab-size) +
+                    var(--mobile-main-scroll-tail)
+            );
+        }
+
+        .mobile-fab-bottom {
+            bottom: calc(var(--mobile-fab-gap-above-nav) + var(--mobile-bottom-nav-height));
+        }
+
+        .mobile-fab-size {
+            width: var(--mobile-fab-size);
+            height: var(--mobile-fab-size);
+        }
+    }
+}
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',

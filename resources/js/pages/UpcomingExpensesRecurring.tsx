@@ -365,7 +365,7 @@ export default function UpcomingExpensesRecurring({
     return (
         <AppDashboardLayout>
             <Head title={t('upcoming_expenses.recurring.head_title')} />
-            <div className="space-y-4 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] sm:pb-0">
+            <div className="space-y-4">
                 <div
                     className={cn(
                         'flex min-w-0 flex-col gap-3 rounded-xl border border-border bg-card p-3 text-card-foreground shadow-sm',

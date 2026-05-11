@@ -39,7 +39,6 @@ import ThemeMenu from '@/components/molecules/ThemeMenu';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useTranslate } from '@/hooks/use-translate';
 import { dashboardHeaderTitleFromPath } from '@/lib/dashboard-header-title';
-import { mobileMainContentBottomPaddingClass } from '@/lib/mobile-dashboard-ui';
 import { cn } from '@/lib/utils';
 
 type AuthUser = {
@@ -248,7 +247,7 @@ export default function AppDashboardLayout({
                     <div
                         className={cn(
                             'flex flex-1 flex-col gap-4 p-4 md:p-6',
-                            mobileMainContentBottomPaddingClass,
+                            'max-sm:pb-mobile-dashboard-main',
                         )}
                     >
                         {children}

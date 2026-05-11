@@ -5,7 +5,7 @@ import * as React from 'react';
 import { useTranslate } from '@/hooks/use-translate';
 import { cn } from '@/lib/utils';
 
-/** Bottom taskbar on small screens mirroring the app sidebar destinations. */
+/** Bottom taskbar on small screens. Mantener altura acorde a `--mobile-bottom-nav-height` en `resources/css/app.css`. */
 export default function MobileBottomNav() {
     const { url } = usePage();
     const { t } = useTranslate();
@@ -58,7 +58,7 @@ export default function MobileBottomNav() {
     return (
         <nav
             className={cn(
-                'fixed inset-x-0 bottom-0 z-30 border-t border-border/80 bg-background/95 pb-[env(safe-area-inset-bottom,0px)] pt-1 backdrop-blur-md sm:hidden',
+                'fixed inset-x-0 bottom-0 z-30 border-t border-border/80 bg-background/95 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] backdrop-blur-md sm:hidden',
             )}
             aria-label={t('layout.mobile_bottom_nav_aria')}
         >
