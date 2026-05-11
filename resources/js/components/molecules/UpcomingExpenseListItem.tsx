@@ -65,9 +65,7 @@ export function UpcomingExpenseListItem({
             <p className="min-w-0 whitespace-pre-wrap break-words text-sm font-medium leading-snug text-foreground" title={row.description}>
                 {row.description}
             </p>
-        ) : (
-            <p className="text-sm italic leading-snug text-muted-foreground">{t('expenses.list_no_description')}</p>
-        );
+        ) : null;
 
     const kindBadge = (
         <Badge variant="secondary" className="max-w-[min(100%,12rem)] shrink-0 truncate font-normal" title={kindLabel}>
@@ -228,28 +226,61 @@ export function UpcomingExpenseListItem({
         />
     );
 
-    return (
-        <article className={cn(EXPENSE_CARD_CLASS_NAME, 'min-w-0 overflow-x-clip')}>
-            <div className="flex flex-col gap-3 sm:hidden">
-                <div className="flex min-w-0 flex-col gap-2">
-                    {categoryTitleRow}
-                    <p className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
-                        {formatAmountDisplay(row.amount, locale)}
+    const mobileTopActions = (
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+            {makeRecurringControl}
+            {financingPlanInfoControl}
+            {expenseActions}
+        </div>
+    );
+
+    const mobileCategoryColumn = (
+        <div className="flex min-w-0 flex-1 gap-1.5">
+            <ExpenseCategoryIcon
+                name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                className="size-5 shrink-0 text-primary/90"
+            />
+            <div
+                className={cn(
+                    'flex min-w-0 flex-col',
+                    descriptionBlock !== null || noteBlock !== null ? 'gap-1' : 'gap-0',
+                )}
+            >
+                <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                    <p className="min-w-0 max-w-full shrink truncate text-sm font-medium leading-snug text-muted-foreground">
+                        {categoryDisplayName}
                     </p>
+                    {kindBadge}
+                    {recurringBadge}
+                    {financingPlanBadge}
+                </div>
+                {(descriptionBlock !== null || noteBlock !== null) ? (
                     <div className="flex min-w-0 flex-col gap-1.5 text-left">
                         {descriptionBlock}
                         {noteBlock}
                     </div>
+                ) : null}
+            </div>
+        </div>
+    );
+
+    return (
+        <article className={cn(EXPENSE_CARD_CLASS_NAME, 'min-w-0 overflow-x-clip')}>
+            <div className="flex flex-col gap-1.5 sm:hidden">
+                <div className="flex items-start justify-between gap-2">
+                    {mobileCategoryColumn}
+                    {mobileTopActions}
                 </div>
-                <div className="flex min-w-0 flex-row flex-nowrap items-center gap-2">
+                <div className="h-px w-full bg-border/50" aria-hidden />
+                <div className="flex justify-end">
+                    <p className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
+                        {formatAmountDisplay(row.amount, locale)}
+                    </p>
+                </div>
+                <div className="flex min-w-0 flex-row flex-nowrap items-center gap-2 pt-0.5">
                     <div className="flex min-w-0 min-h-0 flex-1 items-center gap-1.5">
                         <div className="min-w-0 flex-1">{paymentSelect}</div>
                         <PaymentStatusPaidBlockedHint visible={paidOptionDisabled} />
-                    </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                        {makeRecurringControl}
-                        {financingPlanInfoControl}
-                        {expenseActions}
                     </div>
                 </div>
             </div>

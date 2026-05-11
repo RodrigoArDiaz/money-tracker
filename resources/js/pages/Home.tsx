@@ -368,6 +368,7 @@ export default function Home({
                                 >
                                     <HomeTodayTotalSummaryCard
                                         headingId={headingId}
+                                        dayDate={day.date}
                                         formattedDateHeading={formattedDayHeading}
                                         todayTotalDisplay={dayTotalDisplay}
                                         totalCaption={isToday ? undefined : t('expenses.day_total_caption')}
