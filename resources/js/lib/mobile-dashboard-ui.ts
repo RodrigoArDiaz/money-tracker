@@ -1,6 +1,6 @@
 /**
- * Mobile dashboard chrome: main column padding clears `MobileBottomNav`.
+ * Mobile dashboard chrome: main column padding clears `MobileBottomNav` (pt-1 + h-16 + safe area).
  * Class string must stay literal for Tailwind (see matching `@source inline` in app.css).
  */
 export const mobileMainContentBottomPaddingClass =
-    'max-sm:pb-[calc(3.75rem+env(safe-area-inset-bottom,0px)+0.75rem)]';
+    'max-sm:pb-[calc(4.25rem+env(safe-area-inset-bottom,0px)+0.75rem)]';

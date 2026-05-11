@@ -62,7 +62,7 @@ export default function MobileBottomNav() {
             )}
             aria-label={t('layout.mobile_bottom_nav_aria')}
         >
-            <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-0.5 px-1">
+            <div className="mx-auto flex h-16 max-w-3xl items-center justify-between gap-0.5 px-1">
                 {items.map(({ href, label, icon: Icon, isActive }) => (
                     <Link
                         key={href}
@@ -75,7 +75,7 @@ export default function MobileBottomNav() {
                         )}
                         aria-current={isActive ? 'page' : undefined}
                     >
-                        <Icon className={cn('size-5 shrink-0', isActive && 'text-primary')} aria-hidden />
+                        <Icon className={cn('size-6 shrink-0', isActive && 'text-primary')} aria-hidden />
                         <span className="line-clamp-2 max-h-8 w-full text-center text-[0.6rem] leading-tight">
                             {label}
                         </span>
