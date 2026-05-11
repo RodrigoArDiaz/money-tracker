@@ -40,7 +40,7 @@ type DefaultCategoryRow = {
 const DEFAULT_CATEGORY_ICON = 'Tag';
 
 const categoryGridClassName =
-    'm-0 grid list-none justify-start gap-2.5 p-0 [grid-template-columns:repeat(auto-fill,minmax(6.25rem,7rem))]';
+    'm-0 grid list-none justify-evenly gap-2.5 p-0 [grid-template-columns:repeat(auto-fill,minmax(6.25rem,7rem))]';
 
 export default function Index({
     categories,
@@ -159,7 +159,7 @@ export default function Index({
     return (
         <AppDashboardLayout>
             <Head title={t('expense_categories.head_title_index')} />
-            <div className="space-y-6 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] sm:pb-0">
+            <div className="space-y-6">
                 <div
                     className={cn(
                         'flex min-w-0 flex-col gap-3 rounded-xl border border-border bg-card p-3 text-card-foreground shadow-sm',
