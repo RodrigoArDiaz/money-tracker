@@ -86,7 +86,7 @@ export default function Index({
     return (
         <>
             <Head title={t('charts.head_title')} />
-            <AppDashboardLayout title={t('charts.title')}>
+            <AppDashboardLayout>
                 <div className="flex w-full min-w-0 max-w-6xl flex-col gap-6">
                     <div
                         className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3"

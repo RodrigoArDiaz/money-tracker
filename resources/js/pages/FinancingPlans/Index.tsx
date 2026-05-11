@@ -321,7 +321,7 @@ export default function FinancingPlansIndex({
     }
 
     return (
-        <AppDashboardLayout title={t('financing_plans.layout_title')}>
+        <AppDashboardLayout>
             <Head title={t('financing_plans.head_title')} />
             <div className="space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0">
                 <div
