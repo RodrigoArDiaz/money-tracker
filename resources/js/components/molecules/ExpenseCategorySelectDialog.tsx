@@ -19,7 +19,7 @@ export type ExpenseCategoryOption = {
 const DEFAULT_CATEGORY_ICON = 'Tag';
 
 const categoryGridClassName =
-    'm-0 grid list-none justify-between gap-2.5 p-0 [grid-template-columns:repeat(auto-fill,minmax(6.25rem,7rem))]';
+    'm-0 grid list-none justify-evenly gap-2.5 p-0 [grid-template-columns:repeat(auto-fill,minmax(6.25rem,7rem))]';
 
 function CategoryPickCard({
     row,
