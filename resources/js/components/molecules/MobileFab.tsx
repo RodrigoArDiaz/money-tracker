@@ -17,7 +17,7 @@ export function MobileFab({ className, ...props }: MobileFabProps) {
             size="icon"
             className={cn(
                 'fixed right-4 z-40 rounded-full shadow-lg sm:hidden touch-manipulation',
-                'bottom-[calc(1rem+3.75rem+env(safe-area-inset-bottom,0px))]',
+                'bottom-[calc(1rem+4.25rem+env(safe-area-inset-bottom,0px))]',
                 'size-[4.375rem]',
                 className,
             )}
