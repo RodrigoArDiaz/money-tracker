@@ -38,6 +38,7 @@ import MobileBottomNav from '@/components/molecules/MobileBottomNav';
 import ThemeMenu from '@/components/molecules/ThemeMenu';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useTranslate } from '@/hooks/use-translate';
+import { dashboardHeaderTitleFromPath } from '@/lib/dashboard-header-title';
 import { mobileMainContentBottomPaddingClass } from '@/lib/mobile-dashboard-ui';
 import { cn } from '@/lib/utils';
 
@@ -211,11 +212,15 @@ export default function AppDashboardLayout({
     title,
 }: {
     children: React.ReactNode;
+    /** When set, overrides the title derived from the current route. */
     title?: React.ReactNode;
 }) {
-    const { auth } = usePage<{ auth: { user: AuthUser | null } }>().props;
+    const page = usePage<{ auth: { user: AuthUser | null } }>();
+    const user = page.props.auth.user;
+    const pathOnly = page.url.split('?')[0] ?? '';
     const { t } = useTranslate();
-    const user = auth.user;
+    const headerTitle =
+        title !== undefined && title !== null ? title : dashboardHeaderTitleFromPath(pathOnly, t);
 
     return (
         <SidebarProvider>
@@ -230,7 +235,7 @@ export default function AppDashboardLayout({
                         <SidebarTrigger className="-ml-1" />
                         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                             <div className="min-w-0 text-sm font-semibold tracking-tight md:text-base">
-                                {title ?? t('dashboard.header_default')}
+                                {headerTitle}
                             </div>
                         </div>
                         <div className="flex items-center gap-1">
