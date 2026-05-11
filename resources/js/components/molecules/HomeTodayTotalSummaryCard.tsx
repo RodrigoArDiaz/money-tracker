@@ -10,10 +10,13 @@ export function HomeTodayTotalSummaryCard({
     headingId,
     totalCaption,
     totalAriaLabel,
+    dayDate,
 }: {
     formattedDateHeading: string;
     todayTotalDisplay: string;
     headingId: string;
+    /** ISO `YYYY-MM-DD` para `datetime` accesible en la fecha visible. */
+    dayDate: string;
     totalCaption?: string;
     totalAriaLabel?: string;
 }): React.ReactElement {
@@ -28,28 +31,28 @@ export function HomeTodayTotalSummaryCard({
                 {t('expenses.date_heading', { date: formattedDateHeading })}
             </h2>
             <div className="flex flex-col gap-2 sm:hidden">
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 flex-1 items-center gap-2">
                         <Sigma className="size-5 shrink-0 text-primary/90" aria-hidden />
                         <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
                             {caption}
                         </p>
                     </div>
+                    <time
+                        className="max-w-[58%] shrink-0 text-right text-xs font-medium leading-snug text-foreground sm:text-sm"
+                        dateTime={dayDate}
+                    >
+                        {formattedDateHeading}
+                    </time>
+                </div>
+                <div className="h-px w-full bg-border/50" aria-hidden />
+                <div className="flex justify-end">
                     <p
-                        className="shrink-0 text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm"
+                        className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm"
                         aria-label={totalAria}
                     >
                         {todayTotalDisplay}
                     </p>
-                </div>
-                <div className="flex items-start justify-between gap-3">
-                    <p
-                        className="min-w-0 flex-1 text-left text-xs font-medium leading-snug text-foreground sm:text-sm"
-                        aria-hidden
-                    >
-                        {t('expenses.date_heading', { date: formattedDateHeading })}
-                    </p>
-                    <span className="inline-flex w-[4.5rem] shrink-0" aria-hidden />
                 </div>
             </div>
             <header className="hidden items-center justify-between gap-3 sm:flex">

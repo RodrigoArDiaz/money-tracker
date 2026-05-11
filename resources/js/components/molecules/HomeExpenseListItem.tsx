@@ -45,14 +45,13 @@ export function HomeExpenseListItem({
     const categoryDisplayName =
         row.category_name.trim() !== '' ? row.category_name : t('expenses.list_no_category');
 
-    const descriptionBlock =
-        row.description.trim() !== '' ? (
-            <p className="min-w-0 whitespace-pre-wrap break-words text-sm font-medium leading-snug text-foreground" title={row.description}>
-                {row.description}
-            </p>
-        ) : (
-            <p className="text-sm italic leading-snug text-muted-foreground">{t('expenses.list_no_description')}</p>
-        );
+    const hasDescription = row.description.trim() !== '';
+
+    const descriptionBlock = hasDescription ? (
+        <p className="min-w-0 whitespace-pre-wrap break-words text-sm font-medium leading-snug text-foreground" title={row.description}>
+            {row.description}
+        </p>
+    ) : null;
 
     const descriptionRight = (
         <div className="flex min-w-0 flex-col gap-1.5 text-right">
@@ -124,23 +123,30 @@ export function HomeExpenseListItem({
 
     return (
         <article className={cn(EXPENSE_CARD_CLASS_NAME, 'min-w-0 overflow-x-clip')}>
-            <div className="flex flex-col gap-0 sm:hidden">
-                <div className="flex items-center justify-between gap-3">
-                    <div className="flex min-w-0 flex-1 items-center gap-2">
+            <div className="flex flex-col gap-1.5 sm:hidden">
+                <div className="flex items-start justify-between gap-2">
+                    <div className="flex min-w-0 flex-1 gap-1.5">
                         <ExpenseCategoryIcon
                             name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
                             className="size-5 shrink-0 text-primary/90"
                         />
-                        <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
-                            {categoryDisplayName}
-                        </p>
+                        <div className={cn('flex min-w-0 flex-col', hasDescription ? 'gap-1' : 'gap-0')}>
+                            <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
+                                {categoryDisplayName}
+                            </p>
+                            {hasDescription ? (
+                                <div className="min-w-0 text-left">{descriptionBlock}</div>
+                            ) : null}
+                        </div>
                     </div>
-                    <p className="shrink-0 text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
+                    <div className="flex shrink-0 items-center gap-1.5">{actionsSlot}</div>
+                </div>
+                <div className="h-px w-full bg-border/50" aria-hidden />
+                <div className="flex justify-end">
+                    <p className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
                         {formatAmountDisplay(row.amount, locale)}
                     </p>
                 </div>
-                <div className="flex min-w-0 flex-col gap-1.5 text-left">{descriptionBlock}</div>
-                <div className="flex items-center justify-end">{actionsSlot}</div>
             </div>
 
             <div className="hidden items-center gap-1.5 sm:flex sm:gap-2">

@@ -64,9 +64,7 @@ export function FinancingPlanListItem({
             <p className="min-w-0 whitespace-pre-wrap break-words text-sm font-medium leading-snug text-foreground" title={plan.description}>
                 {plan.description}
             </p>
-        ) : (
-            <p className="text-sm italic leading-snug text-muted-foreground">{t('expenses.list_no_description')}</p>
-        );
+        ) : null;
 
     const noteBlock =
         plan.note !== null && plan.note.trim() !== '' ? (
@@ -164,18 +162,39 @@ export function FinancingPlanListItem({
         </div>
     );
 
-    return (
-        <article className={cn(EXPENSE_CARD_CLASS_NAME, 'min-w-0 overflow-x-clip')}>
-            <div className="flex flex-col gap-3 sm:hidden">
-                <div className="flex min-w-0 flex-col gap-2">
-                    {categoryTitleRow}
-                    {totalAmountEl}
+    const mobileCategoryColumn = (
+        <div className="flex min-w-0 flex-1 gap-1.5">
+            <ExpenseCategoryIcon
+                name={plan.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
+                className="size-5 shrink-0 text-primary/90"
+            />
+            <div className={cn('flex min-w-0 flex-col', descriptionBlock !== null || noteBlock !== null ? 'gap-1' : 'gap-0')}>
+                <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                    <p className="min-w-0 max-w-full shrink truncate text-sm font-medium leading-snug text-muted-foreground">
+                        {categoryDisplayName}
+                    </p>
+                    {installmentsBadge}
+                    {archivedBadge}
+                </div>
+                {descriptionBlock !== null || noteBlock !== null ? (
                     <div className="flex min-w-0 flex-col gap-1.5 text-left">
                         {descriptionBlock}
                         {noteBlock}
                     </div>
+                ) : null}
+            </div>
+        </div>
+    );
+
+    return (
+        <article className={cn(EXPENSE_CARD_CLASS_NAME, 'min-w-0 overflow-x-clip')}>
+            <div className="flex flex-col gap-1.5 sm:hidden">
+                <div className="flex items-start justify-between gap-2">
+                    {mobileCategoryColumn}
+                    <div className="flex shrink-0 items-center gap-1.5">{planActions}</div>
                 </div>
-                <div className="flex items-center justify-end">{planActions}</div>
+                <div className="h-px w-full bg-border/50" aria-hidden />
+                <div className="flex justify-end">{totalAmountEl}</div>
             </div>
 
             <div className="hidden items-center gap-1.5 sm:flex sm:gap-2">
