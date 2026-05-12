@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { CalendarClock, Landmark, LayoutDashboard, PieChart, Repeat, Tags } from 'lucide-react';
+import { CalendarClock, LayoutDashboard, PieChart, Tags } from 'lucide-react';
 import * as React from 'react';
 
 import { useTranslate } from '@/hooks/use-translate';
@@ -11,10 +11,8 @@ export default function MobileBottomNav() {
     const { t } = useTranslate();
     const pathOnly = url.split('?')[0] ?? '';
 
-    const isUpcomingRecurring = pathOnly === '/upcoming-expenses/recurring';
-    const isFinancingPlans = pathOnly === '/financing-plans';
-    const isUpcomingPlanned = pathOnly === '/upcoming-expenses';
     const isHome = pathOnly === '/' || pathOnly === '';
+    const isUpcomingSection = pathOnly.startsWith('/upcoming-expenses');
 
     const items = [
         {
@@ -27,19 +25,7 @@ export default function MobileBottomNav() {
             href: '/upcoming-expenses',
             label: t('upcoming_expenses.nav_label'),
             icon: CalendarClock,
-            isActive: isUpcomingPlanned,
-        },
-        {
-            href: '/upcoming-expenses/recurring',
-            label: t('upcoming_expenses.recurring.nav_sublabel'),
-            icon: Repeat,
-            isActive: isUpcomingRecurring,
-        },
-        {
-            href: '/financing-plans',
-            label: t('financing_plans.nav_sublabel'),
-            icon: Landmark,
-            isActive: isFinancingPlans,
+            isActive: isUpcomingSection,
         },
         {
             href: '/expense-categories',
