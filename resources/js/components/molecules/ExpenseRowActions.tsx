@@ -13,6 +13,7 @@ export function ExpenseRowActions({
     deleteTooltip,
     showEdit = true,
     showDelete = true,
+    presentation = 'toolbar',
 }: {
     onEdit: () => void;
     onDelete: () => void;
@@ -24,9 +25,42 @@ export function ExpenseRowActions({
     showEdit?: boolean;
     /** Si es false, solo se muestra editar (p. ej. cuotas de un plan de financiación). */
     showDelete?: boolean;
+    /** `toolbar`: iconos con tooltip (fila). `drawerList`: filas ancho completo para menú móvil. */
+    presentation?: 'toolbar' | 'drawerList';
 }): React.ReactElement | null {
     if (!showEdit && !showDelete) {
         return null;
+    }
+
+    if (presentation === 'drawerList') {
+        return (
+            <div className="flex w-full flex-col gap-2">
+                {showEdit ? (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="h-auto min-h-11 w-full justify-start gap-3 py-2.5"
+                        onClick={onEdit}
+                        aria-label={editAriaLabel}
+                    >
+                        <Pencil className="size-4 shrink-0" aria-hidden />
+                        <span className="text-left text-sm font-medium">{editTooltip}</span>
+                    </Button>
+                ) : null}
+                {showDelete ? (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="h-auto min-h-11 w-full justify-start gap-3 py-2.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        onClick={onDelete}
+                        aria-label={deleteAriaLabel}
+                    >
+                        <Trash2 className="size-4 shrink-0" aria-hidden />
+                        <span className="text-left text-sm font-medium">{deleteTooltip}</span>
+                    </Button>
+                ) : null}
+            </div>
+        );
     }
 
     return (

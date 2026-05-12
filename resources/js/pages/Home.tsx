@@ -384,6 +384,8 @@ export default function Home({
                                             <li key={row.id}>
                                                 <HomeExpenseListItem
                                                     row={row}
+                                                    spentOnDate={day.date}
+                                                    formattedDayHeading={formattedDayHeading}
                                                     onEdit={openEdit}
                                                     onDelete={setDeletingExpense}
                                                 />
