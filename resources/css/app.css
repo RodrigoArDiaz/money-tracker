@@ -21,7 +21,7 @@
     --mobile-bottom-nav-height: calc(5.25rem + env(safe-area-inset-bottom, 0px));
     --mobile-fab-size: 4.375rem;
     --mobile-fab-gap-above-nav: 1rem;
-    --mobile-main-scroll-tail: 0.75rem;
+    --mobile-main-scroll-tail: 1.25rem;
 }
 
 @layer utilities {
