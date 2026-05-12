@@ -30,7 +30,7 @@ export function HomeTodayTotalSummaryCard({
             <h2 id={headingId} className="sr-only">
                 {t('expenses.date_heading', { date: formattedDateHeading })}
             </h2>
-            <div className="flex flex-col gap-2 sm:hidden">
+            <div className="flex flex-col gap-0.5 sm:hidden">
                 <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 flex-1 items-center gap-2">
                         <Sigma className="size-5 shrink-0 text-primary/90" aria-hidden />

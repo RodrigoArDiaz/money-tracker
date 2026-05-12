@@ -89,7 +89,7 @@ return [
         'month_expenses_section_aria' => 'Expenses this month, by day',
         'date_heading' => ':date',
         'today_total_aria' => 'Today\'s total: :amount',
-        'today_total_caption' => 'Total expenses',
+        'today_total_caption' => 'Today\'s total',
         'day_total_aria' => 'Day total: :amount',
         'day_total_caption' => 'Day total',
         'add_heading' => 'Add expense',
