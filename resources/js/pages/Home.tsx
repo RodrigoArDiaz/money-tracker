@@ -346,8 +346,8 @@ export default function Home({
                     </Button>
                 </div>
 
-                <section className="flex flex-col gap-6" aria-label={t('expenses.month_expenses_section_aria')}>
-                    {expensesByDay.map((day, index) => {
+                <section className="flex flex-col gap-3" aria-label={t('expenses.month_expenses_section_aria')}>
+                    {expensesByDay.map((day) => {
                         const isToday = day.date === today;
                         const formattedDayHeading = formatDayHeading(day.date, locale);
                         const dayTotalNumeric = sumExpenseRowsAmount(day.expenses);
@@ -355,50 +355,43 @@ export default function Home({
                         const headingId = `home-expenses-day-${day.date}`;
 
                         return (
-                            <React.Fragment key={day.date}>
-                                {index > 0 ? (
-                                    <div
-                                        className="h-px w-full shrink-0 bg-muted"
-                                        aria-hidden
-                                    />
-                                ) : null}
-                                <section
-                                    className="flex flex-col gap-2"
-                                    aria-labelledby={headingId}
-                                >
-                                    <HomeTodayTotalSummaryCard
-                                        headingId={headingId}
-                                        dayDate={day.date}
-                                        formattedDateHeading={formattedDayHeading}
-                                        todayTotalDisplay={dayTotalDisplay}
-                                        totalCaption={isToday ? undefined : t('expenses.day_total_caption')}
-                                        totalAriaLabel={
-                                            isToday
-                                                ? undefined
-                                                : t('expenses.day_total_aria', { amount: dayTotalDisplay })
-                                        }
-                                    />
-                                    {day.expenses.length === 0 ? (
-                                        isToday ? (
-                                            <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
-                                                {t('expenses.empty_today')}
-                                            </p>
-                                        ) : null
-                                    ) : (
-                                        <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-                                            {day.expenses.map((row) => (
-                                                <li key={row.id}>
-                                                    <HomeExpenseListItem
-                                                        row={row}
-                                                        onEdit={openEdit}
-                                                        onDelete={setDeletingExpense}
-                                                    />
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </section>
-                            </React.Fragment>
+                            <section
+                                key={day.date}
+                                className="flex flex-col gap-1"
+                                aria-labelledby={headingId}
+                            >
+                                <HomeTodayTotalSummaryCard
+                                    headingId={headingId}
+                                    dayDate={day.date}
+                                    formattedDateHeading={formattedDayHeading}
+                                    todayTotalDisplay={dayTotalDisplay}
+                                    totalCaption={isToday ? undefined : t('expenses.day_total_caption')}
+                                    totalAriaLabel={
+                                        isToday
+                                            ? undefined
+                                            : t('expenses.day_total_aria', { amount: dayTotalDisplay })
+                                    }
+                                />
+                                {day.expenses.length === 0 ? (
+                                    isToday ? (
+                                        <p className="rounded-xl border border-dashed border-border/60 bg-muted/5 px-4 py-6 text-center text-sm text-muted-foreground">
+                                            {t('expenses.empty_today')}
+                                        </p>
+                                    ) : null
+                                ) : (
+                                        <ul className="m-0 flex list-none flex-col gap-1 p-0">
+                                        {day.expenses.map((row) => (
+                                            <li key={row.id}>
+                                                <HomeExpenseListItem
+                                                    row={row}
+                                                    onEdit={openEdit}
+                                                    onDelete={setDeletingExpense}
+                                                />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </section>
                         );
                     })}
                 </section>
