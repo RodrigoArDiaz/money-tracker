@@ -53,12 +53,6 @@ export function HomeExpenseListItem({
         </p>
     ) : null;
 
-    const descriptionRight = (
-        <div className="flex min-w-0 flex-col gap-1.5 text-right">
-            {descriptionBlock}
-        </div>
-    );
-
     const categoryTitleRow = (
         <div className="flex min-w-0 items-start gap-2 sm:gap-3">
             <ExpenseCategoryIcon
@@ -130,38 +124,59 @@ export function HomeExpenseListItem({
                             name={row.category_icon ?? DEFAULT_EXPENSE_CATEGORY_ICON}
                             className="size-5 shrink-0 text-primary/90"
                         />
-                        <div className={cn('flex min-w-0 flex-col', hasDescription ? 'gap-1' : 'gap-0')}>
+                        <div className="flex min-w-0 flex-col gap-0">
                             <p className="min-w-0 truncate text-sm font-medium leading-snug text-muted-foreground">
                                 {categoryDisplayName}
                             </p>
-                            {hasDescription ? (
-                                <div className="min-w-0 text-left">{descriptionBlock}</div>
-                            ) : null}
                         </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-1.5">{actionsSlot}</div>
-                </div>
-                <div className="h-px w-full bg-border/50" aria-hidden />
-                <div className="flex justify-end">
-                    <p className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
+                    <p className="shrink-0 text-right text-base font-semibold tabular-nums tracking-tight text-foreground">
                         {formatAmountDisplay(row.amount, locale)}
                     </p>
+                </div>
+                <div className="h-px w-full bg-border/50" aria-hidden />
+                <div
+                    className={cn(
+                        'flex gap-2',
+                        hasDescription ? 'items-start justify-between' : 'items-center justify-end',
+                    )}
+                >
+                    {hasDescription ? (
+                        <div className="min-w-0 flex-1 pr-1 text-left">{descriptionBlock}</div>
+                    ) : null}
+                    <div
+                        className={cn(
+                            'flex shrink-0 items-center gap-1.5',
+                            hasDescription ? 'self-center sm:self-auto' : '',
+                        )}
+                    >
+                        {actionsSlot}
+                    </div>
                 </div>
             </div>
 
             <div className="hidden items-center gap-1.5 sm:flex sm:gap-2">
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                     {categoryTitleRow}
-                    <p className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
-                        {formatAmountDisplay(row.amount, locale)}
-                    </p>
                 </div>
-                <div className="flex min-h-0 min-w-0 flex-1 basis-0 flex-col gap-2 pl-1 sm:pl-1.5">
-                    {descriptionRight}
+                <div
+                    className={cn(
+                        'flex min-h-0 min-w-0 flex-1 basis-0 flex-row items-center gap-2 pl-1 sm:pl-1.5',
+                        hasDescription ? 'justify-between' : 'justify-end',
+                    )}
+                >
+                    {hasDescription ? (
+                        <div className="min-w-0 flex-1 text-left">{descriptionBlock}</div>
+                    ) : null}
+                    <div className="flex shrink-0 flex-wrap items-center gap-2 sm:gap-2.5">{actionsSlot}</div>
                 </div>
                 <div className="flex shrink-0 flex-col items-stretch gap-2 self-stretch sm:flex-row sm:items-center sm:gap-2 sm:self-auto sm:pl-2">
                     <div className="w-px shrink-0 self-stretch bg-border" aria-hidden />
-                    <div className="flex shrink-0 items-center gap-2 sm:justify-end">{actionsSlot}</div>
+                    <div className="flex shrink-0 items-center justify-end">
+                        <p className="text-right text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm">
+                            {formatAmountDisplay(row.amount, locale)}
+                        </p>
+                    </div>
                 </div>
             </div>
         </article>
