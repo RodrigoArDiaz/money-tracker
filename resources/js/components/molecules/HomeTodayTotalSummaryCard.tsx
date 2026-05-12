@@ -38,21 +38,21 @@ export function HomeTodayTotalSummaryCard({
                             {caption}
                         </p>
                     </div>
-                    <time
-                        className="max-w-[58%] shrink-0 text-right text-xs font-medium leading-snug text-foreground sm:text-sm"
-                        dateTime={dayDate}
-                    >
-                        {formattedDateHeading}
-                    </time>
-                </div>
-                <div className="h-px w-full bg-border/50" aria-hidden />
-                <div className="flex justify-end">
                     <p
-                        className="text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-sm"
+                        className="max-w-[58%] shrink-0 text-right text-base font-semibold tabular-nums tracking-tight text-foreground"
                         aria-label={totalAria}
                     >
                         {todayTotalDisplay}
                     </p>
+                </div>
+                <div className="h-px w-full bg-border/50" aria-hidden />
+                <div className="flex justify-start">
+                    <time
+                        className="max-w-full text-right text-xs font-medium leading-snug text-foreground"
+                        dateTime={dayDate}
+                    >
+                        {formattedDateHeading}
+                    </time>
                 </div>
             </div>
             <header className="hidden items-center justify-between gap-3 sm:flex">
